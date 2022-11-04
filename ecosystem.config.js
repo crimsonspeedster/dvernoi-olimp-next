@@ -7,7 +7,7 @@ module.exports = {
             script: 'npm',
             args: 'start',
             env: {
-                PORT: '3010',
+                PORT: '3001',
             }
         }
     ]
