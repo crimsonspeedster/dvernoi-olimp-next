@@ -1,0 +1,135 @@
+.about-intro {
+    &-preview {
+        width: 100%;
+        margin-bottom: 130px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 80px;
+        border-bottom: 1px solid #D4DADE;
+
+        &__side {
+            & + & {
+                margin-left: 20px;
+            }
+
+            &:nth-child(1) {
+                max-width: 500px
+            }
+
+            &:nth-child(2) {
+                max-width: 610px;
+            }
+
+            h2 {
+                font-weight: 700;
+                font-size: 27px;
+                line-height: 130%;
+                letter-spacing: -0.02em;
+                margin-bottom: 25px;
+            }
+
+            h3, h4, h5, h6 {
+                font-weight: 600;
+                font-size: 21px;
+                line-height: 160%;
+                letter-spacing: -0.02em;
+                margin-bottom: 25px;
+            }
+        }
+
+        &__photo {
+            max-width: 390px;
+            width: 100%;
+            background: #424255;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px 30px 30px;
+            margin: 0 auto 35px;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+}
+
+@media (max-width: 991px) {
+    .about-intro {
+        &-preview {
+            margin-bottom: 60px;
+        }
+
+        &-content {
+            padding-bottom: 60px;
+            align-items: flex-end;
+
+            &__title {
+                font-size: 24px;
+                line-height: 130%;
+            }
+
+            &__subtitle {
+                font-size: 18px;
+                line-height: 160%;
+            }
+
+            &__photo {
+                max-width: 215px;
+                height: 75px;
+                margin-bottom: 25px;
+                padding: 15px 10px;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .about-intro {
+        &-preview {
+            height: 200px;
+            margin-bottom: 30px;
+        }
+
+        &-content {
+            padding-bottom: 40px;
+            flex-wrap: wrap;
+
+            &__side {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0;
+
+                & + & {
+                    margin: 25px 0 0 0;
+                }
+            }
+
+            &__title {
+                margin-bottom: 15px;
+            }
+
+            &__subtitle {
+                margin-bottom: 15px;
+            }
+        }
+    }
+}

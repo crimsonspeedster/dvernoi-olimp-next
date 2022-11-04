@@ -1,0 +1,112 @@
+.thanks {
+    padding: 100px 0;
+
+    .container {
+        height: 100%;
+    }
+
+    &__inner {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    &__icon {
+        margin-bottom: 80px;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: #a4ac14;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        svg {
+            display: block;
+            stroke: #fff;
+            width: 60%;
+            height: 60%;
+        }
+    }
+
+    &__number {
+        font-weight: 700;
+        font-size: 27px;
+        line-height: 130%;
+        letter-spacing: -0.02em;
+        color: #A4AC14;
+        margin-bottom: 16px;
+    }
+
+    &__title {
+        margin-bottom: 30px;
+        font-weight: 600;
+        font-size: 43px;
+        line-height: 110%;
+        letter-spacing: -0.03em;
+    }
+
+    &__desc {
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 140%;
+        letter-spacing: -0.02em;
+        margin-bottom: 105px;
+    }
+}
+
+@media (max-width: 1366px) {
+    .thanks {
+        padding: 110px 0;
+    }
+}
+
+@media (max-width: 991px) {
+    .thanks {
+        padding: 140px 0;
+
+        &__icon {
+            margin-bottom: 60px;
+        }
+
+        &__number {
+            margin-bottom: 15px;
+            font-size: 24px;
+            line-height: 130%;
+        }
+
+        &__title {
+            margin-bottom: 25px;
+            font-size: 32px;
+            line-height: 110%;
+        }
+
+        &__desc {
+            margin-bottom: 60px;
+            font-size: 14px;
+            line-height: 140%;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .thanks {
+        padding: 60px 0 80px;
+
+        &__icon {
+            width: 70px;
+            height: 70px;
+        }
+
+        &__title {
+            margin-bottom: 15px;
+        }
+
+        &__desc {
+            margin-bottom: 40px;
+        }
+    }
+}

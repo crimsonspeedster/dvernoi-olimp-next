@@ -1,0 +1,201 @@
+.credit {
+    padding-bottom: 120px;
+
+    &__title {
+        margin-bottom: 50px;
+    }
+
+    &-tab {
+        .wrapper {
+            margin: 0 -20px;
+            width: calc(100% + 40px);
+        }
+
+        &__nav {
+            overflow: auto;
+            padding: 0 20px;
+            white-space: nowrap;
+            margin: 0 0 50px;
+
+            &-item {
+                & + & {
+                    margin-left: 25px;
+                }
+            }
+        }
+
+        &__body {
+            &-pay {
+                display: flex;
+                align-items: flex-start;
+
+                & + & {
+                    margin-top: 60px;
+                    padding-top: 60px;
+                    border-top: 1px solid #D4DADE;
+                }
+
+                &-preview {
+                    margin-right: 60px;
+
+                    &-inner {
+                        width: 275px;
+                        height: 135px;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                    }
+                }
+
+                &-content {
+
+                }
+
+                &-title {
+                    font-weight: 700;
+                    font-size: 21px;
+                    line-height: 140%;
+                    margin-bottom: 25px;
+                    text-transform: uppercase;
+                }
+
+                &-article {
+                    p, strong {
+                        font-size: 14px !important;
+                        line-height: 160% !important;
+                        letter-spacing: -0.02em !important;
+                        color: #424255 !important;
+                        margin-bottom: 15px;
+                        display: block;
+                    }
+
+                    a {
+                        color: #a4ac14;
+                    }
+
+                    h2, h3, h4, h5, h6 {
+                        margin-bottom: 15px;
+                    }
+
+                    h2 {
+                        font-size: 21px;
+                    }
+
+                    h3 {
+                        font-size: 19px;
+                    }
+
+                    h4 {
+                        font-size: 17px;
+                    }
+
+                    h5 {
+                        font-size: 15px;
+                    }
+
+                    h6 {
+                        font-size: 13px;
+                    }
+
+                    li {
+                        font-size: 14px !important;
+                        line-height: 160% !important;
+                        letter-spacing: -0.02em !important;
+                        color: #424255 !important;
+                    }
+
+                    ol {
+                        counter-reset: payList;
+                        margin-bottom: 15px;
+
+                        li {
+                            &::before {
+                                counter-increment: payList;
+                                content: counter(payList) ". ";
+                            }
+                        }
+                    }
+
+                    ul {
+                        margin-bottom: 15px;
+
+                        li {
+                            position: relative;
+                            padding-left: 10px;
+
+                            &::before {
+                                content: "";
+                                position: absolute;
+                                width: 5px;
+                                height: 5px;
+                                border-radius: 50%;
+                                background: #424255;
+                                left: 0;
+                                top: 8px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1366px) {
+    .credit {
+        &-tab__body-pay-preview {
+            margin-right: 20px;
+        }
+    }
+}
+
+@media (max-width: 991px) {
+    .credit {
+        padding-bottom: 80px;
+
+        &-tab {
+            &__nav {
+                margin: 0 0 30px;
+            }
+
+            &__body {
+                padding: 0 20px;
+
+                &-pay {
+                    flex-wrap: wrap;
+
+                    & + & {
+                        margin-top: 30px;
+                        padding-top: 30px;
+                    }
+
+                    &-preview {
+                        margin: 0 0 25px 0;
+
+                        &-inner {
+                            width: 155px;
+                            height: 75px;
+                        }
+                    }
+
+                    &-title {
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                        line-height: 140%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .credit {
+        &__title {
+            margin-bottom: 30px;
+        }
+    }
+}

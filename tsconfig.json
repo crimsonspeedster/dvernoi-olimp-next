@@ -13,7 +13,81 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "paths": {
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@pages": [
+        "pages"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@components": [
+        "src/components"
+      ],
+      "@styles/*": [
+        "styles/*"
+      ],
+      "@styles": [
+        "styles"
+      ],
+      "@services/*": [
+        "src/services/*"
+      ],
+      "@services": [
+        "src/services"
+      ],
+      "@images": [
+        "src/images"
+      ],
+      "@fonts": [
+        "src/fonts"
+      ],
+      "@fonts/*": [
+        "src/fonts/*"
+      ],
+      "@lang": [
+        "lang"
+      ],
+      "@lang/*": [
+        "lang/*"
+      ],
+      "@icons": [
+        "src/icons"
+      ],
+      "@icons/*": [
+        "src/icons/*"
+      ],
+      "@images/*": [
+        "src/images/*"
+      ],
+      "@public/*": [
+        "public/*"
+      ],
+      "@public": [
+        "public"
+      ],
+      "@utils": [
+        "src/utils"
+      ],
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@helpers": [
+        "src/helpers"
+      ],
+      "@helpers/*": [
+        "src/helpers/*"
+      ],
+      "@root/*": [
+        "src/*"
+      ],
+      "@root": [
+        "src"
+      ]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

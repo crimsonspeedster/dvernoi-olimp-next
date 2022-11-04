@@ -1,0 +1,63 @@
+.breadcrumbs {
+    padding-top: 25px;
+    white-space: nowrap;
+    overflow: auto;
+
+    &-list {
+        padding: 0 20px;
+        margin: 0 -20px;
+        display: flex;
+        align-items: center;
+        overflow: auto;
+
+        &__item {
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 15px;
+            color: #333342;
+
+            & + & {
+                margin-left: 15px;
+            }
+        }
+
+        &__link {
+            color: #A4AC14;
+            @media (min-width: 1024px) {
+                transition: color .2s ease;
+                &:hover {
+                    color: #333342;
+                }
+            }
+            @media (max-width: 1024px) {
+                transition: color .1s ease;
+                &:active {
+                    color: #333342;
+                }
+            }
+        }
+
+        &__current {
+
+        }
+
+        &__separator {
+            display: block;
+            width: 15px;
+            height: 1px;
+            background: #A4AC14;
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .breadcrumbs {
+        padding-top: calc(78px + 20px);
+    }
+}
+
+@media (max-width: 649px) {
+    .breadcrumbs {
+        padding-top: calc(65px + 20px);
+    }
+}

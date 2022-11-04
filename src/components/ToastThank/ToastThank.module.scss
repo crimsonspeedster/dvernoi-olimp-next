@@ -1,0 +1,75 @@
+.toast-thank {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 80px;
+    min-height: 250px;
+    min-width: 1280px;
+    background: url('./thankbg.jpg') center no-repeat;
+    background-size: cover;
+    position: relative;
+
+    @media screen and (max-width: 1899px) {
+        min-width: 800px;
+    }
+
+    @media screen and (max-width: 1199px) {
+        min-width: 500px;
+        min-height: 150px;
+    }
+
+    @media screen and (max-width: 575px) {
+        min-width: calc(100vw - 20px);
+        min-height: 120px;
+        padding: 12px 20px;
+    }
+
+    &::before {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        width: calc(100% - 30px);
+        height: calc(100% - 30px);
+        border: 1px solid #A4AC14;
+        content: '';
+
+        @media screen and (max-width: 575px) {
+            top: 10px;
+            left: 10px;
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
+        }
+    }
+
+    &__message {
+        font-weight: 700;
+        font-size: 27px;
+        line-height: 130%;
+        letter-spacing: -0.02em;
+        color: #fff;
+        padding-left: 24px;
+        border-left: 2px solid #A4AC14;
+        position: relative;
+        z-index: 2;
+
+        @media screen and (max-width: 1199px) {
+            font-size: 14px;
+            padding-left: 5px;
+            font-weight: 500;
+        }
+
+        @media screen and (max-width: 575px) {
+            font-weight: 300;
+            border-left: 0;
+            padding-left: 0;
+        }
+    }
+
+    &__img {
+        @media screen and (max-width: 1199px) {
+            width: 50px;
+            height: auto;
+        }
+    }
+}

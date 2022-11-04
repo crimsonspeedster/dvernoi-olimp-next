@@ -1,0 +1,48 @@
+.toast {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    transition: all ease .4s;
+
+    &.active {
+        z-index: 100;
+        opacity: 1;
+    }
+
+    &-overlay {
+        background: #424255;
+        opacity: .7;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    &-container {
+        position: absolute;
+        z-index: 2;
+        top: 35px;
+        color: red;
+        transition: all ease .4s;
+        right: -300vw;
+
+        @media screen and (max-width: 575px) {
+            top: 10px;
+        }
+
+        &.active {
+            right: 35px;
+
+            @media screen and (max-width: 575px) {
+                right: 10px;
+            }
+        }
+    }
+}

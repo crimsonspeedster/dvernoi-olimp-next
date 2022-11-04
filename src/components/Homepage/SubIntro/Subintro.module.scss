@@ -1,0 +1,234 @@
+.main-subintro {
+    position: relative;
+    padding: 125px 0 135px;
+
+    &__top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 40px;
+    }
+
+    &__title {
+        max-width: 380px;
+    }
+
+    &__desc {
+        max-width: 390px;
+    }
+
+    &__inner {
+        display: flex;
+        gap: 30px 60px;
+    }
+
+    &__item {
+        width: calc(100% / 3);
+        padding: 0 30px;
+    }
+}
+
+@media (max-width: 1366px) {
+    .main-subintro {
+        &__inner {
+            margin: 0 -10px;
+            gap: 30px;
+        }
+
+        &__item {
+            padding: 0 10px;
+        }
+    }
+}
+
+@media (max-width: 1024px) {
+    .main-subintro {
+        padding: 80px 0;
+
+        &__top {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        &__title {
+            margin-bottom: 25px;
+        }
+
+        &__desc {
+            max-width: 100%;
+            padding: 0 40px;
+        }
+
+        &__inner {
+            margin: 0 -15px;
+        }
+
+        &__item {
+            padding: 0 15px;
+
+            &-inner {
+                height: 360px;
+            }
+
+            &-title {
+                max-width: 100%;
+            }
+
+            &-info,
+            &-links {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        }
+    }
+}
+
+@media (max-width: 694px) {
+    .main-subintro {
+        padding: 50px 0 80px;
+
+        &__inner {
+            margin: 0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        &__desc {
+            padding: 0 0 0 20px;
+        }
+
+        &__item {
+            padding: 0;
+            width: 100%;
+
+            & + & {
+                margin-top: 20px;
+            }
+
+            &-inner {
+                height: 300px;
+            }
+
+            &-info {
+                padding: 25px;
+                justify-content: flex-start;
+            }
+
+            &-info,
+            &-links {
+                align-items: flex-start;
+            }
+
+            &-title {
+                margin-bottom: 25px;
+            }
+
+            &-btn-wrapper {
+                margin-top: auto;
+                width: 100%;
+            }
+
+            &-btn {
+                width: 100%;
+            }
+        }
+    }
+}
+.filter-item {
+    &__inner {
+        position: relative;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        &::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(0deg, rgba(66, 66, 85, 0.8), rgba(66, 66, 85, 0.8));
+        }
+    }
+
+    &__info {
+        padding: 40px 25px 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+    }
+
+    &__title {
+        font-weight: 700;
+        font-size: 21px;
+        line-height: 140%;
+        letter-spacing: -0.03em;
+        color: #fff;
+        margin-bottom: 15px;
+        max-width: 130px;
+    }
+
+    &__links {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+
+        & + & {
+            margin-top: 8px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        &__link:hover &__text {
+            color: #A4AC14;
+        }
+    }
+    @media (max-width: 1024px) {
+        &__link:active &__text {
+            color: #A4AC14;
+        }
+    }
+
+    &__text {
+        font-size: 15px;
+        line-height: 18px;
+        color: #fff;
+        @media (min-width: 1024px) {
+            transition: color .2s ease;
+        }
+        @media (max-width: 1024px) {
+            transition: color .1s ease;
+        }
+    }
+
+    &__icon {
+        display: block;
+        width: 5px;
+        height: 10px;
+        margin-left: 8px;
+        pointer-events: none;
+
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            stroke: #A4AC14;
+        }
+    }
+
+    &__btn-wrapper {
+        margin-top: 15px;
+    }
+}

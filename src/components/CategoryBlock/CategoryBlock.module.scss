@@ -1,0 +1,191 @@
+.main-intro__catalog-wrapper {
+    margin-right: 16px;
+
+    .main-intro__catalog {
+        background: #F1F1FA;
+        border: 1px solid #D4DADE;
+    }
+
+    .main-intro__catalog-item-icon {
+        img {
+            filter: brightness(.2);
+        }
+    }
+
+    .main-intro__catalog-item-text {
+        color: #414042;
+    }
+
+    .main-intro__catalog-dropdown {
+        background: #F1F1FA;
+        border-top: 1px solid #D4DADE;
+        border-right: 1px solid #D4DADE;
+        border-bottom: 1px solid #D4DADE;
+    }
+
+    .main-intro__catalog-dropdown-title {
+        color: #424255;
+    }
+
+    .main-intro__catalog-dropdown-list-link {
+        color: #424255;
+    }
+
+    .main-intro__catalog-list-item {
+        @media (min-width: 1024px) {
+            &:hover {
+                background: rgba(#000, .05);
+            }
+        }
+        @media (max-width: 1024px) {
+            &:active {
+                background: rgba(#000, .05);
+            }
+        }
+    }
+}
+
+.main-intro__catalog {
+    width: 290px;
+    height: 100%;
+    padding: 10px 0;
+
+    &-list {
+        &-item {
+            @media (min-width: 1024px) {
+                &:hover {
+                    .main-intro__catalog-dropdown {
+                        opacity: 1;
+                        visibility: visible;
+                        pointer-events: auto;
+                        transition-delay: .1s;
+                    }
+                }
+            }
+        }
+    }
+
+    &-item-link {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 10px 16px;
+        position: relative;
+        @media (min-width: 1024px) {
+            transition: background .2s ease;
+        }
+        @media (max-width: 1024px) {
+            transition: background .1s ease;
+        }
+    }
+
+    &-item-icon {
+        width: 25px;
+        height: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 8px;
+    }
+
+    &-item-text {
+        font-weight: 600;
+        font-size: 15px;
+        line-height: 18px;
+        letter-spacing: -0.03em;
+    }
+
+    &-item-arrow {
+        pointer-events: none;
+        display: block;
+        width: 10px;
+        height: 20px;
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            stroke: #A4AC14;
+        }
+    }
+
+    &-dropdown {
+        position: absolute;
+        z-index: 90;
+        right: 0;
+        left: 290px;
+        top: 0;
+        bottom: 0;
+        padding: 23px 40px;
+        display: flex;
+        align-items: flex-start;
+        transition: all .2s ease 0s;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        &-item {
+            flex-grow: 1;
+
+            & + & {
+                margin-left: 15px;
+            }
+        }
+
+        &-title {
+            font-size: 12px;
+            line-height: 160%;
+            text-transform: uppercase;
+            margin-bottom: 23px;
+        }
+
+        &-list {
+            &-item {
+                @media (min-width: 1024px) {
+                    &:hover {
+                        .main-intro__catalog-dropdown-list-link {
+                            color: #A4AC14;
+                        }
+                    }
+                }
+                @media (max-width: 1024px) {
+                    &:active {
+                        .main-intro__catalog-dropdown-list-link {
+                            color: #A4AC14;
+                        }
+                    }
+                }
+            }
+
+            &-link {
+                font-size: 12px;
+                line-height: 15px;
+                @media (min-width: 1024px) {
+                    transition: color .2s ease;
+                }
+                @media (max-width: 1024px) {
+                    transition: color .1s ease;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 1366px) {
+    .main-intro__catalog {
+        width: 275px;
+
+        &-dropdown {
+            padding: 20px;
+            left: 275px;
+
+            &-title {
+                margin-bottom: 15px;
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+.about-videoblog {
+    padding: 120px 0;
+
+    &__title {
+        margin-bottom: 50px;
+    }
+
+    &__inner {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 55px 60px;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+}
