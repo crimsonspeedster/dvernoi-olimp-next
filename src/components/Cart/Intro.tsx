@@ -1,13 +1,12 @@
 import React, {useContext} from 'react';
 import Link from "next/link";
 import styles from './Intro.module.scss';
-import QuickModal from '@components/Modal/QuickModal';
-import {PrefixContext} from '@components/context/PrefixContext';
+// import QuickModal from '@components/Modal/QuickModal';
+// import {PrefixContext} from '@components/context/PrefixContext';
 import productImg from '@images/single-product.jpg';
 import classNames from "classnames";
 
 const CartIntro = () => {
-    let prefix = useContext(PrefixContext);
 
     return (
         <section className={classNames(styles['cart'], 'intro')}>
@@ -77,7 +76,7 @@ const CartIntro = () => {
                     </div>
 
                     <div className={classNames(styles['cart__footer'], styles['cart-footer'])}>
-                        <Link href={`${prefix}/`}>
+                        <Link href="/">
                           <a className={classNames(styles['cart-footer__btn'], styles['cart-footer__btn--back'])}>Назад к покупкакам</a>
                         </Link>
 
@@ -97,7 +96,7 @@ const CartIntro = () => {
                                 Быстрый заказ
                             </button>
 
-                            <Link href={`${prefix}checkout/`}>
+                            <Link href={`checkout/`}>
                               <a className={classNames(styles['cart-footer__btn'], styles['cart-footer__btn--checkout'])}>Перейти к оформлению</a>
                             </Link>
                         </div>
@@ -105,7 +104,7 @@ const CartIntro = () => {
                 </div>
             </div>
 
-            <QuickModal/>
+            {/*<QuickModal/>*/}
         </section>
     );
 }

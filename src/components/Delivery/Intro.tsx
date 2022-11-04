@@ -8,6 +8,7 @@ import {SettingsContext} from "@pages/_app";
 import {If, Then} from "react-if";
 import {AcfDataProps} from "@root/templates/DeliveryTemplate";
 import Image from "next/image";
+import {menuItemProp} from "@components/Header/interfaces";
 
 interface DeliveryIntroProps {
     title: string,
@@ -77,7 +78,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
 
                             <article className={styles['delivery-block__article']}>
                                 <p>
-                                    Дверной Олимп сотрудничает только с перевозчиком "Новая почта", так как у него
+                                    Дверной Олимп сотрудничает только с перевозчиком Новая почта, так как у него
                                     обязательным является страхование товара, и в случае потери, повреждения и т.п.
                                     возмещается стоимость, указанная в страховке.
                                 </p>
@@ -114,7 +115,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                                             <li>на двери, купленные без коробки и наличника;</li>
                                             <li>на двери стоимостью до 8000 грн, ф-ры до 1000 грн;</li>
                                             <li>если двери не складские, а под заказ.</li>
-                                            <li>если в карточке товара, не отмечена "Бесплатная доставка Новой Почтой.
+                                            <li>если в карточке товара, не отмечена Бесплатная доставка Новой Почтой.
                                             </li>
                                             <li>на г. Киев и радиус 50 км от черты Киева, г.Одесса и радиус 50 км от
                                                 черты Одесы.
@@ -131,7 +132,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                                             таком случае необходима 100% предоплата, так как наложенный платеж
                                             осуществляется только в отделении. Если клиент изначально оформил доставку
                                             на склад, можно в телефонном режиме Новой Почте, заказать услугу
-                                            "Переадресация", которую необходимо будет оплатить клиенту при получении
+                                            Переадресация, которую необходимо будет оплатить клиенту при получении
                                             товара дома.
                                         </p>
                                         <span className="quote">Доставка груза обычно осуществляется за 1-3 дня.</span>
@@ -284,10 +285,10 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                                 <strong>Для оформления заказа необходимо:</strong>
                                 <ul>
                                     <li>выбрать товар, подтвердить наличие и оформить накладную;</li>
-                                    <li>оплатить предоплату если товар в наличии, 70% - если товар "под заказ", либо
+                                    <li>оплатить предоплату если товар в наличии, 70% - если товар под заказ, либо
                                         100% предоплату (если необходима Адресная доставка);
                                     </li>
-                                    <li>остальную часть суммы доплатить по услуге "наложенный платеж*" на отделении
+                                    <li>остальную часть суммы доплатить по услуге наложенный платеж* на отделении
                                         Новой Почты, после осмотра товара.
                                     </li>
                                 </ul>
@@ -405,7 +406,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                                 <p className="green-text">
                                     В случае отказа от заказа, предоплата в размере 15% которая являлась стоимостью
                                     услуги доставки Новой Почтой (если складской товар), и полная предоплата если товар
-                                    "под заказ", НЕ возвращается, в том случае когда эта услуга уже выполнена.
+                                    под заказ, НЕ возвращается, в том случае когда эта услуга уже выполнена.
                                 </p>
                             </article>
                         </div>
@@ -486,7 +487,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles["delivery-block__header"]}>
                                 <div className={styles["delivery-block__header-title"]}>Товариство з обмеженою відповідальністю
-                                    "Дверний Олімп"
+                                    Дверний Олімп
                                 </div>
                             </div>
                             <article className={styles["delivery-block__article"]}>
@@ -509,7 +510,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
 
                                             <div className={styles['delivery-block__links-inner']}>
                                                 {
-                                                    settingsCtx.shop_addresses.map((item, i:number) => (
+                                                    settingsCtx.shop_addresses.map((item:menuItemProp, i:number) => (
                                                         <div key={i} className={styles['delivery-block__links-item']}>
                                                             <div className={styles['delivery-block__links-title']}>{item.label}</div>
 

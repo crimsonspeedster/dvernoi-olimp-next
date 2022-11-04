@@ -1,4 +1,4 @@
-import React, {useState, useContext} from 'react'
+import React, {useState, useContext, FormEvent} from 'react'
 import Link from "next/link";
 import sprite from '@icons/sprite.svg';
 import styles from './Header.module.scss';
@@ -7,7 +7,7 @@ import classNames from "classnames";
 const MobileSearch = () => {
     let [search, setSearch] = useState<string>('')
 
-    const submitForm = e => {
+    const submitForm = (e:FormEvent) => {
         e.preventDefault()
     }
 

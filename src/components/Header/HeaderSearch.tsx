@@ -1,4 +1,4 @@
-import React, {useState, useContext, Dispatch, SetStateAction} from 'react';
+import React, {useState, useContext, Dispatch, SetStateAction, FormEvent} from 'react';
 import Link from "next/link";
 import sprite from '@icons/sprite.svg';
 import styles from './Header.module.scss';
@@ -13,7 +13,7 @@ interface HeaderSearchProps {
 const HeaderSearch:React.FC<HeaderSearchProps> = ({isOpenSearch, setIsOpenSearch}) => {
     let [search, setSearch] = useState<string>('');
 
-    const submitForm = e => {
+    const submitForm = (e:FormEvent) => {
         e.preventDefault()
 
         setIsOpenSearch(false);

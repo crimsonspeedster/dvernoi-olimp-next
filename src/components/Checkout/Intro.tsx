@@ -5,12 +5,10 @@ import styles from './Intro.module.scss';
 import CheckoutInfo from './CheckoutInfo'
 import CheckoutContent from './CheckoutContent'
 import classNames from "classnames";
-// import {PrefixContext} from '@components/context/PrefixContext';
 
 
 const CheckoutIntro = () => {
     // PrefixContext
-    let prefix = useContext('');
 
     const [isMobileList, setIsMobileList] = useState<boolean>(false);
 

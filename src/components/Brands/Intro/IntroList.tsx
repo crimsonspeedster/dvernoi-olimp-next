@@ -1,13 +1,10 @@
 import React, {useContext} from 'react';
 import Link from "next/link";
 import styles from './Intro.module.scss';
-import {PrefixContext} from '@components/context/PrefixContext';
 import brandsLogo from '@images/brands-logo.png';
 import classNames from "classnames";
 
 const BrandsIntroList = () => {
-    let prefix = useContext(PrefixContext);
-
     return (
         <div className={styles['brands__inner']}>
             {
@@ -24,7 +21,7 @@ const BrandsIntroList = () => {
                                 <p className={styles['brands-item__desc']}>Нас знают и любят благодаря тому, что фабрика дверей Папа Карло зарекомендовала себя как производитель дверей №1 на рынке</p>
 
                                 <div className={styles['brands-item__btn-wrapper']}>
-                                    <Link href={`${prefix}single-brand/`}>
+                                    <Link href={`single-brand/`}>
                                       <a className={styles['brands-item__btn']}>Узнать больше</a>
                                     </Link>
                                 </div>

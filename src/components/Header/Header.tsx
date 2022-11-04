@@ -25,11 +25,14 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
     const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
     const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
 
+    //@ts-ignore
     const closeSchedule = (e:Event) => !e?.target?.closest('.header-schedule') && setIsOpenSchedule(false)
 
     const openSubmenu = (e:Event) => {
         let target = e.currentTarget,
+            //@ts-ignore
             submenuParent = target?.parentElement?.parentElement?.parentElement?.parentElement,
+            //@ts-ignore
             submenuTarget = target?.nextElementSibling;
 
         submenuTarget.classList.add(menuStyles['open'])
@@ -39,7 +42,9 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
 
     const closeSubmenu = (e:Event) => {
         let target = e.currentTarget,
+            //@ts-ignore
             submenuParent = target?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement,
+            //@ts-ignore
             submenuTarget = target?.parentElement;
 
         submenuParent.classList.remove(styles['open'])
@@ -54,7 +59,9 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
 
     const openSubsubmenu = (e:Event) => {
         let target = e.currentTarget,
+            //@ts-ignore
             subSubmenuParent = target?.parentElement?.parentElement?.parentElement,
+            //@ts-ignore
             subSubmenuTarget = target?.nextElementSibling;
 
         subSubmenuTarget.classList.add(menuStyles['open'])
@@ -63,7 +70,9 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
 
     const closeSubsubmenu = (e:Event) => {
         let target = e.currentTarget,
+            //@ts-ignore
             subSubmenuParent = target?.parentElement?.parentElement.parentElement.parentElement,
+            //@ts-ignore
             subSubmenuTarget = target?.parentElement;
 
         subSubmenuParent.classList.remove(menuStyles['close'])
