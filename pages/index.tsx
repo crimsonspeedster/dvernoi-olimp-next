@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {GetServerSideProps} from "next";
+import {GetServerSideProps, GetStaticProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
 import {GetMenu} from "@components/Layout/graphql";
@@ -58,7 +58,7 @@ const Home:React.FC<HomeProps> = (props) => {
 
 export default Home;
 
-export const getServerSideProps:GetServerSideProps = async ({locale}) => {
+export const getStaticProps:GetStaticProps = async ({locale}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
