@@ -25,16 +25,39 @@ const Home = () => {
     // } = props;
 
     useEffect(() => {
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
+        const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
             params: {
                 slug: 'home',
                 lang: 'ru',
                 acf_format: 'standard'
             }
-        })
-            .then((res) => {
-                console.log(res);
-            });
+        });
+
+        const settingsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/options`, {
+            params: {
+                lang: 'ru',
+                id: 'acf-theme-general-settings',
+                acf_format: 'standard'
+            }
+        });
+
+        const recentPosts = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/posts/`, {
+            params: {
+                lang: 'ru',
+                page: 1,
+                per_page: 6
+            }
+        });
+
+        const res = await axios.all([pageRequest, settingsRequest, recentPosts]).then(axios.spread(function(page, settings, recentPosts) {
+            // return {
+            //     page: page.data[0],
+            //     settings: settings.data,
+            //     recentPosts: recentPosts.data
+            // };
+
+            console.log(page.data, settings.data, recentPosts.data);
+        }));
     })
 
     console.log('work');
