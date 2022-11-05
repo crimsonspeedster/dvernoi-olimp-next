@@ -21,8 +21,6 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
     const header_top_menu: menuItemProp[] = settingsCtx.header_top;
     const catalog_menu: menuItemProp[] = settingsCtx.header_catalog;
 
-    console.log(settingsCtx);
-
     return (
         <nav className={styles['menu']}>
             <ul className={classNames(styles['menu__list'], styles['menu-list'])}>

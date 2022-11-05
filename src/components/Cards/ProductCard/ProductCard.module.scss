@@ -169,6 +169,10 @@
         color: #414042;
         align-self: flex-start;
         transition: all ease .4s;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
 
         &:hover {
             color: #A4AC14;

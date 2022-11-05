@@ -54,7 +54,6 @@ const Callback = () => {
                                         .then(function (response) {
                                             setToastStatus(true);
                                             setSubmitting(false);
-                                            console.log(response);
                                         })
                                         .catch(function (error) {
                                             console.log(error);

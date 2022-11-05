@@ -60,57 +60,53 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
     } = props;
 
     return (
-        <If condition={in_stock}>
-            <Then>
-                <div className={classNames(styles['productCard'], `product-${id}`)}>
-                    <span className={styles['productCard__sku']}>Код: {sku}</span>
+        <div className={classNames(styles['productCard'], `product-${id}`)}>
+            <span className={styles['productCard__sku']}>Код: {sku}</span>
 
-                    <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
-                        <Then>
-                            <div className={styles['productCard-labels']}>
-                                {
-                                    labels.new_card &&
-                                    <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
-                                }
+            <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
+                <Then>
+                    <div className={styles['productCard-labels']}>
+                        {
+                            labels.new_card &&
+                            <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
+                        }
 
-                                {
-                                    labels.sale &&
-                                    <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
-                                }
+                        {
+                            labels.sale &&
+                            <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
+                        }
 
-                                {
-                                    labels.is_hit &&
-                                    <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
-                                }
+                        {
+                            labels.is_hit &&
+                            <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
+                        }
 
-                                {
-                                    labels.video &&
-                                    <span className={styles['productCard-label--video']}>
-                                        <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
-                                    </span>
-                                }
-                            </div>
-                        </Then>
-                    </If>
-
-                    <div className={styles['productCard__img']}>
-                        <Image width={160} height={288} src={images.default} alt={name} />
+                        {
+                            labels.video &&
+                            <span className={styles['productCard-label--video']}>
+                                <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
+                            </span>
+                        }
                     </div>
+                </Then>
+            </If>
 
-                    <div className={styles['productCard-row']}>
-                        <p className={styles['productCard__stock']}>В наличии</p>
-                    </div>
+            <div className={styles['productCard__img']}>
+                <Image width={160} height={288} src={images.default} alt={name} />
+            </div>
 
-                    <Link href={`/product/`} className={styles['productCard__title']}>{name}</Link>
+            <div className={styles['productCard-row']}>
+                <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
+            </div>
 
-                    <div className={styles['productCard-bottom']}>
-                        <p className={styles['productCard__price']}>{(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+            <Link href={`/product/`} className={styles['productCard__title']}>{name}</Link>
 
-                        <Link className={classNames('button', styles['productCard__btn'])} href="/">Купить</Link>
-                    </div>
-                </div>
-            </Then>
-        </If>
+            <div className={styles['productCard-bottom']}>
+                <p className={styles['productCard__price']}>{(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+
+                <Link className={classNames('button', styles['productCard__btn'])} href="/">Купить</Link>
+            </div>
+        </div>
     );
 }
 

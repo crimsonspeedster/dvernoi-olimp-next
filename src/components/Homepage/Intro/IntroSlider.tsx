@@ -78,7 +78,7 @@ const IntroSlider:React.FC<IntroSliderProps> = ({slider}) => {
 
                     <span className={classNames(styles['main-intro__slider-separator'], 'slider-counter__separator')}>/</span>
 
-                    <span className={classNames(styles['main-intro__slider-total'], 'slider-counter__total')}>4</span>
+                    <span className={classNames(styles['main-intro__slider-total'], 'slider-counter__total')}>{slider.length}</span>
                 </div>
 
                 <div className={classNames(styles['main-intro__slider-pagination'], 'slider-pagination')} />

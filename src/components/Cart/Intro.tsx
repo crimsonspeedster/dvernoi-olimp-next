@@ -1,10 +1,10 @@
 import React, {useContext} from 'react';
 import Link from "next/link";
 import styles from './Intro.module.scss';
-// import QuickModal from '@components/Modal/QuickModal';
-// import {PrefixContext} from '@components/context/PrefixContext';
 import productImg from '@images/single-product.jpg';
 import classNames from "classnames";
+// import QuickModal from '@components/Modal/QuickModal';
+
 
 const CartIntro = () => {
 

@@ -7,7 +7,6 @@ import {SettingsContext} from "@pages/_app";
 import HeadHTML from "@components/Layout/Head";
 import Layout from "@components/Layout";
 import HomeTemplate from "@root/templates/Home";
-import partners from "@components/Partners/Partners";
 
 interface HomeProps {
     pageData: any,
@@ -24,8 +23,6 @@ const Home:React.FC<HomeProps> = (props) => {
         menus,
         recentPosts
     } = props;
-
-    console.log(pageData.acf);
 
     return (
         <>

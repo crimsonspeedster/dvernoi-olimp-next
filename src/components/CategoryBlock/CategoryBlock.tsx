@@ -16,8 +16,6 @@ interface CategoryBlockProps {
 const CategoryBlock:React.FC<CategoryBlockProps> = ({className}) => {
     const settingsCtx = useContext(SettingsContext).menus.header_catalog;
 
-    console.log(settingsCtx);
-
     return (
         <div className={classNames(styles['main-intro__catalog-wrapper'], className)}>
             <div className={styles['main-intro__catalog']}>

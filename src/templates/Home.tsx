@@ -47,8 +47,6 @@ const HomeTemplate:React.FC<HomeTemplateProps> = (props) => {
         top_group
     } = props;
 
-    console.log(recentPosts);
-
     return (
         <>
             <MainIntro

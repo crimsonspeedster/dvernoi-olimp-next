@@ -160,10 +160,12 @@
     }
 
     &-slide {
-        //height: 100% !important;
+        &:not(.swiper-slide--default) {
+            height: 100%;
+        }
 
         &--default {
-            height: auto !important;
+            height: auto;
 
             &:global(.product) {
                 max-width: calc(100% / 4);

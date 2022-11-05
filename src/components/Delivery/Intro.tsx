@@ -24,8 +24,6 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
 
     const settingsCtx = useContext(SettingsContext).menus;
 
-    console.log(acf);
-
     return (
         <section className={classNames(styles['delivery'], 'intro')}>
             <div className="container">
