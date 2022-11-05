@@ -49,7 +49,7 @@ const Home = () => {
             }
         });
 
-        const res = await axios.all([pageRequest, settingsRequest, recentPosts]).then(axios.spread(function(page, settings, recentPosts) {
+        axios.all([pageRequest, settingsRequest, recentPosts]).then(axios.spread(function(page, settings, recentPosts) {
             // return {
             //     page: page.data[0],
             //     settings: settings.data,
