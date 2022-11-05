@@ -86,6 +86,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
     });
 
     const res = await axios.all([pageRequest, settingsRequest, recentPosts]).then(axios.spread(function(page, settings, recentPosts) {
+        console.log(pageRequest);
+
         return {
             page: page.data[0],
             settings: settings.data,
