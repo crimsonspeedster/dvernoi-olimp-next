@@ -25,7 +25,7 @@ const Home = () => {
     // } = props;
 
     useEffect(() => {
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}pages/`, {
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
             params: {
                 slug: 'home',
                 lang: 'ru',
