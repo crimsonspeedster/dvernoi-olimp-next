@@ -39,6 +39,8 @@ const Dostavka:React.FC<DostavkaProps> = (props) => {
         company: pageData.acf.company
     }
 
+    console.log(pageData.acf);
+
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
     return (

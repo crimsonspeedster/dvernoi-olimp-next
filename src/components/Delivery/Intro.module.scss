@@ -67,6 +67,7 @@
                 display: flex;
                 justify-content: space-between;
                 flex-wrap: wrap;
+                gap: 5px;
 
                 & ~ em {
                     margin-bottom: 15px;
@@ -179,16 +180,22 @@
             }
         }
 
-        p.green-text {
+        .green-text {
             color: #A4AC14;
             font-weight: 600;
             padding: 15px 0;
             border-top: 1px solid #D4DADE;
             border-bottom: 1px solid #D4DADE;
             margin: 30px 0;
+
+            &:last-child {
+                border-bottom: 0;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
         }
 
-        p {
+        p:not(:last-child) {
             margin-bottom: 25px;
 
             strong {

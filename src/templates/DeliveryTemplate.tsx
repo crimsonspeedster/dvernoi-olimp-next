@@ -70,7 +70,7 @@ interface cities_repeaterProps {
 interface pickupProps {
     title: string,
     icon: PhotoProps,
-    repeater_conditions: repeater_conditionsProps,
+    repeater_conditions: repeater_conditionsProps[],
     description_after_conditions: string,
     repeater_store: repeater_storeProps[],
     description_after_store: string

@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
         {
-            name: 'ui',
+            name: 'frontend',
             exec_mode: 'cluster',
             instances: 1, // Or a number of instances
             script: 'npm',

@@ -5,7 +5,7 @@ import sprite from '@icons/sprite.svg';
 import classNames from "classnames";
 import Banner from "@components/Banner/Banner";
 import {SettingsContext} from "@pages/_app";
-import {If, Then} from "react-if";
+import {Else, If, Then} from "react-if";
 import {AcfDataProps} from "@root/templates/DeliveryTemplate";
 import Image from "next/image";
 import {menuItemProp} from "@components/Header/interfaces";
@@ -66,75 +66,34 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#car`}/>
-                                    </svg>
+                                    <Image src={acf.delivery.icon.url} alt={acf.delivery.icon.alt} width={acf.delivery.icon.width} height={acf.delivery.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>ДОСТАВКА</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.delivery.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
-                                <p>
-                                    Дверной Олимп сотрудничает только с перевозчиком Новая почта, так как у него
-                                    обязательным является страхование товара, и в случае потери, повреждения и т.п.
-                                    возмещается стоимость, указанная в страховке.
-                                </p>
+                                {
+                                    acf.delivery.description_before &&
+                                    <div dangerouslySetInnerHTML={{__html: acf.delivery.description_before}} />
+                                }
 
                                 <div className={styles['delivery-subblock']}>
-                                    <div className={styles['delivery-subblock__item']}>
-                                        <strong>1. Доставка до склада Новой Почты, при заказе:</strong>
-                                        <ul>
-                                            <li>от 8000 грн - бесплатно*, при условии, что это будет указано в счете
-                                                Дверного Олимпа, так как продавец предварительно должен проверить,
-                                                подпадает ли Ваш заказ под акцию;
-                                            </li>
-                                            <li>
-                                                до 8000 грн - за счет Покупателя, по тарифам Новой Почты (расчет
-                                                ориентировочной стоимости**);
-                                                <em>** - Дверной Олимп не несет ответственности за перевозку и тарифы
-                                                    перевозчика, за это несет ответственность сам Перевозчик</em>
-                                            </li>
-                                            <li>от 1000 грн - бесплатно на доставку фурнитуры.</li>
-                                            <li>на двери, сума заказа которых - до 3000 грн (на фурнитуру до 800грн) -
-                                                кроме оплаты клиентом доставки Новой Почтой, плюс 150 грн доплата за
-                                                доставку со склада Дверной Олимп до склада отправки Новой Почты;
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    {
+                                        acf.delivery.repeater_description.map((item, i) => (
+                                            <div key={i} className={styles['delivery-subblock__item']}>
+                                                <strong>{item.title}</strong>
 
-                                    <div className={styles['delivery-subblock__item']}>
-                                        <strong>*Акция бесплатной доставки НЕ действует:</strong>
-                                        <ul>
-                                            <li>на заказы с применением НДС;</li>
-                                            <li>на некоторие модели дверей ТМ Омис и Новий Стиль, ТМ Брама, (ТМ Стилгард
-                                                Forza, Un, Torre, Fuomo, Polo, Tech) -уточняйте у менеджеров;
-                                            </li>
-                                            <li>на двери, купленные без коробки и наличника;</li>
-                                            <li>на двери стоимостью до 8000 грн, ф-ры до 1000 грн;</li>
-                                            <li>если двери не складские, а под заказ.</li>
-                                            <li>если в карточке товара, не отмечена Бесплатная доставка Новой Почтой.
-                                            </li>
-                                            <li>на г. Киев и радиус 50 км от черты Киева, г.Одесса и радиус 50 км от
-                                                черты Одесы.
-                                            </li>
-                                        </ul>
-                                    </div>
+                                                <div dangerouslySetInnerHTML={{__html: item.description}} />
+                                            </div>
+                                        ))
+                                    }
 
-                                    <div className={styles['delivery-subblock__item']}>
-                                        <strong>*2. Адресная доставка:</strong>
-                                        <p>
-                                            Возможно оформить Адресную доставку - с доплатой разницы между стоимостью
-                                            доставки на отделение и адресной доставкой домой клиенту, в момент
-                                            оформления заказа, по тарифам Новой Почты. Согласно правил Новой Почты, в
-                                            таком случае необходима 100% предоплата, так как наложенный платеж
-                                            осуществляется только в отделении. Если клиент изначально оформил доставку
-                                            на склад, можно в телефонном режиме Новой Почте, заказать услугу
-                                            Переадресация, которую необходимо будет оплатить клиенту при получении
-                                            товара дома.
-                                        </p>
-                                        <span className="quote">Доставка груза обычно осуществляется за 1-3 дня.</span>
-                                    </div>
+                                    <If condition={acf.delivery.description_after}>
+                                        <Then>
+                                            <span className={styles['quote']}>{acf.delivery.description_after}</span>
+                                        </Then>
+                                    </If>
                                 </div>
                             </article>
                         </div>
@@ -142,183 +101,169 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#card`}/>
-                                    </svg>
+                                    <Image src={acf.delivery_price.icon.url} alt={acf.delivery_price.icon.alt} width={acf.delivery_price.icon.width} height={acf.delivery_price.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>СТОИМОСТЬ ДОСТАВКИ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.delivery_price.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
-                                <h5>КИЕВ - 490 грн</h5>
+                                <h5>{acf.delivery_price.price_kiev}</h5>
 
-                                <h5>Киевская область — 490 грн*. (до подъезда) в следующие населенные пункты:</h5>
+                                <h5>{acf.delivery_price.price_kiev_region}</h5>
 
-                                <div className={styles['delivery-block__article-inner']}>
-                                    <div className={styles['delivery-block__article-item']}>Борисполь</div>
-                                    <div className={styles['delivery-block__article-item']}>Вишневое (бесплатно)*</div>
-                                    <div className={styles['delivery-block__article-item']}>Ирпень</div>
-                                    <div className={styles['delivery-block__article-item']}>Петроп. Борщаговка</div>
-                                    <div className={styles['delivery-block__article-item']}>Боярка (бесплатно)*</div>
-                                    <div className={styles['delivery-block__article-item']}>Ворзель</div>
-                                    <div className={styles['delivery-block__article-item']}>Коцюбинское</div>
-                                    <div className={styles['delivery-block__article-item']}>Пуща-Водица</div>
-                                    <div className={styles['delivery-block__article-item']}>Бровары</div>
-                                    <div className={styles['delivery-block__article-item']}>Вышгород (бесплатно)*</div>
-                                    <div className={styles['delivery-block__article-item']}>Крюковщина (бесплатно)*</div>
-                                    <div className={styles['delivery-block__article-item']}>Романовка</div>
-                                    <div className={styles['delivery-block__article-item']}>Буча</div>
-                                    <div className={styles['delivery-block__article-item']}>Гостомель</div>
-                                    <div className={styles['delivery-block__article-item']}>Петровское</div>
-                                    <div className={styles['delivery-block__article-item']}>Соф. Борщаговка</div>
-                                </div>
-                                <em>* - при заказе до 7000 грн. доплата + 200 грн за доставку</em>
-                                <em>Для городов, не указанных выше в радиусе 40 км от черты Киева - 490грн +
-                                    14грн/км</em>
-                                <h3>ОДЕССА - 390грн, Одесская обл. в радиусе до 40 км - 390 грн + 14грн/км. (от 40 км -
-                                    доставка Новой Почтой либо доплата 14 грн за км)</h3>
-                                <em>***Заказы, стоимостью до 6000 грн, которые заказаны в Одессе со склада в Киеве -
-                                    отправляются путем доставки Перевозчика за доп плату.</em>
+                                <If condition={acf.delivery_price.cities_repeater.length}>
+                                    <Then>
+                                        <div className={styles['delivery-block__article-inner']}>
+                                            {
+                                                acf.delivery_price.cities_repeater.map((item, i) => (
+                                                    <div key={i} className={styles['delivery-block__article-item']}>{item.title}</div>
+                                                ))
+                                            }
+                                        </div>
+                                    </Then>
+                                </If>
+
+                                {
+                                    acf.delivery_price.description_after_cities &&
+                                    <div dangerouslySetInnerHTML={{__html: acf.delivery_price.description_after_cities}} />
+                                }
+
+                                {
+                                    acf.delivery_price.price_odessa &&
+                                    <h3>{acf.delivery_price.price_odessa}</h3>
+                                }
+
+                                {
+                                    acf.delivery_price.description_after_odessa &&
+                                    <div dangerouslySetInnerHTML={{__html: acf.delivery_price.description_after_odessa}} />
+                                }
                             </article>
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#user-check`}/>
-                                    </svg>
+                                    <Image src={acf.pickup.icon.url} alt={acf.pickup.icon.alt} width={acf.pickup.icon.width} height={acf.pickup.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>САМОВЫВОЗ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.pickup.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
                                 <ul>
-                                    <li>Предварительно уточняете у менеджеров наличие необходимого товара.</li>
-                                    <li>Оформляете заявку и узнаете адрес склада или магазина, в котором находится
-                                        заказ.
-                                    </li>
-                                    <li>Оплачиваете и отгружаете купленный товар.</li>
+                                    {
+                                        acf.pickup.repeater_conditions.map((item, i) => (
+                                            <li key={i}>{item.text}</li>
+                                        ))
+                                    }
                                 </ul>
-                                <p className="green-text">
-                                    Плата за доставку с нашего склада в один из магазинов сети Дверной Олимп (для
-                                    осуществления оттуда самовывоза) будет равняться стоимости доставки в город
-                                    магазина, откуда будет делаться самовывоз клиентом. При самовывозе со склада
-                                    Дверного Олимпа - без дополнительной оплаты (при стоимости заказа от 3000грн)
-                                </p>
+
+                                <div className={styles['green-text']} dangerouslySetInnerHTML={{__html: acf.pickup.description_after_conditions}} />
+
                                 <strong>Адреса складов:</strong>
+
                                 <ul>
-                                    <li>г. Ирпень (ул. Антонова, 11-А)</li>
-                                    <li>г. Одесса (пр-т Небесной Сотни (Маршала Жукова), 3а) .</li>
+                                    {
+                                        acf.pickup.repeater_store.map((item, i) => (
+                                            <li key={i}>{item.adress}</li>
+                                        ))
+                                    }
                                 </ul>
-                                <p className="green-text">
-                                    Внимание: склад консультаций и услуг погрузки товара не предоставляет! Задача склада
-                                    - отпустить товар, предварительно оформленный Вами. По любым вопросам обращайтесь в
-                                    офис.
-                                </p>
+
+                                <div className={styles['green-text']} dangerouslySetInnerHTML={{__html: acf.pickup.description_after_store}} />
                             </article>
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#express-car`}/>
-                                    </svg>
+                                    <Image src={acf.express.icon.url} alt={acf.express.icon.alt} width={acf.express.icon.width} height={acf.express.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>Экспресс-доставка</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.express.title}</div>
                             </div>
 
-                            <article className={styles['delivery-block__article']}>
-                                <p>
-                                    При условии заказа до 13:00 осуществляется на следующий день, по г. Киев, г. Ирпень,
-                                    г. Буча (др. города по согласованию). Стоимость - 950 грн.
-                                </p>
-                                <p>
-                                    (Минимальная стоимость заказа 5000 грн.)
-                                </p>
-                            </article>
+                            <article className={styles['delivery-block__article']} dangerouslySetInnerHTML={{__html: acf.express.description}} />
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#portmone`}/>
-                                    </svg>
+                                    <Image src={acf.delivery_payment.icon.url} alt={acf.delivery_payment.icon.alt} width={acf.delivery_payment.icon.width} height={acf.delivery_payment.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>ОПЛАТА ДОСТАВКИ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.delivery_payment.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
                                 <ul>
-                                    <li>Наложенным платежом, на отделении Новой Почты;</li>
-                                    <li>На банковскую карту Visa/MasterCard - с указанием назначения платежа и номером
-                                        заказа.**
-                                    </li>
-                                    <li>Безналичный расчет на р/с предприятия, с НДС или без НДС.</li>
+                                    {
+                                        acf.delivery_payment.payment_repeater.map((item, i) => (
+                                            <li key={i}>{item.text}</li>
+                                        ))
+                                    }
                                 </ul>
-                                <em>** - Будьте осторожны! Не пересылайте деньги тем, кто требует не указывать/оставлять
-                                    пустое место назначение платежа. Это могут быть мошенники. Особенно могут вызвать
-                                    подозрение те интернет-магазины, у которых нет своих магазинов оффлайн.</em>
+
+                                {
+                                    acf.delivery_payment.description_after &&
+                                    <div dangerouslySetInnerHTML={{__html: acf.delivery_payment.description_after}} />
+                                }
                             </article>
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#note`}/>
-                                    </svg>
+                                    <Image src={acf.checkout_steps.icon.url} alt={acf.checkout_steps.icon.alt} width={acf.checkout_steps.icon.width} height={acf.checkout_steps.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>ЭТАПЫ ОФОРМЛЕНИЯ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.checkout_steps.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
-                                <strong>Для оформления заказа необходимо:</strong>
+                                <strong>{acf.checkout_steps.description_before}</strong>
+
                                 <ul>
-                                    <li>выбрать товар, подтвердить наличие и оформить накладную;</li>
-                                    <li>оплатить предоплату если товар в наличии, 70% - если товар под заказ, либо
-                                        100% предоплату (если необходима Адресная доставка);
-                                    </li>
-                                    <li>остальную часть суммы доплатить по услуге наложенный платеж* на отделении
-                                        Новой Почты, после осмотра товара.
-                                    </li>
+                                    {
+                                        acf.checkout_steps.step_repeater.map((item, i) => (
+                                            <li key={i}>{item.text}</li>
+                                        ))
+                                    }
                                 </ul>
-                                <em>* - за его проведение Перевозчик берет комиcсию около 20 грн + 2% от суммы
-                                    перевода</em>
+
+                                {
+                                    acf.checkout_steps.description_after &&
+                                    <div dangerouslySetInnerHTML={{__html: acf.checkout_steps.description_after}} />
+                                }
                             </article>
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#achive`}/>
-                                    </svg>
+                                    <Image src={acf.advantages.icon.url} alt={acf.advantages.icon.alt} width={acf.advantages.icon.width} height={acf.advantages.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>ПРЕИМУЩЕСТВА</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.advantages.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
                                 <ul>
-                                    <li>Оплата клиентами осуществляется согласно официальных реквизитов, с указанием в
-                                        назначении платежа номера заказа.
-                                    </li>
-                                    <li>Будьте внимательны! Не отправляйте ваши деньги на личные карты, в особенности,
-                                        если просят ничего не указывать в поле назначения платежа. Это могут быть
-                                        мошенники!
-                                    </li>
-                                    <li>Наличие у нас оффлайн сети (т.е. стационарных магазинов) подтверждает нашу
-                                        надежность по сравнению с другими интернет-магазинами, имеющими лишь сайт,
-                                        который можно удалить за считанные минуты.
-                                    </li>
+                                    {
+                                        acf.advantages.repeater.map((item, i) => (
+                                            <If condition={item.description} key={i}>
+                                                <Then>
+                                                    <li>{item.title}</li>
+
+                                                    <li>{item.description}</li>
+                                                </Then>
+                                                <Else>
+                                                    <li>{item.title}</li>
+                                                </Else>
+                                            </If>
+                                        ))
+                                    }
                                 </ul>
                             </article>
                         </div>
