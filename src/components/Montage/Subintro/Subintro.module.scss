@@ -1,0 +1,151 @@
+.montage-subintro {
+    padding-bottom: 120px;
+
+    &__title {
+        max-width: 380px;
+        margin-bottom: 40px;
+    }
+
+    &__block {
+        margin-bottom: 45px;
+
+        &>*:not(:last-child) {
+            margin-bottom: 15px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 15px;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 9px;
+                width: 5px;
+                height: 5px;
+                background: #a4ac14;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    &__table {
+        border: 1px solid #D4DADE;
+
+        &-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 40px;
+
+            &:first-child {
+                padding: 15px 40px;
+
+                .montage-subintro__table-title,
+                .montage-subintro__table-value {
+                    font-weight: 700;
+                    font-size: 16px;
+                    line-height: 140%;
+                    letter-spacing: -0.02em;
+                    text-transform: uppercase;
+                    color: #414042;
+                }
+            }
+
+            &:nth-child(odd) {
+                background: rgba(164, 172, 20, 0.08);
+            }
+
+            &:nth-child(even) {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            & + & {
+                border-top: 1px solid #D4DADE;
+            }
+        }
+
+        &-title {
+            width: 50%;
+            font-weight: 500;
+        }
+
+        &-value {
+            width: 50%;
+            font-weight: 500;
+        }
+    }
+}
+
+@media (max-width: 991px) {
+    .montage-subintro {
+        padding-bottom: 80px;
+
+        &__title {
+            margin-bottom: 25px;
+        }
+
+        &__block {
+            margin-bottom: 30px;
+        }
+
+        &__table {
+            &-row {
+                padding: 15px;
+
+                &:nth-child(1) {
+                    padding: 15px;
+
+                    .montage-subintro__table-title,
+                    .montage-subintro__table-value {
+                        font-size: 14px;
+                        line-height: 140%;
+                    }
+                }
+            }
+
+            &-title {
+                width: 70%;
+            }
+
+            &-value {
+                width: 30%;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .montage-subintro {
+        &__title {
+            margin-bottom: 20px;
+        }
+
+        &__block {
+            margin-bottom: 10px;
+        }
+
+        &__table {
+            &-row {
+                &:nth-child(1) {
+                    .montage-subintro__table-title,
+                    .montage-subintro__table-value {
+                        font-size: 12px;
+                        line-height: 140%;
+                    }
+                }
+            }
+
+            &-title,
+            &-value {
+                font-size: 12px;
+                line-height: 160%;
+            }
+
+            &-value {
+                text-align: right;
+                margin-left: 15px;
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+.privacy-intro {
+    padding-bottom: 120px;
+
+    &__title {
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 991px) {
+    .privacy-intro {
+        padding-bottom: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .privacy-intro {
+        &__title {
+            margin-bottom: 25px;
+        }
+    }
+}

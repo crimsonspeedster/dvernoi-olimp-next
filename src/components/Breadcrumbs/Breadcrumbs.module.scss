@@ -25,7 +25,7 @@
             color: #A4AC14;
             @media (min-width: 1024px) {
                 transition: color .2s ease;
-                &:hover {
+                &[href]:hover {
                     color: #333342;
                 }
             }

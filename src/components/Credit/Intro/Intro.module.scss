@@ -12,19 +12,41 @@
         }
 
         &__nav {
-            overflow: auto;
+            overflow-x: auto;
             padding: 0 20px;
             white-space: nowrap;
             margin: 0 0 50px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            max-width: 100%;
+            column-gap: 25px;
 
             &-item {
-                & + & {
-                    margin-left: 25px;
+                transition: all ease .4s;
+                border-bottom: 1px solid transparent;
+
+                &:hover:not(.active) {
+                    cursor: pointer;
+                    color: #A4AC14;
+                }
+
+                &.active {
+                    border-bottom: 1px solid #A4AC14;
+                    color: #A4AC14;
                 }
             }
         }
 
         &__body {
+            &-item {
+                opacity: 0 !important;
+
+                &:global(.swiper-slide-active) {
+                    opacity: 1 !important;
+                }
+            }
+
             &-pay {
                 display: flex;
                 align-items: flex-start;

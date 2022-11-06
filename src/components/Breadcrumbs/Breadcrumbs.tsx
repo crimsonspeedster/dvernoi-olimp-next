@@ -28,6 +28,9 @@ const Breadcrumbs:React.FC<BreadcrumbsProps> = ({list}) => {
                                             <Then>
                                                 <Link className={styles['breadcrumbs-list__link']} href={breadcrumb.item ?? '/'}>{breadcrumb.name}</Link>
                                             </Then>
+                                            <Else>
+                                                <span className={styles['breadcrumbs-list__link']}>{breadcrumb.name}</span>
+                                            </Else>
                                         </If>
                                     </li>
 

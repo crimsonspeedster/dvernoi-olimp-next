@@ -1,7 +1,9 @@
-import React, {Dispatch, SetStateAction} from 'react'
+import React, {Dispatch, SetStateAction, useContext} from 'react'
 import styles from './Header.module.scss';
 import sprite from '@icons/sprite.svg';
 import classNames from "classnames";
+import {workTimeProps} from "@components/Footer/FooterContacts";
+import {SettingsContext} from "@pages/_app";
 
 
 interface HeaderScheduleProps {
@@ -10,11 +12,13 @@ interface HeaderScheduleProps {
 }
 
 const HeaderSchedule:React.FC<HeaderScheduleProps> = ({isOpenSchedule, setIsOpenSchedule}) => {
+    const settingsCtx = useContext(SettingsContext).settings;
+
     return (
         <div className={classNames(styles['header__schedule'], styles['header-schedule'])}>
             <div className={styles['header-schedule__title']}>(бесплатно с любого номера)</div>
 
-            <a className={styles['header-schedule__phone']} href="tel:380800339827">0 800 339 827</a>
+            <a className={styles['header-schedule__phone']} href={settingsCtx.header_phone.url}>{settingsCtx.header_phone.title}</a>
 
             <div className={styles['header-schedule__list']}>
                 <div
@@ -37,17 +41,15 @@ const HeaderSchedule:React.FC<HeaderScheduleProps> = ({isOpenSchedule, setIsOpen
                     />
 
                     <div className={styles['header-schedule__panel-inner']}>
-                        <div className={styles['header-schedule__panel-item']}>
-                            <div className={styles['header-schedule__panel-title']}>пн-пт</div>
+                        {
+                            settingsCtx.wort_time_repeater.map((item:workTimeProps, i:number) => (
+                                <div key={i} className={styles['header-schedule__panel-item']}>
+                                    <div className={styles['header-schedule__panel-title']}>{item.days}</div>
 
-                            <div className={styles['header-schedule__panel-val']}>09:00-21:00</div>
-                        </div>
-
-                        <div className={styles['header-schedule__panel-item']}>
-                            <div className={styles['header-schedule__panel-title']}>сб-вс</div>
-
-                            <div className={styles['header-schedule__panel-val']}>09:00-21:00</div>
-                        </div>
+                                    <div className={styles['header-schedule__panel-val']}>{item.time}</div>
+                                </div>
+                            ))
+                        }
                     </div>
                 </div>
             </div>

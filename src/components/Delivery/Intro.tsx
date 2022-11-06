@@ -271,26 +271,27 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#post`}/>
-                                    </svg>
+                                    <Image src={acf.rules_nova_powta.icon.url} alt={acf.rules_nova_powta.icon.alt} width={acf.rules_nova_powta.icon.width} height={acf.rules_nova_powta.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>ПРАВИЛА НОВОЙ ПОЧТЫ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.rules_nova_powta.title}</div>
                             </div>
 
                             <article className={styles['delivery-block__article']}>
                                 <ul>
-                                    <li>
-                                        при отправке обязательным является покупка обриштовки для дверей (что
-                                        гарантирует клиенту целостность товара и возмещение средств, в случае
-                                        повреждения), поэтому цена за доставку увеличивается примерно на 150-180 грн*;
-                                        <em>* - для просчета стоимости в тарифах отмечайте пункт обриштовка.</em>
-                                    </li>
-                                    <li>также обязательным является страхование товара (его оплачивает Дверной Олимп).
-                                        Что страхует клиента от получения битого товара, ибо в таком случае Новая Почта
-                                        возмещает стоимость!
-                                    </li>
+                                    {
+                                        acf.rules_nova_powta.repeater_rules.map((item, i) => (
+                                            <li key={i}>
+                                                {item.title}
+
+                                                <If condition={item.description}>
+                                                    <Then>
+                                                        <em>{item.description}</em>
+                                                    </Then>
+                                                </If>
+                                            </li>
+                                        ))
+                                    }
                                 </ul>
                             </article>
                         </div>
@@ -298,153 +299,99 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#clock`}/>
-                                    </svg>
+                                    <Image src={acf.delivery_time.icon.url} alt={acf.delivery_time.icon.alt} width={acf.delivery_time.icon.width} height={acf.delivery_time.icon.height} />
                                 </div>
-                                <div className={styles['delivery-block__header-title']}>ВРЕМЯ ДОСТАВКИ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.delivery_time.title}</div>
                             </div>
 
-                            <article className={styles['delivery-block__article']}>
-                                <p>10.00 - 19.00. Выходные дни: суббота, воскресенье.</p>
-                            </article>
+                            <article className={styles['delivery-block__article']} dangerouslySetInnerHTML={{__html: acf.delivery_time.description}} />
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#schedule`}/>
-                                    </svg>
+                                    <Image src={acf.delivery_date.icon.url} alt={acf.delivery_date.icon.alt} width={acf.delivery_date.icon.width} height={acf.delivery_date.icon.height} />
                                 </div>
 
-                                <div className={styles['delivery-block__header-title']}>ВРЕМЯ ДОСТАВКИ</div>
+                                <div className={styles['delivery-block__header-title']}>{acf.delivery_date.title}</div>
                             </div>
 
-                            <article className={styles['delivery-block__article']}>
-                                <p>
-                                    Доставка заказа 1-3 рабочих дня, при условии наличия товара на складе. Но, если
-                                    нужно очень срочно, звоните! Мы приложим все усилия, чтобы помочь Вам.
-                                </p>
-                            </article>
+                            <article className={styles['delivery-block__article']} dangerouslySetInnerHTML={{__html: acf.delivery_date.description}} />
                         </div>
 
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles['delivery-block__header']}>
                                 <div className={styles['delivery-block__header-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#user-check`}/>
-                                    </svg>
+                                    <Image src={acf.receipt_goods.icon.url} alt={acf.receipt_goods.icon.alt} width={acf.receipt_goods.icon.width} height={acf.receipt_goods.icon.height} />
                                 </div>
 
-                                <div className={styles["delivery-block__header-title"]}>ПОЛУЧЕНИЕ ТОВАРА</div>
+                                <div className={styles["delivery-block__header-title"]}>{acf.receipt_goods.title}</div>
                             </div>
                             <article className={styles["delivery-block__article"]}>
                                 <ul>
-                                    <li>Покупатель обязан при получении товара осмотреть его и при наличии претензий
-                                        оформить соответствующую рекламацию на отделении Новой почты.
-                                    </li>
-                                    <li>Покупатель обязуется следить за сроками доставки товара самостоятельно.</li>
+                                    {
+                                        acf.receipt_goods.repeater.map((item, i) => (
+                                            <li key={i}>{item.text}</li>
+                                        ))
+                                    }
                                 </ul>
-                                <p className="green-text">
-                                    В случае отказа от заказа, предоплата в размере 15% которая являлась стоимостью
-                                    услуги доставки Новой Почтой (если складской товар), и полная предоплата если товар
-                                    под заказ, НЕ возвращается, в том случае когда эта услуга уже выполнена.
-                                </p>
+
+                                {
+                                    acf.receipt_goods.description_after &&
+                                    <p className={styles['green-text']}>{acf.receipt_goods.description_after}</p>
+                                }
                             </article>
                         </div>
+
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles["delivery-block__header"]}>
                                 <div className={styles["delivery-block__header-icon"]}>
-                                    <svg>
-                                        <use href={`${sprite.src}#pen`}/>
-                                    </svg>
+                                    <Image src={acf.before_get.icon.url} alt={acf.before_get.icon.alt} width={acf.before_get.icon.width} height={acf.before_get.icon.height} />
                                 </div>
-                                <div className={styles["delivery-block__header-title"]}>ПРИ ПОЛУЧЕНИИ ТОВАРА</div>
+
+                                <div className={styles["delivery-block__header-title"]}>{acf.before_get.title}</div>
                             </div>
-                            <article className={styles["delivery-block__article"]}>
-                                <p>
-                                    Покупатель обязан осмотреть товар и подписать акт-приема передачи. Претензии к
-                                    внешнему виду и механическим повреждениям (не касается заводских дефектов) Вы можете
-                                    предъявить только во время передачи Вам товара продавцом. Ссылка на то, что
-                                    Покупатель не осмотрел товар (или плохо осмотрел), что торопил водитель, плохое
-                                    освещение, испачканный товар и др. причины — не являются основанием для возврата или
-                                    обмена товара после отъезда водителя.
-                                </p>
-                            </article>
+                            <article className={styles["delivery-block__article"]} dangerouslySetInnerHTML={{__html: acf.before_get.description}} />
                         </div>
+
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles["delivery-block__header"]}>
                                 <div className={styles["delivery-block__header-icon"]}>
-                                    <svg>
-                                        <use href={`${sprite.src}#peoples`}/>
-                                    </svg>
+                                    <Image src={acf.climb.icon.url} alt={acf.climb.icon.alt} width={acf.climb.icon.width} height={acf.climb.icon.height} />
                                 </div>
-                                <div className={styles["delivery-block__header-title"]}>ПОДЪЕМ</div>
+
+                                <div className={styles["delivery-block__header-title"]}>{acf.climb.title}</div>
                             </div>
+
                             <article className={styles["delivery-block__article"]}>
                                 <div className={styles['delivery-block__table']}>
-                                    <div className={styles['delivery-block__table-row']}>
-                                        <div className={styles['delivery-block__table-row-item']}>ПОДЪЕМ</div>
-                                        <div className={styles['delivery-block__table-row-item']}>ВХОДНЫЕ</div>
-                                        <div className={styles['delivery-block__table-row-item']}>МЕЖКОМНАТНЫЕ/ПЛИНТУС</div>
-                                    </div>
-                                    <div className={styles["delivery-block__table-row"]}>
-                                        <div className={styles['delivery-block__table-row-item']}>По ступенькам</div>
-                                        <div className={styles['delivery-block__table-row-item']}>
-                                            <p>
-                                                технические, эконом до 7000 грн: 70 грн./этаж, но не менее 300 грн.
-                                            </p>
-                                            <p>
-                                                входные от 7000 грн - 80грн/этаж, но не менее 450 грн.
-                                            </p>
-                                            <p>
-                                                двустворчатые - по договоренности.
-                                            </p>
-                                        </div>
-                                        <div className={styles['delivery-block__table-row-item']}>60 грн./этаж</div>
-                                    </div>
-                                    <div className={styles["delivery-block__table-row"]}>
-                                        <div className={styles['delivery-block__table-row-item']}>Грузовой лифт</div>
-                                        <div className={styles['delivery-block__table-row-item']}>300 грн.</div>
-                                        <div className={styles['delivery-block__table-row-item']}>60 грн.</div>
-                                    </div>
-                                    <div className={styles["delivery-block__table-row"]}>
-                                        <div className={styles['delivery-block__table-row-item']}>Занос на 1-й этаж (или частный
-                                            дом)
-                                        </div>
-                                        <div className={styles['delivery-block__table-row-item']}>300 грн. (двустворчатые по
-                                            договоренности)
-                                        </div>
-                                        <div className={styles['delivery-block__table-row-item']}>60 грн.</div>
-                                    </div>
+                                    {
+                                        acf.climb.table_repeater.map((item, i) => (
+                                            <div key={i} className={styles['delivery-block__table-row']}>
+                                                <div className={styles['delivery-block__table-row-item']} dangerouslySetInnerHTML={{__html: item.column_1}} />
+
+                                                <div className={styles['delivery-block__table-row-item']} dangerouslySetInnerHTML={{__html: item.column_2}} />
+
+                                                <div className={styles['delivery-block__table-row-item']} dangerouslySetInnerHTML={{__html: item.column_3}} />
+                                            </div>
+                                        ))
+                                    }
                                 </div>
-                                <p>
-                                    Если проезд к месту разгрузки затруднен, доставка будет осуществлена максимально
-                                    близко к месту планируемой выгрузки без нарушения правил дорожного движения и
-                                    вероятности повреждения автомобиля, а перенос товара считается как подъем на этаж за
-                                    каждые 30 метров.
-                                </p>
+
+                                {
+                                    acf.climb.description_after &&
+                                    <div dangerouslySetInnerHTML={{__html: acf.climb.description_after}} />
+                                }
                             </article>
                         </div>
+
                         <div className={classNames(styles['delivery__block'], styles['delivery-block'])}>
                             <div className={styles["delivery-block__header"]}>
-                                <div className={styles["delivery-block__header-title"]}>Товариство з обмеженою відповідальністю
-                                    Дверний Олімп
-                                </div>
+                                <div className={styles["delivery-block__header-title"]}>{acf.company.title}</div>
                             </div>
+
                             <article className={styles["delivery-block__article"]}>
-                                <p>
-                                    <strong>Місцезнаходження юридичної особи:</strong>
-                                    04114, м. Київ, вулиця Автозаводська, будинок 29-А, приміщення 4
-                                </p>
-                                <p>
-                                    <strong>
-                                        Дата та номер запису в Єдиному державному реєстрі юридичних осіб та фізичних
-                                        осіб-підприємців про проведення державної реєстрації:
-                                        <span>29.10.2015, 1 069 102 0000 035539</span>
-                                    </strong>
-                                </p>
+                                <div dangerouslySetInnerHTML={{__html: acf.company.description}} />
 
                                 <If condition={settingsCtx.shop_addresses}>
                                     <Then>
