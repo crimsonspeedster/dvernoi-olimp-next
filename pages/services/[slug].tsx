@@ -12,7 +12,7 @@ import SingleDefault from "@root/templates/SingleDefault/SingleDefault";
 import Credit from "@root/templates/services/Credit";
 import MontageTemplate from "@root/templates/services/Montage";
 import Error from "next/error";
-import FourOhFour from "@pages/404";
+// import FourOhFour from "@pages/404";
 
 
 interface ServiceSingleProps {
@@ -28,26 +28,26 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
         menus,
     } = props;
 
-    if (!pageData.id) {
-        return (
-            <FourOhFour
-                settingsData={settingsData}
-                menus={menus}
-                pageData={{
-                    translated_slugs: [
-                        {
-                            lang: 'ru',
-                            slug: 'home'
-                        },
-                        {
-                            lang: 'uk',
-                            slug: 'home'
-                        }
-                    ]
-                }}
-            />
-        );
-    }
+    // if (!pageData.id) {
+    //     return (
+    //         <FourOhFour
+    //             settingsData={settingsData}
+    //             menus={menus}
+    //             pageData={{
+    //                 translated_slugs: [
+    //                     {
+    //                         lang: 'ru',
+    //                         slug: 'home'
+    //                     },
+    //                     {
+    //                         lang: 'uk',
+    //                         slug: 'home'
+    //                     }
+    //                 ]
+    //             }}
+    //         />
+    //     );
+    // }
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
