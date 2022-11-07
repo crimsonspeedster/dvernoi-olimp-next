@@ -1,17 +1,21 @@
 import React, {useEffect} from "react";
 import {GetServerSideProps} from "next";
-import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
-import {GetMenu} from "@components/Layout/graphql";
-import {SettingsContext} from "@pages/_app";
-import HeadHTML from "@components/Layout/Head";
-import Layout from "@components/Layout";
-import HomeTemplate from "@root/templates/Home";
 
 interface HomeProps {
     pageData: any,
 }
 
+interface test {
+    exchangeRate: exchangeRateProps[]
+}
+
+interface exchangeRateProps {
+    baseCurrency: string,
+    currency: string,
+    saleRateNB: number,
+    purchaseRateNB: number
+}
 
 const Home:React.FC<HomeProps> = (props) => {
     const {
@@ -23,6 +27,27 @@ const Home:React.FC<HomeProps> = (props) => {
     return (
         <>
             <div>Home Page</div>
+
+            {
+                pageData.exchangeRate.map((item:exchangeRateProps, i:number) => (
+                    <div key={i}>
+                        <div>
+                            <p>baseCurrency</p>
+                            <p>{item.baseCurrency}</p>
+                        </div>
+
+                        <div>
+                            <p>saleRateNB</p>
+                            <p>{item.saleRateNB}</p>
+                        </div>
+
+                        <div>
+                            <p>purchaseRateNB</p>
+                            <p>{item.purchaseRateNB}</p>
+                        </div>
+                    </div>
+                ))
+            }
         </>
     );
 }
@@ -32,11 +57,10 @@ export default Home;
 export const getServerSideProps:GetServerSideProps = async ({locale}) => {
     // const apolloClient = getApolloClient();
 
-    const pageRequest = axios.get(`https://api.privatbank.ua/p24api/exchange_rates?date=01.12.2014&json`, {
+    const pageRequest = axios.get(`https://api.privatbank.ua/p24api/exchange_rates`, {
         params: {
-            slug: 'home',
-            lang: locale,
-            acf_format: 'standard'
+            date: '01.12.2014',
+            json: true,
         }
     });
     //
