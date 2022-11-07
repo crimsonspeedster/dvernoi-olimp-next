@@ -39,11 +39,15 @@ export const getStaticProps:GetStaticProps = async ({locale}) => {
         }
     })
 
-    const res = await axios.all([settingsRequest]).then(axios.spread(function(settings) {
-        return {
-            settings: settings.data
-        };
-    }));
+    const res = await axios.all([settingsRequest])
+        .then(axios.spread(function (settings) {
+            return {
+                settings: settings.data
+            };
+        }))
+        .catch((error:any) => {
+            console.log(error);
+        });
 
     const {data: footer_company} = await apolloClient.query({
         query: GetMenu,
@@ -104,7 +108,8 @@ export const getStaticProps:GetStaticProps = async ({locale}) => {
 
     return {
         props: {
-            settingsData: res.settings,
+            // settingsData: res.settings,
+            settingsData: {},
             pageData: {
                 translated_slugs: [
                     {
