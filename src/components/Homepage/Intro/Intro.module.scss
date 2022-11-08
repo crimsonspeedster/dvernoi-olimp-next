@@ -191,10 +191,18 @@
 
         &__prev {
             left: 10px;
+
+            &-mob {
+                opacity: 1;
+            }
         }
 
         &__next {
             right: 10px;
+
+            &-mob {
+                opacity: 1;
+            }
         }
 
         &__controls {

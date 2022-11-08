@@ -33,7 +33,7 @@ const IntroCatSlider:React.FC<IntroCatSliderProps> = ({}) => {
                 spaceBetween={0}
                 slidesPerView={5}
                 speed={500}
-                loop={true}
+                loop={false}
                 navigation={{
                     prevEl: `.${styles['main-intro-cat__prev']}`,
                     nextEl: `.${styles['main-intro-cat__next']}`
@@ -62,7 +62,7 @@ const IntroCatSlider:React.FC<IntroCatSliderProps> = ({}) => {
                         slidesPerView: 2.7,
                         navigation: {
                             nextEl: `.${styles['main-intro-cat__next-mob']}.slider-nav__btn-next`,
-                            prevEl: `.${styles['main-intro-cat__next-mob']}.slider-nav__btn-prev`,
+                            prevEl: `.${styles['main-intro-cat__prev-mob']}.slider-nav__btn-prev`,
                         },
                     }
                 }}
