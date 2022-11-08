@@ -87,6 +87,7 @@ button, .button {
     height: 100%;
     width: 100%;
     background: $bodyBg;
+    //overflow: hidden;
 
     &.disable-overflow {
         overflow: initial;
@@ -97,6 +98,7 @@ button, .button {
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 .footer {

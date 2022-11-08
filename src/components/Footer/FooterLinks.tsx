@@ -55,6 +55,8 @@ const FooterLinks = () => {
             }
         }));
 
+        console.log(window.innerWidth <= 745);
+
     }, []);
 
     const toggleIsOpen = (index:number):void => {
