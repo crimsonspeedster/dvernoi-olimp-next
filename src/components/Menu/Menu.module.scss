@@ -215,6 +215,10 @@
                         justify-content: center;
                         align-items: center;
                         margin-right: 8px;
+
+                        img {
+                            filter: brightness(0) invert(1);
+                        }
                     }
 
                     &-back {
