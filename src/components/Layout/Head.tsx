@@ -46,6 +46,7 @@ const HeadHTML: React.FC<HeadHTMLProps> = ({seoPage}) => {
             <meta property="og:locale" content={seoPage.og_locale}/>
             <meta property="og:type" content={seoPage.og_type}/>
             <meta property="og:title" content={seoPage.og_title} key="title"/>
+            <meta name="robots" content="noindex, nofollow" />
             {
                 seoPage.description || seoPage.og_description &&
                 <meta property="og:description" content={seoPage.og_description ? seoPage.og_description : seoPage.description}/>
