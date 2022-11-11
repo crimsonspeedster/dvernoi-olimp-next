@@ -1,73 +1,66 @@
-import React, {useState, useCallback} from 'react'
-import BlogIntroCategories from './BlogIntroCategories';
+import React, {useContext, useEffect, useState} from 'react'
+import BlogIntroCategories, {categoriesProps} from './BlogIntroCategories';
 import BlogIntroList from './BlogIntroList';
 import BlogIntroBtn from './BlogIntroBtn';
-import BlogIntroPagination from './BlogIntroPagination';
-
 import styles from './Intro.module.scss';
 import classNames from "classnames";
+import {PostProp} from "@components/Homepage/Posts/Posts";
+import {SettingsContext} from "@pages/_app";
+import {If, Then} from "react-if";
+import {useRouter} from "next/router";
+import CustomPagination from "@components/CustomPagination/CustomPagination";
 
-const BLogIntro = () => {
-    const [categories, setCategories] = useState([
-        {
-            id: 1,
-            title: 'Все категории',
-            isActive: true
-        },
-        {
-            id: 2,
-            title: 'Название категории',
-            isActive: false
-        },
-        {
-            id: 3,
-            title: 'Название категории',
-            isActive: false
-        },
-        {
-            id: 4,
-            title: 'Название категории',
-            isActive: false
-        },
-        {
-            id: 5,
-            title: 'Название категории',
-            isActive: false
-        },
-        {
-            id: 6,
-            title: 'Название категории',
-            isActive: false
-        },
-        {
-            id: 7,
-            title: 'Название категории',
-            isActive: false
-        },
-    ])
 
-    const changeCategory = useCallback((catId: number) => {
-        setCategories(categories.map((item) => {
-            return {
-                ...item,
-                isActive: item.id === catId
-            }
-        }))
-    }, [categories]);
+interface BLogIntroProps {
+    title: string,
+    categories: categoriesProps[],
+    posts: PostProp[],
+    updatePosts: React.Dispatch<React.SetStateAction<PostProp[]>>
+}
+
+const BLogIntro:React.FC<BLogIntroProps> = ({title, categories, posts, updatePosts}) => {
+    const settingsCtx = useContext(SettingsContext);
+    const router = useRouter();
+
+    const [page, setPage] = useState<number>(!isNaN(parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1')) ? parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1') - 1 : 0);
+
+    // useEffect(()=>{
+    //     setPage(parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1') - 1);
+    // }, [router.query]);
+
+    const handlePageClick = (selectedItem: {selected: number}):void => {
+        if (router.route === "/blog/[[...slug]]")
+        {
+            selectedItem.selected + 1 === 1 ? router.push('/blog') : router.push(`/blog/page/${selectedItem.selected + 1}`);
+        }
+        else {
+            selectedItem.selected + 1 === 1 ? router.push(`/category/${router?.query?.slug?.[0]}`) : router.push(`/category/${router?.query?.slug?.[0]}/page/${selectedItem.selected + 1}`);
+        }
+    }
 
     return (
         <section className={classNames(styles['blog-intro'], 'intro')}>
             <div className="container">
                 <div className={styles['blog-intro__wrapper']}>
-                    <h1 className={classNames(styles['blog-intro__title'], 'title', 'title--dark')}>Блог</h1>
+                    <h1 className={classNames(styles['blog-intro__title'], 'title', 'title--dark')}>{title}</h1>
 
-                    <BlogIntroCategories categories={categories} changeCategory={changeCategory} />
+                    <BlogIntroCategories
+                        categories={categories}
+                    />
 
-                    <BlogIntroList />
+                    <BlogIntroList
+                        posts={posts}
+                    />
 
-                    <BlogIntroBtn />
+                    <If condition={settingsCtx.total_pages > 1}>
+                        <Then>
+                            <BlogIntroBtn
+                                updatePosts={updatePosts}
+                            />
 
-                    <BlogIntroPagination />
+                            <CustomPagination pages={settingsCtx.total_pages} initialPage={page} handlePageClick={handlePageClick} />
+                        </Then>
+                    </If>
                 </div>
             </div>
         </section>

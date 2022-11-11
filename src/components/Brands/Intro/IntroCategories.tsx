@@ -1,17 +1,39 @@
 import React from 'react';
 import styles from './Intro.module.scss';
 import classNames from "classnames";
+import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
+import Link from "next/link";
+import {useRouter} from "next/router";
 
-const BrandsIntroCategories = () => {
+
+interface BrandsIntroCategoriesProps {
+    categories: categoriesProps[],
+}
+
+const BrandsIntroCategories:React.FC<BrandsIntroCategoriesProps> = ({categories}) => {
+    const router = useRouter();
+    console.log(router);
+
     return (
         <div className={classNames(styles['brands__categories'], styles['brands-categories'])}>
-            <div className={classNames(styles['brands-categories__item'], styles.active)}>Все категории</div>
+            <Link
+                href={"/brands"}
+                className={classNames(styles['brands-categories__item'], router.pathname === "/brands/[[...slug]]" ? styles.active : '')}
+            >
+                Все категории
+            </Link>
 
-            <div className={styles['brands-categories__item']}>Межкомнатные двери</div>
-
-            <div className={styles['brands-categories__item']}>Входные двери</div>
-
-            <div className={styles['brands-categories__item']}>Фурнитура</div>
+            {
+                categories.map((item, i) => (
+                    <Link
+                        href={`/brands_category/${item.slug}`}
+                        key={i}
+                        className={classNames(styles['brands-categories__item'], router.query?.slug?.[0] === item.slug ? styles.active : '')}
+                    >
+                        {item.name}
+                    </Link>
+                ))
+            }
         </div>
     );
 }

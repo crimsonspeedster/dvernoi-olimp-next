@@ -28,30 +28,7 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
         menus,
     } = props;
 
-    if (!pageData.id) {
-        return (
-            <FourOhFour
-                settingsData={settingsData}
-                menus={menus}
-                pageData={{
-                    translated_slugs: [
-                        {
-                            lang: 'ru',
-                            slug: 'home'
-                        },
-                        {
-                            lang: 'uk',
-                            slug: 'home'
-                        }
-                    ]
-                }}
-            />
-        );
-    }
-
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
-
-    console.log(breadcrumbs);
 
     const getTemplate = (name:string):ReactElement => {
         switch (name) {
@@ -108,7 +85,7 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
 
 export default ServiceSingle;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, res}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/services/`, {
@@ -127,12 +104,18 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
         }
     })
 
-    const res = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
+    const resultData = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
         return {
             page: page.data?.[0] ?? {},
             settings: settings.data
         };
     }));
+
+    if (!resultData.page.id)
+    {
+        res.writeHead(301, { Location: '/404' });
+        res.end();
+    }
 
     const {data: footer_company} = await apolloClient.query({
         query: GetMenu,
@@ -202,8 +185,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
 
     return {
         props: {
-            pageData: res.page,
-            settingsData: res.settings,
+            pageData: resultData.page,
+            settingsData: resultData.settings,
             menus
         }
     }

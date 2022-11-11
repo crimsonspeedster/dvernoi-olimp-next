@@ -77,7 +77,7 @@ const CardSlider:React.FC<cardSliderProps> = (props) => {
             case 'post':
                 return (
                     <BlogCard
-                        title={data.title.rendered}
+                        title={data.title}
                         featured_image_link={data.featured_image_link}
                         slug={data.slug}
                         id={data.id}

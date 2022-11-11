@@ -3,33 +3,30 @@ import Link from "next/link";
 import styles from './Intro.module.scss';
 import post1 from '@images/post-1.jpg';
 import classNames from "classnames";
+import {PostProp} from "@components/Homepage/Posts/Posts";
+import BlogCard from "@components/Cards/BlogCard/BlogCard";
 
 
-const BlogIntroList = () => {
-
-    return (
-        <div className={classNames(styles['blog-intro__list'], styles['blog-intro-list'])}>
-            <div className={classNames(styles['blog-intro-list__item'], 'post')}>
-                <div className="post__inner">
-                    <Link href={`single-post/`}>
-                        <a className="post__link"/>
-                    </Link>
-
-                    <div className="post__preview">
-                        <img src={post1.src} alt="" width={410} height={295}/>
-                    </div>
-
-                    <div className={classNames('post__info', styles['post__info'])}>
-                        <div className="post__date">01.12.2021</div>
-
-                        <div className={classNames('post__cat', styles['post__cat'])}>Название категории</div>
-                    </div>
-
-                    <div className="post__title">А в DARUMI в листопад - АКЦІЯ!</div>
-                </div>
-            </div>
-        </div>
-    )
+interface BlogIntroListProps {
+    posts: PostProp[]
 }
+
+const BlogIntroList:React.FC<BlogIntroListProps> = ({posts}) => (
+    <div className={classNames(styles['blog-intro__list'], styles['blog-intro-list'])}>
+        {
+            posts.map((item, i) => (
+                <BlogCard
+                    key={i}
+                    title={item.title}
+                    featured_image_link={item.featured_image_link}
+                    slug={item.slug}
+                    id={item.id}
+                    category_main={item.category_main}
+                    locale_date={item.locale_date}
+                />
+            ))
+        }
+    </div>
+);
 
 export default BlogIntroList

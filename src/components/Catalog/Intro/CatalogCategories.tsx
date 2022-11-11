@@ -29,16 +29,14 @@ const CatalogCategories = () => {
                                 <div className={classNames(styles['catalog-intro-categories__filter-title'], 'filter-item__title')}>Тип</div>
 
                                 <div className={classNames(styles['catalog-intro-categories__filter-links'], 'filter-item__links')}>
-                                    <Link href="/" legacyBehavior>
-                                        <a className={classNames(styles['catalog-intro-categories__filter-link'], 'filter-item__link')}>
-                                            <span className={classNames(styles['catalog-intro-categories__filter-text'], 'filter-item__text')}>Раздвижные двери</span>
+                                    <Link href="/" className={classNames(styles['catalog-intro-categories__filter-link'], 'filter-item__link')}>
+                                        <span className={classNames(styles['catalog-intro-categories__filter-text'], 'filter-item__text')}>Раздвижные двери</span>
 
-                                            <span className={classNames(styles['catalog-intro-categories__filter-icon'], 'filter-item__icon')}>
-                                                <svg>
-                                                    <use href={`${sprite.src}#big-item-arrow`}/>
-                                                </svg>
-                                            </span>
-                                        </a>
+                                        <span className={classNames(styles['catalog-intro-categories__filter-icon'], 'filter-item__icon')}>
+                                            <svg>
+                                                <use href={`${sprite.src}#big-item-arrow`}/>
+                                            </svg>
+                                        </span>
                                     </Link>
                                 </div>
                             </div>

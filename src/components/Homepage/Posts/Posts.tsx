@@ -1,18 +1,24 @@
 import React from "react";
 import styles from './Posts.module.scss';
 import CardSlider from "@components/CardSlider/CardSlider";
+import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 
 export interface PostsSectionProps {
     recentPosts: PostProp[]
 }
 
 export interface PostProp {
-    title: string,
-    featured_image_link: string,
+    title: postTitleProp,
+    featured_image_link?: string,
     slug: string,
+    content?: postTitleProp,
     id: number,
     locale_date: string,
-    category_main?: string,
+    category_main?: categoriesProps,
+}
+
+interface postTitleProp {
+    rendered: string
 }
 
 const PostsSection: React.FC<PostsSectionProps> = ({recentPosts}) => (
