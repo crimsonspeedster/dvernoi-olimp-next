@@ -1,73 +1,145 @@
-import React from 'react';
+import React, {ReactElement} from 'react';
 import Link from "next/link";
 import sprite from '@icons/sprite.svg';
-import catalogCat from '@images/catalog-cat-1.svg';
-import subintro1 from '@images/main-subintro-1.png';
 import classNames from "classnames";
 import styles from './Intro.module.scss';
+import Image from "next/image";
+import {PhotoProps} from "@components/About/Intro/Intro";
+import {LinkProps} from "@components/ContactsInfo/ContactsInfo";
+import {If, Then} from "react-if";
 
-const CatalogCategories = () => {
-    return (
-        <div className={classNames(styles['catalog-intro__categories'], styles['catalog-intro-categories'])}>
-            <div className={styles['catalog-intro-categories__item']}>
-                <div className={styles['catalog-intro-categories__title']}>
-                    <div className={styles['catalog-intro-categories__title-icon']}>
-                        <img src={catalogCat.src} alt=""/>
-                    </div>
 
-                    <div className={styles['catalog-intro-categories__title-text']}>
-                        Каталог межкомнатных дверей
-                    </div>
-                </div>
+interface CatalogCategoriesProps {
+    block: acfBlockProps[]
+}
 
-                <div className={styles['catalog-intro-categories__inner']}>
-                    <div className={classNames(styles['catalog-intro-categories__filter'], 'filter-item')}>
-                        <div className={classNames(styles['catalog-intro-categories__filter-inner'], 'filter-item__inner')}>
-                            <img src={subintro1.src} alt="" width={385} height={360}/>
+export interface acfBlockProps {
+    title: string,
+    icon: PhotoProps,
+    categories: categoriesItemsProps[],
+    bottom_items: bottom_itemsProps
+}
 
-                            <div className={classNames(styles['catalog-intro-categories__filter-info'], 'filter-item__info')}>
-                                <div className={classNames(styles['catalog-intro-categories__filter-title'], 'filter-item__title')}>Тип</div>
+interface categoriesItemsProps {
+    title: string,
+    background: PhotoProps,
+    repeater: linkRepeater[]
+}
 
-                                <div className={classNames(styles['catalog-intro-categories__filter-links'], 'filter-item__links')}>
-                                    <Link href="/" className={classNames(styles['catalog-intro-categories__filter-link'], 'filter-item__link')}>
-                                        <span className={classNames(styles['catalog-intro-categories__filter-text'], 'filter-item__text')}>Раздвижные двери</span>
+interface linkRepeater {
+    link: LinkProps
+}
 
-                                        <span className={classNames(styles['catalog-intro-categories__filter-icon'], 'filter-item__icon')}>
-                                            <svg>
-                                                <use href={`${sprite.src}#big-item-arrow`}/>
-                                            </svg>
-                                        </span>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+interface bottom_itemsProps {
+    show_blocks: boolean,
+    repeater_blocks: repeater_blocksProps[] | false
+}
 
-                <div className={styles['catalog-intro-categories__select']}>
-                    <div className={styles['catalog-intro-categories__select-item']}>
-                        <div className={styles['catalog-intro-categories__select-title']}>Выберите Ваш город:</div>
+interface repeater_blocksProps {
+    title: string,
+    items: linkRepeater[]
+}
 
-                        <ul className={styles['catalog-intro-categories__select-list']}>
-                            <li className={styles['catalog-intro-categories__select-elem']}>Одесса</li>
 
-                            <li className={styles['catalog-intro-categories__select-elem']}>Борисполь</li>
-                        </ul>
-                    </div>
+const CatalogCategories:React.FC<CatalogCategoriesProps> = ({block}) => {
+    console.log(block[1].bottom_items.repeater_blocks, block[1].bottom_items.show_blocks);
 
-                    <div className={styles['catalog-intro-categories__select-item']}>
-                        <div className={styles['catalog-intro-categories__select-title']}>Дополнительные параметры выбора:</div>
+    const CategoryBlock = (item:categoriesItemsProps):ReactElement => (
+        <div className={classNames(styles['catalog-intro-categories__filter'], styles['filter-item'])}>
+            <div className={classNames(styles['catalog-intro-categories__filter-inner'], styles['filter-item__inner'])} style={{backgroundImage: `url(${item.background.url})`}}>
+                <div className={classNames(styles['catalog-intro-categories__filter-info'], styles['filter-item__info'])}>
+                    <h3 className={classNames(styles['catalog-intro-categories__filter-title'], styles['filter-item__title'])}>{item.title}</h3>
 
-                        <ul className={styles['catalog-intro-categories__select-list']}>
-                            <li className={styles['catalog-intro-categories__select-elem']}>На складе</li>
-
-                            <li className={styles['catalog-intro-categories__select-elem']}>Нестандартный размер</li>
-                        </ul>
+                    <div className={classNames(styles['catalog-intro-categories__filter-links'], styles['filter-item__links'])}>
+                        {
+                            item.repeater.map((subitem, k) => (
+                                <SubcategoryLink
+                                    link={subitem.link}
+                                    key={k}
+                                />
+                            ))
+                        }
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
+
+    const SubcategoryLink = (item:linkRepeater):ReactElement => (
+        <Link href={item.link.url} className={classNames(styles['catalog-intro-categories__filter-link'], styles['filter-item__link'])}>
+            <span className={classNames(styles['catalog-intro-categories__filter-text'], styles['filter-item__text'])}>{item.link.title}</span>
+
+            <span className={classNames(styles['catalog-intro-categories__filter-icon'], styles['filter-item__icon'])}>
+                <svg>
+                    <use href={`${sprite.src}#big-item-arrow`}/>
+                </svg>
+            </span>
+        </Link>
+    );
+
+    const BottomBlock = (item:repeater_blocksProps):ReactElement => (
+        <div className={styles['catalog-intro-categories__select-item']}>
+            <h4 className={styles['catalog-intro-categories__select-title']}>{item.title}</h4>
+
+            <ul className={styles['catalog-intro-categories__select-list']}>
+                {
+                    item.items.map((subitem, k) => (
+                        <li key={k} className={styles['catalog-intro-categories__select-elem']}>
+                            <Link href={subitem.link.url}>{subitem.link.title}</Link>
+                        </li>
+                    ))
+                }
+            </ul>
+        </div>
+    );
+
+
+    return (
+        <div className={classNames(styles['catalog-intro__categories'], styles['catalog-intro-categories'])}>
+            {
+                block.map((item, i) => (
+                    <div key={i} className={styles['catalog-intro-categories__item']}>
+                        <div className={styles['catalog-intro-categories__title']}>
+                            <div className={styles['catalog-intro-categories__title-icon']}>
+                                <Image src={item.icon.url} alt={item.icon.alt} width={item.icon.width} height={item.icon.height} />
+                            </div>
+
+                            <h2 className={styles['catalog-intro-categories__title-text']}>{item.title}</h2>
+                        </div>
+
+                        <div className={styles['catalog-intro-categories__inner']}>
+                            {
+                                item.categories.map((subitem, k) => (
+                                    <CategoryBlock
+                                        key={k}
+                                        title={subitem.title}
+                                        background={subitem.background}
+                                        repeater={subitem.repeater}
+                                    />
+                                ))
+                            }
+                        </div>
+
+                        <If condition={item.bottom_items.show_blocks}>
+                            <Then>
+                                <div className={styles['catalog-intro-categories__select']}>
+                                    {
+                                        item.bottom_items.repeater_blocks && item.bottom_items.repeater_blocks.map((subitem, k) => (
+                                            <BottomBlock
+                                                key={k}
+                                                title={subitem.title}
+                                                items={subitem.items}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                            </Then>
+                        </If>
+                    </div>
+                ))
+            }
+        </div>
+    );
 }
 
-export default CatalogCategories
+export default CatalogCategories;

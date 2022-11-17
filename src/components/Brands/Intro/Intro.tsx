@@ -36,7 +36,7 @@ const BrandsIntro:React.FC<BrandsIntroProps> = ({title, categories, posts, updat
             selectedItem.selected + 1 === 1 ? router.push('/brands') : router.push(`/brands/page/${selectedItem.selected + 1}`);
         }
         else {
-            selectedItem.selected + 1 === 1 ? router.push(`/brands_category/${router?.query?.slug?.[0]}`) : router.push(`/brands_category/${router?.query?.slug?.[0]}/page/${selectedItem.selected + 1}`);
+            selectedItem.selected + 1 === 1 ? router.push(`/brands-category/${router?.query?.slug?.[0]}`) : router.push(`/brands-category/${router?.query?.slug?.[0]}/page/${selectedItem.selected + 1}`);
         }
     }
 

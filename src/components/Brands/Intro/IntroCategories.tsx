@@ -26,7 +26,7 @@ const BrandsIntroCategories:React.FC<BrandsIntroCategoriesProps> = ({categories}
             {
                 categories.map((item, i) => (
                     <Link
-                        href={`/brands_category/${item.slug}`}
+                        href={`/brands-category/${item.slug}`}
                         key={i}
                         className={classNames(styles['brands-categories__item'], router.query?.slug?.[0] === item.slug ? styles.active : '')}
                     >

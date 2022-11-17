@@ -3,6 +3,7 @@ import styles from './Subintro.module.scss';
 import SubintroTop from './SubintroTop'
 import SubintroList from './SubintroList'
 import {PhotoProps} from "@components/About/Intro/Intro";
+import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 
 
 export interface MainSubIntroProps {
@@ -13,15 +14,8 @@ export interface MainSubIntroProps {
 
 export interface categories_repeaterProps {
     block_background: PhotoProps,
-    main_category: categoryProps,
-    subcategories: categoryProps[]
-}
-
-export interface categoryProps {
-    name: string,
-    slug: string,
-    term_id: number,
-    taxonomy: string
+    main_category: categoriesProps,
+    subcategories: categoriesProps[]
 }
 
 const MainSubIntro:React.FC<MainSubIntroProps> = ({title, description, categories_repeater}) => {

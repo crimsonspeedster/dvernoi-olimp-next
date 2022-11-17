@@ -11,11 +11,11 @@ import ProductCard from "@components/Cards/ProductCard/ProductCard";
 import VideoCard from "@components/Cards/VideoCard/VideoCard";
 import {PhotoProps} from "@components/About/Intro/Intro";
 import BlogCard from "@components/Cards/BlogCard/BlogCard";
-import {categoryProps} from "@components/Homepage/SubIntro/SubIntro";
+import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 
 interface cardSliderProps {
     block_title: string,
-    tabs?: categoryProps[]|[],
+    tabs?: categoriesProps[]|[],
     sliderItems: any[],
     tabHandler?: (index:number) => void,
     perViewAmount: number,

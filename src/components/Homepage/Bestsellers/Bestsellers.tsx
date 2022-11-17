@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import styles from './Bestsellers.module.scss';
 import CardSlider from "@components/CardSlider/CardSlider";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
-import {categoryProps} from "@components/Homepage/SubIntro/SubIntro";
+import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 
 export interface BestsellersProps {
     title: string,
@@ -10,13 +10,13 @@ export interface BestsellersProps {
 }
 
 interface repeaterProps {
-    kategoriya: categoryProps,
+    kategoriya: categoriesProps,
     tovary: ProductCardProps[]
 }
 
 const Bestsellers:React.FC<BestsellersProps> = ({title, repeater}) => {
     const [sliderItems, setSliderItems] = useState<ProductCardProps[]>(repeater[0].tovary);
-    const [tabs, setTabs] = useState<[]|categoryProps[]|undefined>([]);
+    const [tabs, setTabs] = useState<[]|categoriesProps[]|undefined>([]);
 
     const tabHandler = (index: number):void => {
        setSliderItems(repeater[index].tovary);
