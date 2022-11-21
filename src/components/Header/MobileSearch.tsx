@@ -1,14 +1,20 @@
-import React, {useState, useContext, FormEvent} from 'react'
+import React, {useState, useContext, FormEvent, useEffect} from 'react'
 import Link from "next/link";
 import sprite from '@icons/sprite.svg';
 import styles from './Header.module.scss';
 import classNames from "classnames";
+import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
+import {useRouter} from "next/router";
+import axios from "axios";
 
 const MobileSearch = () => {
-    let [search, setSearch] = useState<string>('')
+    let [search, setSearch] = useState<string>('');
+    const router = useRouter();
 
-    const submitForm = (e:FormEvent) => {
+    const submitForm = (e:FormEvent):void => {
         e.preventDefault()
+
+        router.push(`/search?s=${search}`);
     }
 
     return (
@@ -25,7 +31,7 @@ const MobileSearch = () => {
                         autoComplete="off"
                         placeholder="Поиск..."
                         value={search}
-                        onChange={e => setSearch(e.currentTarget.value)}
+                        onChange={e => setSearch(e.currentTarget.value.trim())}
                     />
                 </div>
 

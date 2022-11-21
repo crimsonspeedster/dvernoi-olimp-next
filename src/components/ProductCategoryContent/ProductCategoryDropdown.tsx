@@ -10,7 +10,7 @@ interface ProductCategoryDropdownProps {
 
 }
 
-interface SortDropdownProps {
+export interface SortDropdownProps {
     id: number,
     title: string,
     order: string,
@@ -27,15 +27,15 @@ const ProductCategoryDropdown:React.FC<ProductCategoryDropdownProps> = ({}) => {
         {
             id: 1,
             title: 'По новизне (от новых к старым)',
-            order: 'asc',
+            order: 'desc',
             orderBy: 'date',
-            isActive: router.query.order === 'asc' && router.query.orderBy === 'date'
+            isActive: router.query.order === 'desc' && router.query.orderBy === 'date'
         },
         {
             id: 2,
             title: 'По новизне (от старых к новым)',
-            isActive: router.query.order === 'desc' && router.query.orderBy === 'date',
-            order: 'desc',
+            isActive: router.query.order === 'asc' && router.query.orderBy === 'date',
+            order: 'asc',
             orderBy: 'date',
         },
         {
