@@ -112,7 +112,7 @@ const ProductCategoryDropdown:React.FC<ProductCategoryDropdownProps> = ({}) => {
                 className={classNames(styles['product-category-dropdown__current'], 'dropdown__current')}
                 onClick={() => setIsOpen(prev => !prev)}
             >
-                <div className={classNames(styles['product-category-dropdown__text'], 'dropdown__text')}>{dropdownList.filter(item => item.isActive)[0].title}</div>
+                <div className={classNames(styles['product-category-dropdown__text'], 'dropdown__text')}>{dropdownList.filter(item => item.isActive)?.[0]?.title ?? ''}</div>
 
                 <div className={classNames(styles['product-category-dropdown__icon'], 'dropdown__icon')}>
                     <svg>
