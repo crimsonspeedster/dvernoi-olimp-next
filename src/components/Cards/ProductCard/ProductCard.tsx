@@ -91,15 +91,15 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
                 </Then>
             </If>
 
-            <div className={styles['productCard__img']}>
+            <Link href={`/product/${slug}`} className={styles['productCard__img']}>
                 <Image width={160} height={288} src={images.default} alt={name} />
-            </div>
+            </Link>
 
             <div className={styles['productCard-row']}>
                 <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
             </div>
 
-            <Link href={`/product/`} className={styles['productCard__title']}>{name}</Link>
+            <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
 
             <div className={styles['productCard-bottom']}>
                 <p className={styles['productCard__price']}>{(price.sale ? price.sale : price.default).toLocaleString()} грн</p>

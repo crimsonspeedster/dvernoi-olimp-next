@@ -1,21 +1,32 @@
-import React from "react";
+import React, {SetStateAction, useState} from "react";
 import Breadcrumbs, {Breadcrumb} from "@components/Breadcrumbs/Breadcrumbs";
 import ProductCategoryIntro from "@components/ProductCategory/Intro/Intro";
 import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
+import ProductCategoryContent from "@components/ProductCategoryContent/ProductCategoryContent";
+import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
+import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 
 
 interface CatalogCategoryTemplateProps {
     breadcrumbs: Breadcrumb[],
     pageTitle: string,
-    childrenCategories: categoriesProps[]
+    childrenCategories: categoriesProps[],
+    category_filter: FilterAttrsProps[],
+    productItems: ProductCardProps[],
+    setProductItems: React.Dispatch<SetStateAction<ProductCardProps[]>>
 }
 
 const CatalogCategoryTemplate:React.FC<CatalogCategoryTemplateProps> = (props) => {
     const {
         breadcrumbs,
         pageTitle,
-        childrenCategories
+        category_filter,
+        childrenCategories,
+        productItems,
+        setProductItems
     } = props;
+
+    const [ isOpenFilter, setIsOpenFilter ] = useState<boolean>(false)
 
     return (
         <>
@@ -26,6 +37,15 @@ const CatalogCategoryTemplate:React.FC<CatalogCategoryTemplateProps> = (props) =
             <ProductCategoryIntro
                 title={pageTitle}
                 childrenCategories={childrenCategories}
+            />
+
+            <ProductCategoryContent
+                isSearchPage={false}
+                isOpenFilter={isOpenFilter}
+                setIsOpenFilter={setIsOpenFilter}
+                category_filter={category_filter}
+                products={productItems}
+                setProductItems={setProductItems}
             />
         </>
     );

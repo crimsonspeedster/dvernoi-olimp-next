@@ -989,6 +989,10 @@ button, .button {
     }
 
     &__text {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
         @media (min-width: 1024px) {
             transition: color .2s ease;
         }

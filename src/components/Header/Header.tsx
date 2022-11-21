@@ -8,7 +8,9 @@ import {isBrowser} from '@utils/isBrowser'
 import {disableScrollbar} from '@utils/disableScrollbar'
 import {enableScrollbar} from '@utils/enableScrollbar'
 import menuStyles from '@components/Menu/Menu.module.scss';
-// import CallbackModal from '../Modal/CallbackModal'
+import CallbackModal from '@components/Modal/CallbackModal';
+import classNames from "classnames";
+import {useRouter} from "next/router";
 
 
 interface HeaderProps {
@@ -24,6 +26,8 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
     const [isOpenSchedule, setIsOpenSchedule] = useState<boolean>(false);
     const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
     const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
+
+    const router = useRouter();
 
     //@ts-ignore
     const closeSchedule = (e:Event) => !e?.target?.closest('.header-schedule') && setIsOpenSchedule(false)
@@ -101,8 +105,12 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
         isOpenMenu ? disableScrollbar() : enableScrollbar()
     }, [isOpenMenu])
 
+    useEffect(()=>{
+        setIsOpenSearch(false);
+    }, [router.query]);
+
     return (
-        <header className={styles['header']}>
+        <header className={classNames(styles['header'], 'header')}>
             <HeaderTop
                 isTablet={isTablet}
                 isMobile={isMobile}
@@ -144,7 +152,7 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
                 setIsOpenFilter={setIsOpenFilter}
             />
 
-            {/*<CallbackModal/>*/}
+            <CallbackModal />
         </header>
     )
 }

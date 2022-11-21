@@ -11,13 +11,14 @@ import Layout from "@components/Layout";
 import CatalogCategoryTemplate from "@root/templates/CatalogCategoryTemplate";
 import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 import {Else, If, Then} from "react-if";
+import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 
 
 interface SubCategoryProps {
     settingsData: any,
     menus: any,
     pageData: any,
-    is_product: boolean,
+    products: ProductCardProps[]
 }
 
 const SubCategory:React.FC<SubCategoryProps> = (props) => {
@@ -25,24 +26,26 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         settingsData,
         menus,
         pageData,
-        is_product,
+        products
     } = props;
 
-    const router = useRouter();
+    const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
 
-    const filterStartIndex:number|undefined = router.query.subcategory_slug?.indexOf('filter');
-    const filterEndIndex:number|undefined = router.query.subcategory_slug?.indexOf('apply');
-
-    const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
-
-    useEffect(()=>{
-
-        if (filterStartIndex !== undefined && filterEndIndex !== undefined)
-        {
-            setFilterItems(router.query.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(','));
-        }
-
-    }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
+    // const router = useRouter();
+    //
+    // const filterStartIndex:number|undefined = router.query.subcategory_slug?.indexOf('filter');
+    // const filterEndIndex:number|undefined = router.query.subcategory_slug?.indexOf('apply');
+    //
+    // const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
+    //
+    // useEffect(()=>{
+    //
+    //     if (filterStartIndex !== undefined && filterEndIndex !== undefined)
+    //     {
+    //         setFilterItems(router.query.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(','));
+    //     }
+    //
+    // }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
 
     // const handleClick = (category: string, cat_param: string):void => {
     //     const linkItemsFilter:string|undefined = filterItems?.filter(item => item.includes(category))[0];
@@ -107,19 +110,14 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
             <HeadHTML seoPage={pageData.yoast_head_json} />
 
             <Layout>
-                <If condition={!is_product}>
-                    <Then>
-                        <CatalogCategoryTemplate
-                            breadcrumbs={breadcrumbs}
-                            pageTitle={pageData.name}
-                            childrenCategories={pageData.children_terms}
-                        />
-                    </Then>
-
-                    <Else>
-                        <div>Is Product Page</div>
-                    </Else>
-                </If>
+                <CatalogCategoryTemplate
+                    breadcrumbs={breadcrumbs}
+                    pageTitle={pageData.name}
+                    childrenCategories={pageData.children_terms}
+                    category_filter={pageData.category_filter}
+                    productItems={productItems}
+                    setProductItems={setProductItems}
+                />
             </Layout>
         </SettingsContext.Provider>
     )
@@ -130,21 +128,13 @@ export default SubCategory;
 export const getServerSideProps:GetServerSideProps = async ({locale, params, res}) => {
     const apolloClient = getApolloClient();
 
-    const categoryRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/product_cat/`, {
+    const categoryRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_WOO_API}/products/categories`, {
         params: {
             slug: params?.subcategory_slug?.[0] ?? params?.slug,
             lang: locale,
-            acf_format: 'standard'
-        }
-    });
-
-    const productRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_WOO_API}/products`, {
-        params: {
-            slug: params?.subcategory_slug?.[1] ?? params?.subcategory_slug?.[0] ?? params?.slug,
-            lang: locale,
-            acf_format: 'standard',
             consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
-            consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET
+            consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
+            acf_format: 'standard'
         }
     });
 
@@ -156,25 +146,14 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     })
 
-    const resData = await axios.all([settingsRequest, categoryRequest, productRequest]).then(axios.spread(function(settings, category, product) {
+    const resData = await axios.all([settingsRequest, categoryRequest]).then(axios.spread(function(settings, category) {
         return {
             settings: settings.data,
-            pageData: product.data.length === 0 ? category.data : product.data,
-            is_product: product.data.length > 0
+            pageData: category.data?.[0] ?? {}
         };
     }));
 
-    if (resData.pageData.length === 0)
-    {
-        res.writeHead(301, { Location: '/404' });
-        res.end();
-    }
-    else if (resData.is_product && params?.subcategory_slug?.[1] && resData.pageData?.[0]?.category_main?.slug !== params?.subcategory_slug?.[0])
-    {
-        res.writeHead(301, { Location: '/404' });
-        res.end();
-    }
-    else if (resData.is_product && !params?.subcategory_slug?.[1] && resData.pageData?.[0]?.category_main?.slug !== params?.slug)
+    if (!resData.pageData.id)
     {
         res.writeHead(301, { Location: '/404' });
         res.end();
@@ -250,8 +229,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         props: {
             settingsData: resData.settings,
             menus,
-            pageData: resData.pageData[0],
-            is_product: resData.is_product,
+            pageData: resData.pageData,
+            products: []
         }
     }
 }

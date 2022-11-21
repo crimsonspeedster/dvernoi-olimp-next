@@ -332,6 +332,9 @@
                 border: 1px solid #424255;
                 width: 225px;
                 height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 @media (min-width: 1024px) {
                     transition: all .2s ease;
                     &:hover {

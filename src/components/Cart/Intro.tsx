@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from './Intro.module.scss';
 import productImg from '@images/single-product.jpg';
 import classNames from "classnames";
-// import QuickModal from '@components/Modal/QuickModal';
+import QuickModal from '@components/Modal/QuickModal';
 
 
 const CartIntro = () => {
@@ -104,7 +104,7 @@ const CartIntro = () => {
                 </div>
             </div>
 
-            {/*<QuickModal/>*/}
+            <QuickModal />
         </section>
     );
 }

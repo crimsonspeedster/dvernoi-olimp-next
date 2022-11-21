@@ -1,0 +1,15 @@
+.search-intro {
+    padding: 25px 0 40px;
+}
+
+@media (max-width: 991px) {
+    .search-intro {
+        padding: 25px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .search-intro {
+        padding: 25px 0 30px;
+    }
+}
