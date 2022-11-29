@@ -32,17 +32,18 @@ interface ProductImagesProps {
     alt: string
 }
 
-interface acfProductProps {
+export interface acfProductProps {
     video_group: videoGroupProps,
     akciya: akciyaProps,
     meta_data: metaDataProps,
-    opisanie: string,
     icon?: PhotoProps,
+    enable_characteristics: boolean,
     haratekristiki: haratekristikiProps[]
 }
 
 interface videoGroupProps {
-    foto?: string,
+    enable_video: boolean,
+    foto?: PhotoProps,
     video: string,
     video_title: string,
     duration?: string
@@ -93,8 +94,6 @@ const HeaderSearch:React.FC<HeaderSearchProps> = ({isOpenSearch, setIsOpenSearch
             }
         })
             .then((res) => {
-                console.log(res.data);
-
                 setSearchData(res.data);
                 setIsSearching(false);
                 setIsOpenSearch(prev => !prev);

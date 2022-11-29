@@ -33,8 +33,6 @@ const CallbackModal = () => {
 
     const test = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-
-        console.log('click works');
     }
 
     return (

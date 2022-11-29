@@ -26,10 +26,6 @@ const BrandsIntro:React.FC<BrandsIntroProps> = ({title, categories, posts, updat
 
     const [page, setPage] = useState<number>(!isNaN(parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1')) ? parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1') - 1 : 0);
 
-    useEffect(()=>{
-        console.log(page);
-    }, [page]);
-
     const handlePageClick = (selectedItem: {selected: number}):void => {
         if (router.route === "/brands/[[...slug]]")
         {

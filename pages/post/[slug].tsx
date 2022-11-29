@@ -85,7 +85,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/posts/`, {
         params: {
-            slug: params?.slug?.[0] ?? '',
+            slug: params?.slug ?? '404',
             lang: locale,
             _embed: true,
             acf_format: 'standard'
@@ -107,7 +107,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         };
     }));
 
-    if (!params?.slug?.[0] || resultDat.page.length > 1)
+    if (!params?.slug?.[0] || resultDat.page.length !== 1)
     {
         res.writeHead(301, { Location: '/404' });
         res.end();

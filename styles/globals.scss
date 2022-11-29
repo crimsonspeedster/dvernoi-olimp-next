@@ -976,6 +976,8 @@ button, .button {
         justify-content: space-between;
         padding: 0 15px;
         cursor: pointer;
+        text-transform: capitalize;
+
         @media (min-width: 1024px) {
             &:hover .dropdown__text {
                 color: #a4ac14;

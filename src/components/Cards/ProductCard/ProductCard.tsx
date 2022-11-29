@@ -11,7 +11,7 @@ import labelTop from "@icons/label-top.svg";
 
 export interface ProductCardProps {
     id: number,
-    images: ImageProps,
+    images: ImageProductProps,
     name: string,
     price: PriceProps,
     sku: string,
@@ -22,12 +22,12 @@ export interface ProductCardProps {
     labels: labelProps
 }
 
-interface ImageProps {
+export interface ImageProductProps {
     default: string,
     gallery: string[]
 }
 
-interface variationsProps {
+export interface variationsProps {
     attr_name: string,
     attr_value: string
 }

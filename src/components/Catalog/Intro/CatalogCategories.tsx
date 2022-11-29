@@ -42,8 +42,6 @@ interface repeater_blocksProps {
 
 
 const CatalogCategories:React.FC<CatalogCategoriesProps> = ({block}) => {
-    console.log(block[1].bottom_items.repeater_blocks, block[1].bottom_items.show_blocks);
-
     const CategoryBlock = (item:categoriesItemsProps):ReactElement => (
         <div className={classNames(styles['catalog-intro-categories__filter'], styles['filter-item'])}>
             <div className={classNames(styles['catalog-intro-categories__filter-inner'], styles['filter-item__inner'])} style={{backgroundImage: `url(${item.background.url})`}}>

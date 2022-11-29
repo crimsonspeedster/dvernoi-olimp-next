@@ -12,7 +12,6 @@ interface BrandsIntroCategoriesProps {
 
 const BrandsIntroCategories:React.FC<BrandsIntroCategoriesProps> = ({categories}) => {
     const router = useRouter();
-    console.log(router);
 
     return (
         <div className={classNames(styles['brands__categories'], styles['brands-categories'])}>
