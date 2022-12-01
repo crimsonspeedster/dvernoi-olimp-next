@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   i18n: {
     locales: ['ru', 'uk'],
@@ -8,7 +8,7 @@ const nextConfig = {
     localePath: "./lang"
   },
   images: {
-    domains: ['test.dvernoyolimp.com.ua', 'img.youtube.com'],
+    domains: ['test.dvernoyolimp.com.ua', 'img.youtube.com', 'olimp.loc'],
   },
 }
 

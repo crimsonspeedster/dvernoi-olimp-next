@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, memo} from "react";
 import classNames from "classnames";
 import styles from './Dropdown.module.scss';
 import sprite from "@icons/sprite.svg";
@@ -73,4 +73,4 @@ const Dropdown:React.FC<DropdownProps> = ({default_value, values, classNameStr, 
     );
 }
 
-export default Dropdown;
+export default memo(Dropdown);

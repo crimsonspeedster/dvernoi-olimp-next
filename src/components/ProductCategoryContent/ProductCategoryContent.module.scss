@@ -332,21 +332,21 @@
             &--slider {
                 margin-top: 30px !important;
 
-                .noUi-target {
+                :global(.noUi-target) {
                     border: none;
                     box-shadow: none;
                     border-radius: 0;
                     background: #D4DADE;
 
-                    &.noUi-horizontal {
+                    &:global(.noUi-horizontal) {
                         height: 1px;
                     }
 
-                    .noUi-connect {
+                    :global(.noUi-connect) {
                         background: #A4AC14;
                     }
 
-                    .noUi-handle {
+                    :global(.noUi-handle) {
                         border: none;
                         box-shadow: none;
                         border-radius: 0;

@@ -7,6 +7,7 @@ import {enableScrollbar} from '@utils/enableScrollbar'
 import {disableScrollbar} from '@utils/disableScrollbar'
 import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
+import {PriceRangeProps} from "@root/templates/CatalogCategoryTemplate";
 
 
 interface ProductCategoryContentProps {
@@ -15,7 +16,8 @@ interface ProductCategoryContentProps {
     setIsOpenFilter: Dispatch<SetStateAction<boolean>>,
     category_filter: FilterAttrsProps[],
     products: ProductCardProps[],
-    setProductItems: React.Dispatch<React.SetStateAction<ProductCardProps[]>>
+    setProductItems: React.Dispatch<React.SetStateAction<ProductCardProps[]>>,
+    priceRange?: PriceRangeProps
 }
 
 const ProductCategoryContent: React.FC<ProductCategoryContentProps> = (props) => {
@@ -25,7 +27,8 @@ const ProductCategoryContent: React.FC<ProductCategoryContentProps> = (props) =>
         category_filter,
         setIsOpenFilter,
         products,
-        setProductItems
+        setProductItems,
+        priceRange
     } = props;
 
     const [isModalExist, setIsModalExist] = useState<boolean>(false);
@@ -58,6 +61,7 @@ const ProductCategoryContent: React.FC<ProductCategoryContentProps> = (props) =>
                     category_filter={category_filter}
                     products={products}
                     setProductItems={setProductItems}
+                    priceRange={priceRange}
                 />
 
                 {isModalExist && <SortModal />}

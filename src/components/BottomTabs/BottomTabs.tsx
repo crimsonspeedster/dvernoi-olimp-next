@@ -4,15 +4,20 @@ import styles from './BottomTabs.module.scss';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import {SettingsContext} from "@pages/_app";
 import {menuItemProp} from "@components/Header/interfaces";
+import classNames from "classnames";
 
 
-const BottomTabs = () => {
+interface BottomTabsProps {
+    classNameStr?: string
+}
+
+const BottomTabs:React.FC<BottomTabsProps> = ({classNameStr}) => {
     const menuCatalog:menuItemProp[] = useContext(SettingsContext).menus?.catalog_menu ?? [];
 
     if (menuCatalog.length > 0)
     {
         return (
-            <div className={styles['bottom-tabs']}>
+            <section className={classNames(styles['bottom-tabs'], classNameStr)}>
                 <div className="container">
                     <Tabs selectedTabClassName={styles['active']}>
                         <TabList className={styles['bottom-tabs__head']}>
@@ -40,7 +45,7 @@ const BottomTabs = () => {
                         </div>
                     </Tabs>
                 </div>
-            </div>
+            </section>
         );
     }
     else {

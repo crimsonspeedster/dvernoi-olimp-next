@@ -4,6 +4,7 @@ import ProductCategorySidebar, {FilterAttrsProps} from './ProductCategorySidebar
 import ProductCategoryList from './ProductCategoryList'
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 import {Else, If, Then} from "react-if";
+import {PriceRangeProps} from "@root/templates/CatalogCategoryTemplate";
 
 
 interface ProductCategoryBoxProps {
@@ -13,10 +14,11 @@ interface ProductCategoryBoxProps {
     setIsOpenFilter: Dispatch<SetStateAction<boolean>>,
     category_filter: FilterAttrsProps[],
     products: ProductCardProps[],
-    setProductItems: React.Dispatch<React.SetStateAction<ProductCardProps[]>>
+    setProductItems: React.Dispatch<React.SetStateAction<ProductCardProps[]>>,
+    priceRange?: PriceRangeProps
 }
 
-const ProductCategoryBox:React.FC<ProductCategoryBoxProps> = ({isSearchPage, setProductItems, isModalExist, products, isOpenFilter, setIsOpenFilter, category_filter}) => {
+const ProductCategoryBox:React.FC<ProductCategoryBoxProps> = ({isSearchPage, priceRange, setProductItems, isModalExist, products, isOpenFilter, setIsOpenFilter, category_filter}) => {
     return (
         <div className={styles['product-category-box']}>
             <ProductCategorySidebar
@@ -25,6 +27,7 @@ const ProductCategoryBox:React.FC<ProductCategoryBoxProps> = ({isSearchPage, set
                 isOpenFilter={isOpenFilter}
                 setIsOpenFilter={setIsOpenFilter}
                 category_filter={category_filter}
+                priceRange={priceRange}
             />
 
             <ProductCategoryList

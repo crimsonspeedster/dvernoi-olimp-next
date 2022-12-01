@@ -1355,3 +1355,54 @@ button, .button {
 .swiper-button-lock {
     display: block !important;
 }
+.cardSlider-slide--default {
+    height: auto !important;
+
+    &.product {
+        max-width: calc(100% / 4);
+
+        @media screen and (max-width: 991px) {
+            max-width: calc(100% / 3);
+        }
+
+        @media screen and (max-width: 767px) {
+            max-width: calc(100% / 2);
+        }
+    }
+
+    &.post {
+        max-width: calc(100% / 3 - 30px);
+
+        @media screen and (max-width: 1199px) {
+            max-width: calc(100% / 3 - 20px);
+        }
+
+        @media screen and (max-width: 991px) {
+            max-width: calc(100% / 3 - 30px);
+        }
+
+        @media screen and (max-width: 767px) {
+            max-width: calc(100% / 2 - 15px);
+        }
+
+        @media screen and (max-width: 575px) {
+            max-width: 100%;
+        }
+    }
+
+    &.video {
+        max-width: calc(100% / 2 - 60px);
+
+        @media screen and (max-width: 1399px) {
+            max-width: calc(100% / 2 - 10px);
+        }
+
+        @media screen and (max-width: 1199px) {
+            max-width: calc(100% / 2 - 15px);
+        }
+
+        @media screen and (max-width: 575px) {
+            max-width: 100%;
+        }
+    }
+}

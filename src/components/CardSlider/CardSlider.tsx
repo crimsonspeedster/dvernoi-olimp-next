@@ -91,7 +91,7 @@ const CardSlider:React.FC<cardSliderProps> = (props) => {
     };
 
     const cardSlides = (item:any, index:number):ReactElement => (
-        <SwiperSlide key={index} className={classNames(styles['cardSlider-slide'], sliderItems.length <= perViewAmount ? styles['cardSlider-slide--default'] : '', cardType)}>
+        <SwiperSlide key={index} className={classNames(styles['cardSlider-slide'], sliderItems.length <= perViewAmount ? 'cardSlider-slide--default' : '', cardType)}>
             {
                 cardItem(cardType, item)
             }

@@ -22,8 +22,7 @@ interface ProductPageProps {
     settingsData: any,
     menus: any,
     products: ProductCardProps[],
-    reviewed_products: ProductCardProps[],
-    test: any
+    reviewed_products: ProductCardProps[]
 }
 
 const ProductPage:React.FC<ProductPageProps> = (props) => {
@@ -33,7 +32,6 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
         menus,
         products,
         reviewed_products,
-        test
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
@@ -252,8 +250,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             settingsData: resultDat.settings,
             menus,
             products,
-            reviewed_products,
-            test: JSON.parse(getCookie('reviewed_products', {req, res})?.toString() ?? '[]')
+            reviewed_products
         }
     };
 }

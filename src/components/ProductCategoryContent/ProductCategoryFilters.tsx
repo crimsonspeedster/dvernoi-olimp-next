@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styles from './ProductCategoryContent.module.scss';
 import {useRouter} from "next/router";
-import {convertToDefaultAttrs} from "@utils/stringHelper";
+import {convertToDefaultAttrs, removeMultipleSlashes} from "@utils/stringHelper";
 import Link from "next/link";
 import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {If, Then} from "react-if";
@@ -16,46 +16,79 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
 
     const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
 
-    const filterStartIndex:number|undefined = router.query.subcategory_slug?.indexOf('filter');
-    const filterEndIndex:number|undefined = router.query.subcategory_slug?.indexOf('apply');
+    const filterStartIndex:number = router.query.subcategory_slug?.indexOf('filter') ?? -1;
+    const filterEndIndex:number = router.query.subcategory_slug?.indexOf('apply') ?? -1;
 
     const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
-    const [filterLinkItems, setFilterLinkItems] = useState<string[]>([]);
     const [itemsFilterIsOpen, setItemsFilterIsOpen] = useState<FilterAttrsProps[]>(category_filter);
-    const [filterStringValues, setFilterStringValues] = useState<string[]>([]);
 
     useEffect(()=>{
-        const elements:FilterAttrsProps[] = [];
-
-        filterItems?.forEach((item, i) => {
-            const strArr:string[] = convertToDefaultAttrs(item).split('-');
-
-            const curr_ellement:FilterAttrsProps = itemsFilterIsOpen.filter(subitem => subitem.slug === strArr[0])[0];
-
-            curr_ellement.isChoosed = true;
-            curr_ellement.values.forEach(element => {
-                strArr.includes(element.slug) ? element.isChoosed = true : null;
-
-                return element;
-            });
-
-            return item;
-        });
-
-        itemsFilterIsOpen.map(item => {elements.push(item); return item;});
-
-        // setItemsFilterIsOpen(elements);
-
-    }, [filterItems, itemsFilterIsOpen]);
+        setItemsFilterIsOpen(category_filter);
+    }, [category_filter]);
 
     useEffect(()=>{
 
-        if (filterStartIndex !== undefined && filterEndIndex !== undefined && filterStartIndex > 0 && filterEndIndex > 0)
+        if (filterStartIndex >= 0 && filterEndIndex > 0)
         {
-            setFilterItems(router.query.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(','));
+            setFilterItems(router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
+        }
+        else {
+            setFilterItems([]);
         }
 
     }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
+
+    const removeAttrHandler = (category: string, cat_param: string):void => {
+        const linkItemsFilter:string|undefined = filterItems?.filter(item => item.includes(category))[0];
+        const indexInFilterItems:number = filterItems?.findIndex(item => item.includes(category)) ?? 0;
+        const linkItemsArray:string[] = linkItemsFilter ? linkItemsFilter.split('-') : [];
+
+        // const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
+
+        if (linkItemsFilter && !linkItemsArray.includes(cat_param))
+        {
+            filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter((item) => item !== linkItemsFilter), `${linkItemsFilter}-or-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${linkItemsFilter}-or-${cat_param}/apply`));
+        }
+        else if (!linkItemsFilter && !linkItemsArray.includes(cat_param)) {
+            filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems, `${category}-is-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${category}-is-${cat_param}/apply`));
+        }
+        else if (linkItemsArray.includes(cat_param)) {
+            const stringWithoutParam:string = linkItemsArray.filter(item => item !== cat_param).join('-');
+            let filtered_param:string|boolean = false;
+
+            if (stringWithoutParam === `${category}-is` || stringWithoutParam === `${category}-or`)
+            {
+                filtered_param = false;
+            }
+            else if (stringWithoutParam.endsWith('or'))
+            {
+                filtered_param = stringWithoutParam.slice(0, -3);
+            }
+            else if (stringWithoutParam.includes('is-or'))
+            {
+                filtered_param = stringWithoutParam.replace('is-or', 'is');
+            }
+            else if(stringWithoutParam.includes('or-or'))
+            {
+                filtered_param = stringWithoutParam.replace('or-or', 'or');
+            }
+
+            const filterString:string[]|undefined = filterItems?.filter((item, i) => i !== indexInFilterItems);
+
+            if (filtered_param)
+            {
+                filterString?.push(filtered_param);
+            }
+
+            if (filterString && filterString.length > 0)
+            {
+                router.push(removeMultipleSlashes(`${current_link}/filter/${filterString.join('/')}/apply`));
+            }
+            else {
+                router.push(`${current_link}`);
+            }
+        }
+    }
 
     if (itemsFilterIsOpen.filter(item => item.isChoosed).length > 0)
     {
@@ -77,7 +110,7 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
                                                     <div className={styles['product-category-filters__item']}>
                                                         <span className={styles['product-category-filters__item-text']}>{subitem.value}</span>
 
-                                                        <span className={styles['product-category-filters__item-icon']}>
+                                                        <span className={styles['product-category-filters__item-icon']} onClick={()=>{removeAttrHandler(item.slug, subitem.slug)}}>
                                                             <span className={styles['product-category-filters__item-icon-inner']} />
                                                         </span>
                                                     </div>
@@ -91,10 +124,12 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
                     }
                 </div>
 
-                <Link
-                    href={current_link}
+                <button
+                    onClick={()=>{
+                        router.push(current_link);
+                    }}
                     className={styles['product-category-filters__btn']}
-                >Сбросить все фильтры</Link>
+                >Сбросить все фильтры</button>
             </div>
         )
     }

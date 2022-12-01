@@ -12,13 +12,23 @@ import CatalogCategoryTemplate from "@root/templates/CatalogCategoryTemplate";
 import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 import {Else, If, Then} from "react-if";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
+import styles from "@styles/SingleProduct.module.scss";
+import CardSlider from "@components/CardSlider/CardSlider";
+import {getCookie} from "cookies-next";
+import Callback from "@components/Callback/Callback";
+import BottomTabs from "@components/BottomTabs/BottomTabs";
+import SeoBlock from "@components/SeoBlock/SeoBlock";
+import classNames from "classnames";
 
 
 interface SubCategoryProps {
     settingsData: any,
     menus: any,
     pageData: any,
-    products: ProductCardProps[]
+    products: ProductCardProps[],
+    reviewed_products: ProductCardProps[],
+    total_pages: number,
+    current_page: number
 }
 
 const SubCategory:React.FC<SubCategoryProps> = (props) => {
@@ -26,78 +36,17 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         settingsData,
         menus,
         pageData,
-        products
+        products,
+        reviewed_products,
+        total_pages,
+        current_page
     } = props;
 
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
 
-    // const router = useRouter();
-    //
-    // const filterStartIndex:number|undefined = router.query.subcategory_slug?.indexOf('filter');
-    // const filterEndIndex:number|undefined = router.query.subcategory_slug?.indexOf('apply');
-    //
-    // const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
-    //
-    // useEffect(()=>{
-    //
-    //     if (filterStartIndex !== undefined && filterEndIndex !== undefined)
-    //     {
-    //         setFilterItems(router.query.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(','));
-    //     }
-    //
-    // }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
-
-    // const handleClick = (category: string, cat_param: string):void => {
-    //     const linkItemsFilter:string|undefined = filterItems?.filter(item => item.includes(category))[0];
-    //     const indexInFilterItems:number = filterItems?.findIndex(item => item.includes(category)) ?? 0;
-    //     const linkItemsArray:string[] = linkItemsFilter ? linkItemsFilter.split('-') : [];
-    //
-    //     if (linkItemsFilter && !linkItemsArray.includes(cat_param))
-    //     {
-    //         filterItems && filterItems.length ? router.push(`/${router.query.slug}/filter/${[...filterItems.filter((item) => item !== linkItemsFilter), `${linkItemsFilter}-or-${cat_param}`]?.join('/')}/apply`) : router.push(`/${router.query.slug}/filter/${linkItemsFilter}-or-${cat_param}/apply`);
-    //     }
-    //     else if (!linkItemsFilter && !linkItemsArray.includes(cat_param)) {
-    //         filterItems && filterItems.length ? router.push(`/${router.query.slug}/filter/${[...filterItems, `${category}-is-${cat_param}`]?.join('/')}/apply`) : router.push(`/${router.query.slug}/filter/${category}-is-${cat_param}/apply`);
-    //     }
-    //     else if (linkItemsArray.includes(cat_param)) {
-    //         const stringWithoutParam:string = linkItemsArray.filter(item => item !== cat_param).join('-');
-    //         let filtered_param:string|boolean = false;
-    //
-    //         if (stringWithoutParam === `${category}-is` || stringWithoutParam === `${category}-or`)
-    //         {
-    //             filtered_param = false;
-    //         }
-    //         else if (stringWithoutParam.endsWith('or'))
-    //         {
-    //             filtered_param = stringWithoutParam.slice(0, -3);
-    //         }
-    //         else if (stringWithoutParam.includes('is-or'))
-    //         {
-    //             filtered_param = stringWithoutParam.replace('is-or', 'is');
-    //         }
-    //         else if(stringWithoutParam.includes('or-or'))
-    //         {
-    //             filtered_param = stringWithoutParam.replace('or-or', 'or');
-    //         }
-    //
-    //         const filterString:string[]|undefined = filterItems?.filter((item, i) => i !== indexInFilterItems);
-    //
-    //         if (filtered_param)
-    //         {
-    //             filterString?.push(filtered_param);
-    //         }
-    //
-    //         if (filterString && filterString.length > 0)
-    //         {
-    //             router.push(`/${router.query.slug}/filter/${filterString.join('/')}/apply`);
-    //         }
-    //         else {
-    //             setFilterItems([]);
-    //             router.push(`/${router.query.slug}`);
-    //         }
-    //         // filterString && filterString.length > 0 ? router.push(`/${router.query.slug}/filter/${filterString.join('/')}/apply`) : router.push(`/${router.query.slug}`);
-    //     }
-    // }
+    useEffect(()=>{
+        setProductItems(products);
+    }, [products]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
@@ -105,7 +54,9 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         <SettingsContext.Provider value={{
             settings: settingsData,
             translates: pageData.translated_slugs,
-            menus
+            menus,
+            total_pages,
+            page: current_page
         }}>
             <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -117,6 +68,36 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
                     category_filter={pageData.category_filter}
                     productItems={productItems}
                     setProductItems={setProductItems}
+                    priceRange={pageData.price_range}
+                />
+
+                <If condition={reviewed_products.length > 0}>
+                    <Then>
+                        <section className={styles['section-slider--reviewed']}>
+                            <div className="container">
+                                <CardSlider
+                                    block_title={'Ранее просмотренные товары'}
+                                    sliderItems={reviewed_products}
+                                    perViewAmount={4}
+                                    cardType={'product'}
+                                    perCard={0}
+                                />
+                            </div>
+                        </section>
+                    </Then>
+                </If>
+
+                <Callback />
+
+                {
+                    pageData.acf?.seo_block?.title &&
+                    <SeoBlock
+                        seoBlock={pageData.acf?.seo_block}
+                    />
+                }
+
+                <BottomTabs
+                    classNameStr={classNames(styles['section-slider--bottom'], pageData.acf?.seo_block?.title ? '' : styles.alone)}
                 />
             </Layout>
         </SettingsContext.Provider>
@@ -125,17 +106,53 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
 
 export default SubCategory;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req, query}) => {
     const apolloClient = getApolloClient();
 
+    let filter_items:string[]|undefined = [];
+
+    const filterStartIndex:number = params?.subcategory_slug?.indexOf('filter') ?? -1;
+    const filterEndIndex:number = params?.subcategory_slug?.indexOf('apply') ?? -1;
+    const pageNum:number = params?.subcategory_slug?.indexOf('page') ?? -1;
+
+    const categoryRequestParams:any = {
+        slug: params?.subcategory_slug?.[0] === 'filter' || params?.subcategory_slug?.[0] === 'page' ? params?.slug : params?.subcategory_slug?.[0] ?? params?.slug,
+        lang: locale,
+        consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
+        consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
+        acf_format: 'standard',
+    }
+
+    const productsRequestParams:any = {
+        lang: locale,
+        category: params?.subcategory_slug?.[0] === 'filter' || params?.subcategory_slug?.[0] === 'page' ? params?.slug : params?.subcategory_slug?.[0] ?? params?.slug,
+        consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
+        consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
+        per_page: process.env.NEXT_PUBLIC_ENV_PRODUCTS_PER_PAGE,
+        page: pageNum >= 0 && params?.subcategory_slug && params?.subcategory_slug?.length >= pageNum + 2 ? parseInt(params?.subcategory_slug?.[pageNum+1]) : 1,
+        acf_format: 'standard',
+        ...(query.order) && {order: query.order},
+        ...(query.orderBy) && {orderby: query.orderBy}
+    };
+
+    if (filterStartIndex >= 0 && filterEndIndex > 0)
+    {
+        filter_items = params?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(',');
+
+        filter_items?.map(item => item.split('-').filter(item => item !== 'is' && item !== 'or'))?.map(item => {
+            categoryRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
+            productsRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
+
+            return item;
+        });
+    }
+
     const categoryRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_WOO_API}/products/categories`, {
-        params: {
-            slug: params?.subcategory_slug?.[0] ?? params?.slug,
-            lang: locale,
-            consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
-            consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
-            acf_format: 'standard'
-        }
+        params: categoryRequestParams
+    });
+
+    const productsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/products`, {
+        params: productsRequestParams
     });
 
     const settingsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/options`, {
@@ -146,10 +163,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     })
 
-    const resData = await axios.all([settingsRequest, categoryRequest]).then(axios.spread(function(settings, category) {
+    const resData = await axios.all([settingsRequest, categoryRequest, productsRequest]).then(axios.spread(function(settings, category, products) {
         return {
             settings: settings.data,
-            pageData: category.data?.[0] ?? {}
+            pageData: category.data?.[0] ?? {},
+            products: products.data.products,
+            current_page: products.data.current_page,
+            total_pages: products.data.total_pages
         };
     }));
 
@@ -157,6 +177,26 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
     {
         res.writeHead(301, { Location: '/404' });
         res.end();
+    }
+
+    let reviewed_products_ids = JSON.parse(getCookie('reviewed_products', {req, res})?.toString() ?? '[]');
+    let reviewed_products = [];
+
+    if (getCookie('reviewed_products', {req, res}) && reviewed_products_ids.length > 0)
+    {
+        reviewed_products = await axios.get(`${process.env.NEXT_PUBLIC_ENV_WOO_API}/products`, {
+            params: {
+                lang: locale,
+                consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
+                consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
+                acf_format: 'standard',
+                page: 1,
+                per_page: 16,
+                include: reviewed_products_ids.join(','),
+            }
+        })
+            .then((result) => result.data)
+            .catch((err) => console.log(err));
     }
 
     const {data: footer_company} = await apolloClient.query({
@@ -230,7 +270,10 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             settingsData: resData.settings,
             menus,
             pageData: resData.pageData,
-            products: []
+            products: resData.products ?? [],
+            current_page: resData.current_page,
+            total_pages: resData.total_pages,
+            reviewed_products
         }
     }
 }

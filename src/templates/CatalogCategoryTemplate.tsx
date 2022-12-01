@@ -14,6 +14,12 @@ interface CatalogCategoryTemplateProps {
     category_filter: FilterAttrsProps[],
     productItems: ProductCardProps[],
     setProductItems: React.Dispatch<SetStateAction<ProductCardProps[]>>
+    priceRange?: PriceRangeProps
+}
+
+export interface PriceRangeProps {
+    min_price: string,
+    max_price: string
 }
 
 const CatalogCategoryTemplate:React.FC<CatalogCategoryTemplateProps> = (props) => {
@@ -23,7 +29,8 @@ const CatalogCategoryTemplate:React.FC<CatalogCategoryTemplateProps> = (props) =
         category_filter,
         childrenCategories,
         productItems,
-        setProductItems
+        setProductItems,
+        priceRange
     } = props;
 
     const [ isOpenFilter, setIsOpenFilter ] = useState<boolean>(false)
@@ -46,6 +53,7 @@ const CatalogCategoryTemplate:React.FC<CatalogCategoryTemplateProps> = (props) =
                 category_filter={category_filter}
                 products={productItems}
                 setProductItems={setProductItems}
+                priceRange={priceRange}
             />
         </>
     );

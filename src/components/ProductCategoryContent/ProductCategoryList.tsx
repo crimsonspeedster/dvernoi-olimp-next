@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import Link from "next/link";
 import ProductCategoryLoadBtn from './ProductCategoryLoadBtn'
 import ProductCategoryPagination from './ProductCategoryPagination'
@@ -30,17 +30,47 @@ const ProductCategoryList:React.FC<ProductCategoryListProps> = (props) => {
 
     const [page, setPage] = useState<number>(settings.page-1);
 
+    useEffect(()=>{
+        setPage(settings.page-1);
+    }, [settings]);
+
     const handlePageClick = (selectedItem: {selected: number}):void => {
+        const queryParams = router.query;
+
         if (router.route === '/search')
         {
-            const queryParams = router.query;
-
             selectedItem.selected + 1 === 1 ? delete queryParams['page'] : queryParams['page'] = (selectedItem.selected + 1).toString();
 
             router.push({
                 pathname: router.pathname,
                 query: queryParams
             });
+        }
+        else if (router.route === '/[slug]/[[...subcategory_slug]]') {
+            let updated_url:string = '';
+
+            if (router?.query?.subcategory_slug && router?.query?.subcategory_slug?.length > 0)
+            {
+                if (router?.query?.subcategory_slug?.[0] === 'page')
+                {
+                    //@ts-ignore
+                    updated_url = selectedItem.selected+1 === 1 ? `/${router.query.slug}` : `/${router.query.slug}/page/${selectedItem.selected+1}`;
+                }
+                else {
+                    //@ts-ignore
+                    updated_url = selectedItem.selected+1 === 1 ? `/${router.query.slug}/${router?.query?.subcategory_slug?.filter((item, i, arr) => item !== 'page' && arr[i-1] !== 'page' && item !== 'order' && item !== 'orderBy')?.join('/')}` : `/${router.query.slug}/${router?.query?.subcategory_slug?.filter((item, i, arr) => item !== 'page' && arr[i-1] !== 'page' && item !== 'order' && item !== 'orderBy')?.join('/')}/page/${selectedItem.selected+1}`;
+                }
+            }
+            else {
+                updated_url = selectedItem.selected+1 === 1 ? `/${router.query.slug}` : `/${router.query.slug}/page/${selectedItem.selected+1}`;
+            }
+
+            if (router.query.order)
+            {
+                updated_url+=`?order=${router.query.order}&orderBy=${router.query.orderBy}`;
+            }
+
+           router.push(updated_url);
         }
     }
 
@@ -73,8 +103,6 @@ const ProductCategoryList:React.FC<ProductCategoryListProps> = (props) => {
                     />
 
                     <CustomPagination pages={total_pages} initialPage={page} handlePageClick={handlePageClick} />
-
-                    {/*<ProductCategoryPagination />*/}
                 </Then>
             </If>
 

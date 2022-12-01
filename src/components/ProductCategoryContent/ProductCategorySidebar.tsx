@@ -9,6 +9,10 @@ import classNames from "classnames";
 import {If, Then} from "react-if";
 import {useRouter} from "next/router";
 import {convertToDefaultAttrs, removeMultipleSlashes} from "@utils/stringHelper";
+import Nouislider from "nouislider-react";
+import 'nouislider/distribute/nouislider.css'
+import {PriceRangeProps} from "@root/templates/CatalogCategoryTemplate";
+import {DebounceInput} from "react-debounce-input";
 
 
 interface ProductCategorySidebarProps {
@@ -16,19 +20,15 @@ interface ProductCategorySidebarProps {
     isModalExist: boolean,
     isOpenFilter: boolean,
     setIsOpenFilter: Dispatch<SetStateAction<boolean>>,
-    category_filter: FilterAttrsProps[]
+    category_filter: FilterAttrsProps[],
+    priceRange?: PriceRangeProps
 }
-
-// export interface FilterLinkProps {
-//     slug: string,
-//     values: string[]
-// }
 
 export interface FilterAttrsProps {
     name: string,
     slug: string,
-    isOpen?: boolean,
-    isChoosed?: boolean,
+    isOpen: boolean,
+    isChoosed: boolean,
     values: FilterValuesProps[]
 }
 
@@ -36,7 +36,7 @@ interface FilterValuesProps {
     id: number,
     slug: string,
     value: string,
-    isChoosed?: boolean
+    isChoosed: boolean
 }
 
 const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => {
@@ -45,55 +45,62 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
         isModalExist,
         isOpenFilter,
         setIsOpenFilter,
-        category_filter
+        category_filter,
+        priceRange
     } = props;
 
-    const [minPriceVal, setMinPriceVal] = useState<number>(0);
-    const [maxPriceVal, setMaxPriceVal] = useState<number>(3000);
+    const router = useRouter();
+
+    const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
+
+    const filterStartIndex:number = router.query.subcategory_slug?.indexOf('filter') ?? -1;
+    const filterEndIndex:number = router.query.subcategory_slug?.indexOf('apply') ?? -1;
+
+    const [filterItems, setFilterItems] = useState<string[]|undefined>(router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') ?? []);
+
+    const [minPriceVal, setMinPriceVal] = useState<number>(parseInt(priceRange?.min_price ?? '0'));
+    const [maxPriceVal, setMaxPriceVal] = useState<number>(parseInt(priceRange?.max_price ?? '0'));
+
+    const [currentMinVal, setCurrentMinVal] = useState<number>(parseInt(priceRange?.min_price ?? '0'));
+    const [currentMaxVal, setCurrentMaxVal] = useState<number>(parseInt(priceRange?.max_price ?? '0'));
 
     const [globalFilterIsOpen, setGlobalFilterIsOpen] = useState<boolean>(false);
     const [itemsFilterIsOpen, setItemsFilterIsOpen] = useState<FilterAttrsProps[]>(category_filter);
 
-    const router = useRouter();
+    useEffect(()=>{
+        setMinPriceVal(parseInt(priceRange?.min_price ?? '0'));
+        setMaxPriceVal(parseInt(priceRange?.max_price ?? '0'));
 
-    const filterStartIndex:number|undefined = router.query.subcategory_slug?.indexOf('filter');
-    const filterEndIndex:number|undefined = router.query.subcategory_slug?.indexOf('apply');
-
-    const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
-
-    // useEffect(()=>{
-    //     const elements:FilterAttrsProps[] = [];
-    //
-    //     filterItems?.forEach((item, i) => {
-    //         const strArr:string[] = convertToDefaultAttrs(item).split('-');
-    //
-    //         const curr_ellement:FilterAttrsProps = itemsFilterIsOpen.filter(subitem => subitem.slug === strArr[0])[0];
-    //
-    //         curr_ellement.isChoosed = true;
-    //         curr_ellement.values.forEach(element => {
-    //             strArr.includes(element.slug) ? element.isChoosed = true : null;
-    //
-    //             return element;
-    //         });
-    //
-    //         return item;
-    //     });
-    //
-    //     itemsFilterIsOpen.map(item => {elements.push(item); return item;});
-    //
-    //     setItemsFilterIsOpen(elements);
-    //
-    // }, [filterItems]);
+        setCurrentMinVal(parseInt(priceRange?.min_price ?? '0'));
+        setCurrentMaxVal(parseInt(priceRange?.max_price ?? '0'));
+    }, [priceRange]);
 
     useEffect(()=>{
-        setItemsFilterIsOpen(category_filter.map(item => {item.isOpen = true; return item;}));
+        setItemsFilterIsOpen(category_filter);
     }, [category_filter]);
 
     useEffect(()=>{
 
-        if (filterStartIndex !== undefined && filterEndIndex !== undefined && filterStartIndex > 0 && filterEndIndex > 0)
+        if (filterStartIndex >= 0 && filterEndIndex > 0)
         {
-            setFilterItems(router.query.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(','));
+            setFilterItems(router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
+
+            let min_price:string = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('min_price'))?.[0] ?? '';
+
+            let max_price:string = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('max_price'))?.[0] ?? '';
+
+            if (min_price)
+            {
+                setCurrentMinVal(parseInt(min_price.replace('min_price-is-', '')));
+            }
+
+            if (max_price)
+            {
+                setCurrentMaxVal(parseInt(max_price.replace('max_price-is-', '')));
+            }
+        }
+        else {
+            setFilterItems([]);
         }
 
     }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
@@ -107,11 +114,15 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
         const indexInFilterItems:number = filterItems?.findIndex(item => item.includes(category)) ?? 0;
         const linkItemsArray:string[] = linkItemsFilter ? linkItemsFilter.split('-') : [];
 
-        const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
-
         if (linkItemsFilter && !linkItemsArray.includes(cat_param))
         {
-            filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter((item) => item !== linkItemsFilter), `${linkItemsFilter}-or-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${linkItemsFilter}-or-${cat_param}/apply`));
+            if (category === 'min_price' || category === 'max_price')
+            {
+                filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter(item => !item.includes(category)), `${category}-is-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${category}-is-${cat_param}/apply`));
+            }
+            else {
+                filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter((item) => item !== linkItemsFilter), `${linkItemsFilter}-or-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${linkItemsFilter}-or-${cat_param}/apply`));
+            }
         }
         else if (!linkItemsFilter && !linkItemsArray.includes(cat_param)) {
             filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems, `${category}-is-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${category}-is-${cat_param}/apply`));
@@ -149,7 +160,6 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                 router.push(removeMultipleSlashes(`${current_link}/filter/${filterString.join('/')}/apply`));
             }
             else {
-                setFilterItems([]);
                 router.push(`${current_link}`);
             }
         }
@@ -166,6 +176,101 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
             case 'pa_price':
                 return (
                     <>
+                        <div className={styles['product-category-sidebar__item']}>
+                            <div
+                                className={classNames(styles['product-category-sidebar__head'], attribute?.isOpen ? styles['open'] : '')}
+                                onClick={() => handleStatus(attribute.slug)}
+                            >
+                                <div className={styles['product-category-sidebar__head-text']}>{attribute.name}</div>
+
+                                <div className={styles['product-category-sidebar__head-icon']}>
+                                    <svg>
+                                        <use href={`${sprite.src}#big-item-arrow`}/>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className={styles['product-category-sidebar__body']}>
+                                <Collapse isOpened={attribute?.isOpen ?? true}>
+                                    <div className={styles['product-category-sidebar__body-inner']}>
+                                        {
+                                            attribute.values.map((item, i) => (
+                                                <div
+                                                    key={i}
+                                                    className={styles['product-category-sidebar__body-item']}
+                                                    onClick={()=>handleClick(attribute.slug, item.slug)}
+                                                >
+                                                    <input className={styles['product-category-sidebar__body-check']} type="checkbox" defaultChecked={item.isChoosed} id={item.slug} />
+
+                                                    <label className={styles['product-category-sidebar__body-label']} htmlFor={item.slug}>
+                                                    <span className={styles['product-category-sidebar__body-icon']}>
+                                                        <svg><use href={`${sprite.src}#check`}/></svg>
+                                                    </span>
+
+                                                        <span className={styles['product-category-sidebar__body-text']}>{item.value}</span>
+                                                    </label>
+                                                </div>
+                                            ))
+                                        }
+
+                                        <div className={classNames(styles['product-category-sidebar__body-item'], styles['product-category-sidebar__body-item--price'])}>
+                                            <div className={styles['product-category-sidebar__body-inp-wrapper']}>
+                                                <DebounceInput
+                                                    className={styles['product-category-sidebar__body-inp']}
+                                                    minLength={0}
+                                                    autoComplete={'off'}
+                                                    debounceTimeout={500}
+                                                    min={minPriceVal}
+                                                    max={maxPriceVal-1}
+                                                    value={currentMinVal}
+                                                    onChange={e => {
+                                                        setCurrentMinVal(parseInt(e.target.value ?? '1'));
+                                                        handleClick('min_price', e.target.value ?? '1');
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <div className={styles['product-category-sidebar__body-inp-wrapper']}>
+                                                <DebounceInput
+                                                    className={styles['product-category-sidebar__body-inp']}
+                                                    autoComplete="off"
+                                                    debounceTimeout={500}
+                                                    value={currentMaxVal}
+                                                    max={maxPriceVal}
+                                                    min={minPriceVal+1}
+                                                    onChange={e => {
+                                                        setCurrentMaxVal(parseInt(e.target.value ?? '1'));
+                                                        handleClick('max_price', e.target.value ?? '1');
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className={classNames(styles['product-category-sidebar__body-item'], styles['product-category-sidebar__body-item--slider'])}>
+                                            <Nouislider
+                                                range={{min: minPriceVal, max: maxPriceVal}}
+                                                start={[currentMinVal, currentMaxVal]}
+                                                connect
+                                                step={1}
+                                                onChange={(value)=>{
+                                                    setCurrentMinVal(parseInt(value[0]));
+                                                    setCurrentMaxVal(parseInt(value[1]));
+
+                                                    if (parseInt(value[0]) !== currentMinVal)
+                                                    {
+                                                        handleClick('min_price', parseInt(value[0]).toString());
+                                                    }
+                                                    else if (parseInt(value[1]) !== currentMaxVal)
+                                                    {
+                                                        handleClick('max_price', parseInt(value[1]).toString());
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </Collapse>
+                            </div>
+                        </div>
                     </>
                 );
             default:
@@ -233,7 +338,14 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                 <div className={styles['product-category-sidebar__header-text']}>Фильтры</div>
                             </div>
 
-                            <button className={styles['product-category-sidebar__header-btn']}>Сбросить все фильтры</button>
+                            <button
+                                onClick={()=>{
+                                    router.push(current_link);
+                                }}
+                                className={styles['product-category-sidebar__header-btn']}
+                            >
+                                Сбросить все фильтры
+                            </button>
                         </div>
                     </Then>
                 </If>
@@ -249,22 +361,27 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                 </Then>
                             </If>
 
-                            {
-                                itemsFilterIsOpen.map((item, i) => (
-                                    <ParamFilter
-                                        key={i}
-                                        name={item.name}
-                                        slug={item.slug}
-                                        values={item.values}
-                                        isOpen={item.isOpen}
-                                    />
-                                ))
-                            }
+                            <If condition={itemsFilterIsOpen.length > 0}>
+                                <Then>
+                                    {
+                                        itemsFilterIsOpen.map((item, i) => (
+                                            <ParamFilter
+                                                key={i}
+                                                name={item.name}
+                                                slug={item.slug}
+                                                values={item.values}
+                                                isOpen={item.isOpen}
+                                                isChoosed={item.isChoosed}
+                                            />
+                                        ))
+                                    }
+                                </Then>
+                            </If>
                         </div>
                     </Then>
                 </If>
 
-                <If condition={!isSearchPage}>
+                <If condition={!isSearchPage && itemsFilterIsOpen.length > 0}>
                     <Then>
                         <div className={styles['product-category-sidebar__btns']}>
                             <div className={styles['product-category-sidebar__btn-wrapper']}>
@@ -277,7 +394,10 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                             </div>
 
                             <div className={styles['product-category-sidebar__btn-wrapper']}>
-                                <button className={classNames(styles['product-category-sidebar__btn'], styles['product-category-sidebar__btn--cancel'])}>Сбросить фильтры</button>
+                                <button
+                                    onClick={()=>{router.push(current_link)}}
+                                    className={classNames(styles['product-category-sidebar__btn'], styles['product-category-sidebar__btn--cancel'])}
+                                >Сбросить фильтры</button>
                             </div>
                         </div>
                     </Then>
