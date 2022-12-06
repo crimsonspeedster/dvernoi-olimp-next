@@ -13,6 +13,7 @@ import {GetMenu} from "@components/Layout/graphql";
 import {PostProp} from "@components/Homepage/Posts/Posts";
 import {If, Then} from "react-if";
 import styles from '@components/SinglePost/Intro/Intro.module.scss'
+import {useRouter} from "next/router";
 
 
 interface SinglePostProps {
@@ -30,7 +31,38 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
         posts
     } = props;
 
+    const router = useRouter();
+
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
+
+    const PostJsonLD = ():string => {
+        return `
+            {
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": "${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}${router.asPath}"
+                },
+                "headline": "${pageData.title.rendered}",
+                "image": "${pageData.featured_image_link}",
+                "author": {
+                    "@type": "ТРЕБА ДОДАТИ ІНФОРМАЦІЮ",
+                    "name": "ТРЕБА ДОДАТИ ІНФОРМАЦІЮ",
+                    "url": "ПОСИЛАННЯ НА АВТОРА"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "${settingsData.company_name}",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "${settingsData.logo.sizes.thumbnail}"
+                    }
+                },
+                "datePublished": "${pageData.locale_date}"
+            }
+        `;
+    }
 
     return (
         <>
@@ -72,6 +104,10 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
                         </Then>
                     </If>
 
+                    <script
+                        type="application/ld+json"
+                        dangerouslySetInnerHTML={{__html: PostJsonLD()}}
+                    />
                 </Layout>
             </SettingsContext.Provider>
         </>

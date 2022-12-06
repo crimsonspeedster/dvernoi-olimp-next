@@ -31,7 +31,7 @@ const MobileSearch = () => {
                         autoComplete="off"
                         placeholder="Поиск..."
                         value={search}
-                        onChange={e => setSearch(e.currentTarget.value.trim())}
+                        onChange={e => setSearch(e.currentTarget.value)}
                     />
                 </div>
 

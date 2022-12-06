@@ -194,9 +194,9 @@
         }
 
         &__inp {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 254px);
+            grid-column-gap: 20px;
 
             & + & {
                 margin-top: 15px;
@@ -705,5 +705,43 @@
                 height: 15px;
             }
         }
+    }
+}
+.select-dropdown {
+    font-size: 14px;
+    line-height: 160%;
+    letter-spacing: -0.02em;
+    color: #BEBEC8;
+    background: #fff;
+    position: relative;
+    width: 100%;
+
+    select {
+        padding: 5px 15px;
+        outline: none;
+        min-height: 41px;
+        cursor: pointer;
+        width: 100%;
+        background: none;
+        border: 1px solid #D4DADE;
+        appearance: none;
+
+        &::placeholder {
+            color: #BEBEC8;
+        }
+    }
+
+    &::after {
+        position: absolute;
+        cursor: pointer;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        content: '';
+        z-index: 1;
+        width: 10px;
+        height: 8px;
+        background: url('./select-arrow.svg') center no-repeat;
+        background-size: contain;
     }
 }

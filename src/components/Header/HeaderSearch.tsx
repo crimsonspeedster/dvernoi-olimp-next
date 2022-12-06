@@ -121,7 +121,7 @@ const HeaderSearch:React.FC<HeaderSearchProps> = ({isOpenSearch, setIsOpenSearch
                         autoComplete="off"
                         placeholder="Поиск..."
                         value={search}
-                        onChange={e => setSearch(e.currentTarget.value.trim())}
+                        onChange={e => setSearch(e.currentTarget.value)}
                     />
                 </div>
 

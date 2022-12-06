@@ -19,6 +19,7 @@ import Callback from "@components/Callback/Callback";
 import BottomTabs from "@components/BottomTabs/BottomTabs";
 import SeoBlock from "@components/SeoBlock/SeoBlock";
 import classNames from "classnames";
+import {FilterAttrsProps, FilterValuesProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 
 
 interface SubCategoryProps {
@@ -48,6 +49,28 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         setProductItems(products);
     }, [products]);
 
+    const [pageTitle, setPageTitle] = useState<string>(pageData.name);
+
+    useEffect(()=>{
+        let pageTitle:string = pageData.name;
+        const choosedAttributes:string[] = [];
+
+        pageData.category_filter.filter((item:FilterAttrsProps) => item.isChoosed).forEach((item:FilterAttrsProps) => {
+            item.values.map(subitem => {
+                if (subitem.isChoosed)
+                {
+                    choosedAttributes.push(subitem.value);
+                }
+
+                return subitem;
+            });
+
+            return item;
+        });
+
+        setPageTitle(pageTitle += ` ${choosedAttributes.join(', ')}`);
+    }, [pageData.name, pageData.category_filter]);
+
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
     return (
@@ -63,7 +86,7 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
             <Layout>
                 <CatalogCategoryTemplate
                     breadcrumbs={breadcrumbs}
-                    pageTitle={pageData.name}
+                    pageTitle={pageTitle}
                     childrenCategories={pageData.children_terms}
                     category_filter={pageData.category_filter}
                     productItems={productItems}

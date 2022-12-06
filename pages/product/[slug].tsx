@@ -15,6 +15,7 @@ import CardSlider from "@components/CardSlider/CardSlider";
 import {If, Then} from "react-if";
 import { getCookies, getCookie, setCookies, removeCookies } from 'cookies-next';
 import styles from '@styles/SingleProduct.module.scss';
+import {extraAttributesProps} from "@components/SingleProduct/Intro/SingleProductContent";
 
 
 interface ProductPageProps {
@@ -56,9 +57,10 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                 />
 
                 <SingleProductIntro
+                    id={pageData.id}
                     title={pageData.name}
                     slug={pageData.slug}
-                    attributes={pageData.attributes}
+                    attributes={pageData.attributes.filter((item:any) => item?.variation && item?.visible)}
                     sku={pageData.sku}
                     variation_array={pageData.variation_array}
                     type={pageData.type}
@@ -66,6 +68,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     images={pageData.images}
                     in_stock={pageData.in_stock}
                     regular_price={pageData.regular_price}
+                    extra_attributes={pageData.acf.extra_attributes}
                 />
 
                 <SingleProductTabs

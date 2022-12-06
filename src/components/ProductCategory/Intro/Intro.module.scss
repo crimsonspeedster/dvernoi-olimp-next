@@ -8,9 +8,24 @@
     &__slider-wrapper {
         border: 1px solid #D4DADE;
         position: relative;
+
+        &.disabled {
+            border: none;
+        }
     }
 
     &-slider {
+        opacity: 1;
+        
+        &.disabled {
+            opacity: 1;
+
+            :global(.swiper-wrapper) {
+                overflow-x: auto;
+                max-width: 100%;
+            }
+        }
+
         &__prev, &__next {
             opacity: 1;
         }
@@ -23,6 +38,14 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
+
+            &.default {
+                border: 1px solid #D4DADE;
+
+                & + & {
+                    border-left: none;
+                }
+            }
 
             & + & {
                 border-left: 1px solid #D4DADE;

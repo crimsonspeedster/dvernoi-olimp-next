@@ -3,7 +3,7 @@ import styles from './Intro.module.scss'
 import SingleProductSlider from './SingleProductSlider'
 import SingleProductContent, {
     attributesProps,
-    default_attributesProps,
+    default_attributesProps, extraAttributesProps,
     variation_arrayProps
 } from './SingleProductContent'
 import SingleProductInfo from './SingleProductInfo'
@@ -12,6 +12,7 @@ import {ImageProductProps} from "@components/Cards/ProductCard/ProductCard";
 
 
 interface SingleProductIntroProps {
+    id: number,
     title: string,
     sku: string,
     type: string,
@@ -22,10 +23,12 @@ interface SingleProductIntroProps {
     default_attributes: default_attributesProps[],
     images: ImageProductProps,
     regular_price: string,
+    extra_attributes: extraAttributesProps[]
 }
 
 const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
     const {
+        id,
         title,
         sku,
         in_stock,
@@ -36,6 +39,7 @@ const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
         default_attributes,
         images,
         regular_price,
+        extra_attributes
     } = props;
 
     const [variation, setVariation] = useState<variation_arrayProps|undefined>(type === 'variable' ? variation_array.filter(item => item.slug === `${slug}-${default_attributes.sort((a, b)=> a.id > b.id ? 1 : -1).map(item => item.option).join('-')}`)[0] : undefined);
@@ -58,6 +62,7 @@ const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
 
                     <SingleProductContent
                         sku={sku}
+                        id={id}
                         type={type}
                         attributes={attributes}
                         variation_array={variation_array}
@@ -65,6 +70,7 @@ const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
                         price={regular_price}
                         currentVariation={variation}
                         setCurrentVariation={setVariation}
+                        extra_attributes={extra_attributes}
                     />
 
                     <SingleProductInfo />

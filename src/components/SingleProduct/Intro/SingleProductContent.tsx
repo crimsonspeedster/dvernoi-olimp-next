@@ -4,11 +4,15 @@ import sprite from '@icons/sprite.svg';
 import styles from './Intro.module.scss';
 import classNames from "classnames";
 import {If, Then} from "react-if";
-import {variationsProps} from "@components/Cards/ProductCard/ProductCard";
-import Dropdown, {DropdownValuesProps} from "@components/Dropdown/Dropdown";
+import {ProductCardProps, variationsProps} from "@components/Cards/ProductCard/ProductCard";
+import ProductVariation from "@components/SingleProduct/ProductVariation/ProductVariation";
+import ProductExtra, {
+    ProductExtraOptionsProps
+} from "@components/SingleProduct/ProductExtra/ProductExtra";
 
 
 interface SingleProductContentProps {
+    id: number,
     sku: string,
     type: string,
     attributes: attributesProps[],
@@ -16,7 +20,13 @@ interface SingleProductContentProps {
     default_attributes: default_attributesProps[],
     price: string,
     currentVariation?: variation_arrayProps,
-    setCurrentVariation?: Dispatch<SetStateAction<variation_arrayProps|undefined>>
+    setCurrentVariation: Dispatch<SetStateAction<variation_arrayProps|undefined>>
+    extra_attributes: extraAttributesProps[]
+}
+
+export interface extraAttributesProps {
+    attribute_title: string,
+    attribute_values: ProductExtraOptionsProps[]
 }
 
 export interface default_attributesProps {
@@ -28,7 +38,8 @@ export interface default_attributesProps {
 export interface variation_arrayProps {
     id: number,
     name: string,
-    slug: string
+    slug: string,
+    status: string,
     attribute_summary: variationsProps[],
     price: string,
     default_choosed: boolean,
@@ -43,14 +54,9 @@ export interface attributesProps {
     options: string[],
 }
 
-interface ProductVariationProps {
-    attribute: attributesProps,
-    defaultAttribute: default_attributesProps,
-    setCurrVariation?: Dispatch<SetStateAction<variation_arrayProps|undefined>>
-}
-
 const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
     const {
+        id,
         sku,
         type,
         attributes,
@@ -58,15 +64,34 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         price,
         default_attributes,
         currentVariation,
-        setCurrentVariation
+        setCurrentVariation,
+        extra_attributes
     } = props;
 
     const [counter, setCounter] = useState<string>('1');
-    const [itemPrice, setItemPrice] = useState<string>(type === 'simple' ? price : currentVariation?.price ?? '');
+    const [itemPrice, setItemPrice] = useState<string>(type === 'simple' ? price : currentVariation?.price ?? '0');
+    const [extraPrice, setExtraPrice] = useState<string>('0');
+    const [extraProducts, setExtraProducts] = useState<extraAttributesProps[]>(extra_attributes);
 
     useEffect(()=>{
-        setItemPrice(type === 'simple' ? price : currentVariation?.price ?? '');
+        setItemPrice(type === 'simple' ? price : currentVariation?.price ?? '0');
     }, [price, currentVariation, type]);
+
+    useEffect(()=>{
+        setExtraProducts(extra_attributes);
+    }, [extra_attributes]);
+
+    useEffect(()=>{
+        let total_price:number = 0;
+
+        extraProducts.forEach(item => {
+            total_price += parseInt(item.attribute_values.filter(subitem => subitem.choosed)[0].price);
+
+            return item;
+        });
+
+        setExtraPrice(total_price.toString());
+    }, [extraProducts]);
 
     const counterHandler = (val: string):void => {
         const filteredVal = parseInt(val);
@@ -91,61 +116,45 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         }
     }
 
-    const ProductVariation:React.FC<ProductVariationProps> = (props):ReactElement => {
-        const {
-            attribute,
-            defaultAttribute,
-            setCurrVariation
-        } = props;
-
-        const selectHandler = (prevVal: DropdownValuesProps, currVal: DropdownValuesProps):void => {
-            if (type === 'variable' && setCurrVariation)
-                setCurrVariation(prev => variation_array.filter(item => item.slug === prev?.slug?.split('-')?.map(item => item === prevVal.slug.toString().toLowerCase() ? currVal.slug : item)?.join('-'))?.[0] ?? undefined);
-        }
-
-        return (
-            <div className={styles['single-product-intro-content__inps']}>
-                <div className={styles['single-product-intro-content__inp']}>
-                    <p className={styles['single-product-intro-content__text']}>{attribute.name}</p>
-
-                    <Dropdown
-                        default_value={{
-                            slug: currentVariation?.attribute_summary.filter(item => item.attr_name === attribute.name)[0].attr_value ?? defaultAttribute.option,
-                            value: currentVariation?.attribute_summary.filter(item => item.attr_name === attribute.name)[0].attr_value ?? defaultAttribute.option
-                        }}
-                        classNameStr={styles['single-product-intro-dropdown']}
-                        values={attribute.options.map((item) => ({
-                            value: item,
-                            slug: item.toLowerCase()
-                        }))}
-                        onSelect={(prevVal, currVal)=>selectHandler(prevVal, currVal)}
-                    />
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className={classNames(styles['single-product-intro__content'], styles['single-product-intro-content'])}>
             <div className={styles['single-product-intro-content__top']}>
                 <div className={styles['single-product-intro-content__number']}>
-                    Код товара: <span>{sku}</span>
+                    Код товара: <span>{id}</span>
                 </div>
             </div>
 
             <If condition={type === 'variable'}>
                 <Then>
                     {
-                        attributes.sort((a, b) => a.id > b.id ? 1 : -1).map((item, i) => (
+                        attributes.sort((a, b) => a.id > b.id ? 1 : -1).map((item, i, arr) => (
                             <If key={i} condition={item.visible && item.variation}>
                                 <Then>
                                     <ProductVariation
                                         defaultAttribute={default_attributes.sort((a, b) => a.id > b.id ? 1 : -1)[i]}
                                         attribute={item}
                                         setCurrVariation={setCurrentVariation}
+                                        currentVariation={currentVariation}
+                                        variation_array={variation_array}
                                     />
                                 </Then>
                             </If>
+                        ))
+                    }
+                </Then>
+            </If>
+
+            <If condition={extra_attributes.length > 0}>
+                <Then>
+                    {
+                        extra_attributes.map((item, i) => (
+                            <ProductExtra
+                                key={i}
+                                attributeTitle={item.attribute_title}
+                                attributeValues={item.attribute_values}
+                                extraProducts={extraProducts}
+                                updateExtraProducts={setExtraProducts}
+                            />
                         ))
                     }
                 </Then>
@@ -193,7 +202,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 <p className={styles['single-product-intro-content__price-text']}>Общая стоимость:</p>
 
                 <div className={styles['single-product-intro-content__price-count']}>
-                    <span>{itemPrice}</span> грн / шт.
+                    <span>{parseInt(itemPrice) + parseInt(extraPrice)}</span> грн / шт.
                 </div>
             </div>
 

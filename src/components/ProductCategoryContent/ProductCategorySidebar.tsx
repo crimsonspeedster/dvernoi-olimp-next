@@ -32,7 +32,7 @@ export interface FilterAttrsProps {
     values: FilterValuesProps[]
 }
 
-interface FilterValuesProps {
+export interface FilterValuesProps {
     id: number,
     slug: string,
     value: string,

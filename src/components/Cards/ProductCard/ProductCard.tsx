@@ -8,6 +8,7 @@ import YoutubeIco from '@icons/yootube-ico.svg';
 import labelNew from '@icons/label-new.svg';
 import labelShare from '@icons/label-share.svg';
 import labelTop from "@icons/label-top.svg";
+import {variation_arrayProps} from "@components/SingleProduct/Intro/SingleProductContent";
 
 export interface ProductCardProps {
     id: number,
@@ -19,7 +20,8 @@ export interface ProductCardProps {
     type: string,
     in_stock: boolean,
     variations: variationsProps[],
-    labels: labelProps
+    labels: labelProps,
+    variation_array?: variation_arrayProps[],
 }
 
 export interface ImageProductProps {
@@ -61,7 +63,7 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
 
     return (
         <div className={classNames(styles['productCard'], `product-${id}`)}>
-            <span className={styles['productCard__sku']}>Код: {sku}</span>
+            <span className={styles['productCard__sku']}>Код: {id}</span>
 
             <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
                 <Then>
