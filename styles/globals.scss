@@ -796,11 +796,31 @@ button, .button {
 .article {
     iframe,
     video,
-    img {
+    {
         display: block;
         width: 100%;
         height: auto;
         margin-bottom: 25px;
+    }
+
+    img {
+        margin-bottom: 25px;
+        width: auto;
+        height: auto;
+    }
+
+    .alignleft {
+        float: left;
+        margin-right: 15px;
+    }
+
+    .alignright {
+        float: right;
+        margin-left: 15px;
+    }
+    
+    .aligncenter {
+        text-align: center;
     }
 
     p {
