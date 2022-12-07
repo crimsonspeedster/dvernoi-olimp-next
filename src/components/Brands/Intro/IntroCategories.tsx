@@ -16,8 +16,8 @@ const BrandsIntroCategories:React.FC<BrandsIntroCategoriesProps> = ({categories}
     return (
         <div className={classNames(styles['brands__categories'], styles['brands-categories'])}>
             <Link
-                href={"/brands"}
-                className={classNames(styles['brands-categories__item'], router.pathname === "/brands/[[...slug]]" ? styles.active : '')}
+                href={"/proizvoditeli-dverey"}
+                className={classNames(styles['brands-categories__item'], router.pathname === "/proizvoditeli-dverey/[[...slug]]" ? styles.active : '')}
             >
                 Все категории
             </Link>

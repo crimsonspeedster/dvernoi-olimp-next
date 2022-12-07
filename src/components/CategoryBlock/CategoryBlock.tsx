@@ -23,7 +23,7 @@ const CategoryBlock:React.FC<CategoryBlockProps> = ({className}) => {
                     {
                         settingsCtx.map((item:menuItemProp, i:number)=>(
                             <div key={i} className={styles['main-intro__catalog-list-item']}>
-                                <Link className={styles['main-intro__catalog-item-link']} href={item.url}>
+                                <Link className={styles['main-intro__catalog-item-link']} href={item.url ?? ''}>
                                     {
                                         item.acfmenu?.icon &&
                                         <span className={styles['main-intro__catalog-item-icon']}>
@@ -60,7 +60,7 @@ const CategoryBlock:React.FC<CategoryBlockProps> = ({className}) => {
                                                                             <div key={z} className={styles['main-intro__catalog-dropdown-list-item']}>
                                                                                 <Link
                                                                                     className={styles['main-intro__catalog-dropdown-list-link']}
-                                                                                    href={lastItem.url}
+                                                                                    href={lastItem.url ?? ''}
                                                                                 >
                                                                                     {lastItem.label}
                                                                                 </Link>

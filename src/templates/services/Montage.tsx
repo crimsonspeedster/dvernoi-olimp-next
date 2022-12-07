@@ -16,7 +16,12 @@ interface acfGroupProps {
 export interface ustanovka_dverejProps {
     nazvanie_bloka: string,
     opisanie: string,
-    tablicza: tabliczaProps[]
+    tables_repeater: tables_repeaterProps[]
+}
+
+export interface tables_repeaterProps {
+    tablicza: tabliczaProps[],
+    description_after?: string
 }
 
 interface tabliczaProps {

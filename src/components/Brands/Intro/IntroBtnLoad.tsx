@@ -26,7 +26,7 @@ const BrandsIntroBtnLoad:React.FC<BrandsIntroBtnLoadProps> = ({updatePosts}) => 
     const getMoreHandler = ():void => {
         setPostsUpdated(true);
 
-        if (router.route === "/brands/[[...slug]]")
+        if (router.route === "/proizvoditeli-dverey/[[...slug]]")
         {
             axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brend/`, {
                 params: {

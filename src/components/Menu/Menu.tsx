@@ -52,7 +52,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                                 {
                                     catalog_menu.map((item, i) => (
                                         <div key={i} className={styles['menu-list__item-panel-elem']}>
-                                            <Link className={styles['menu-list__item-panel-link']} href={item.url}>
+                                            <Link className={styles['menu-list__item-panel-link']} href={item.url ?? ''}>
 
                                                 {
                                                     item.acfmenu.icon &&
@@ -101,7 +101,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                                                                                                         <Link
                                                                                                             key={z}
                                                                                                             className={styles['menu-list__item-panel-dropdown-link']}
-                                                                                                            href={lastitem.url}
+                                                                                                            href={lastitem.url ?? ''}
                                                                                                         >{lastitem.label}</Link>
                                                                                                     ))
                                                                                                 }

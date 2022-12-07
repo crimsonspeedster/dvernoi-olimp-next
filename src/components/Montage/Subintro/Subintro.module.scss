@@ -33,6 +33,10 @@
     &__table {
         border: 1px solid #D4DADE;
 
+        &-description {
+            margin-top: 15px;
+        }
+
         &-row {
             display: flex;
             align-items: center;
@@ -53,7 +57,7 @@
             }
 
             &:nth-child(odd) {
-                background: rgba(164, 172, 20, 0.08);
+                background: #D4DADE;
             }
 
             &:nth-child(even) {

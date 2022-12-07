@@ -27,9 +27,9 @@ const BrandsIntro:React.FC<BrandsIntroProps> = ({title, categories, posts, updat
     const [page, setPage] = useState<number>(!isNaN(parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1')) ? parseInt(router.query.slug?.[router.query.slug?.length-1]?.toString() ?? '1') - 1 : 0);
 
     const handlePageClick = (selectedItem: {selected: number}):void => {
-        if (router.route === "/brands/[[...slug]]")
+        if (router.route === "/proizvoditeli-dverey/[[...slug]]")
         {
-            selectedItem.selected + 1 === 1 ? router.push('/brands') : router.push(`/brands/page/${selectedItem.selected + 1}`);
+            selectedItem.selected + 1 === 1 ? router.push('/proizvoditeli-dverey') : router.push(`/proizvoditeli-dverey/page/${selectedItem.selected + 1}`);
         }
         else {
             selectedItem.selected + 1 === 1 ? router.push(`/brands-category/${router?.query?.slug?.[0]}`) : router.push(`/brands-category/${router?.query?.slug?.[0]}/page/${selectedItem.selected + 1}`);

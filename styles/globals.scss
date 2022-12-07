@@ -47,6 +47,7 @@ img {
 a {
     text-decoration: none;
     color: inherit;
+    transition: all ease .4s;
 }
 
 ul, ol {
@@ -807,6 +808,16 @@ button, .button {
         margin-bottom: 25px;
         width: auto;
         height: auto;
+    }
+
+    a {
+        text-decoration: underline;
+        text-underline-offset: 5px;
+        text-decoration-color: #000;
+
+        &:hover {
+            text-decoration-color: transparent;
+        }
     }
 
     .alignleft {

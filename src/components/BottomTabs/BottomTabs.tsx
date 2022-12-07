@@ -35,7 +35,7 @@ const BottomTabs:React.FC<BottomTabsProps> = ({classNameStr}) => {
                                         <div className={styles['bottom-tabs__body-item-inner']}>
                                             {
                                                 item.childItems.nodes.map((subitem, k) => (
-                                                    <Link key={k} className={styles['bottom-tabs__body-link']} href={subitem.url}>{subitem.label}</Link>
+                                                    <Link key={k} className={styles['bottom-tabs__body-link']} href={subitem.url ?? ''}>{subitem.label}</Link>
                                                 ))
                                             }
                                         </div>

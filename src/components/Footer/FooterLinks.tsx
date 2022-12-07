@@ -73,7 +73,7 @@ const FooterLinks = () => {
         <li className={styles['footer-links__list-item']}>
             <Link
                 className={classNames(styles['footer-links__list-link'], item.cssClasses)}
-                href={item.url}
+                href={item.url ?? ''}
             >
                 {item.label}
             </Link>

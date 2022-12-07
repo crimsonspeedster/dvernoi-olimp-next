@@ -1,101 +1,62 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import HeadHTML from "@components/Layout/Head";
 import {SettingsContext} from "@pages/_app";
 import Layout from "@components/Layout";
+import styles from '@styles/PoliticsPage.module.scss';
 import {GetServerSideProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
-import {GetMenu} from "@components/Layout/graphql";
 import axios from "axios";
-import BrandsIntro from "@components/Brands/Intro/Intro";
-import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
-import {BrandProp} from "@components/Cards/BrandCard/BrandCard";
+import {GetMenu} from "@components/Layout/graphql";
+import classNames from "classnames";
 import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 
 
-interface BrandsProps {
+interface PoliticsProps {
     pageData: any,
     settingsData: any,
-    menus: any,
-    page: number,
-    total_pages: number,
-    categories: categoriesProps[],
-    posts: BrandProp[],
+    menus: any
 }
 
-const Brands:React.FC<BrandsProps> = (props) => {
+const Politics:React.FC<PoliticsProps> = (props) => {
     const {
         pageData,
         settingsData,
-        menus,
-        page,
-        total_pages,
-        posts,
-        categories
+        menus
     } = props;
-
-    const [postItems, setPostItems] = useState<BrandProp[]>(posts);
-
-    useEffect(() => {
-        setPostItems(posts);
-    }, [posts]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
     return (
-        <>
-            <SettingsContext.Provider value={{
-                settings: settingsData,
-                translates: pageData.translated_slugs,
-                menus,
-                total_pages,
-            }}>
+        <SettingsContext.Provider value={{
+            settings: settingsData,
+            translates: pageData.translated_slugs,
+            menus
+        }}>
+            <Layout>
                 <HeadHTML seoPage={pageData.yoast_head_json} />
 
-                <Layout>
-                    <Breadcrumbs
-                        list={breadcrumbs}
-                    />
+                <Breadcrumbs
+                    list={breadcrumbs}
+                />
 
-                    <BrandsIntro
-                        title={pageData.title.rendered}
-                        categories={categories}
-                        posts={postItems}
-                        updatePosts={setPostItems}
-                    />
-                </Layout>
-            </SettingsContext.Provider>
-        </>
+                <section className={classNames('article', styles['politics'])}>
+                    <div className="container" dangerouslySetInnerHTML={{__html: pageData.content.rendered ?? ''}} />
+                </section>
+            </Layout>
+        </SettingsContext.Provider>
     );
 }
 
-export default Brands;
+export default Politics;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
         params: {
-            slug: 'brands',
+            slug: 'politika-konfidentsialnosti',
             lang: locale,
             acf_format: 'standard'
-        }
-    });
-
-    const brands = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brend/`, {
-        params: {
-            per_page: process.env.NEXT_PUBLIC_ENV_BRAND_PER_PAGE,
-            page: !isNaN(parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1')) ? parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1') : 1,
-            parent: 0,
-            lang: locale,
-            _embed: true,
-            order: 'asc'
-        }
-    })
-
-    const brands_cats = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/product_cat/`, {
-        params: {
-            lang: locale,
-            hide_empty: true,
         }
     });
 
@@ -107,13 +68,10 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
         }
     })
 
-    const res = await axios.all([pageRequest, settingsRequest, brands, brands_cats]).then(axios.spread(function(page, settings, brands, brands_cats) {
+    const res = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
         return {
             page: page.data[0],
-            settings: settings.data,
-            posts: brands.data,
-            categories: brands_cats.data,
-            total_pages: parseInt(brands?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
+            settings: settings.data
         };
     }));
 
@@ -178,11 +136,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
         props: {
             pageData: res.page,
             settingsData: res.settings,
-            menus,
-            total_pages: res.total_pages,
-            categories: res.categories,
-            posts: res.posts,
-            page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1')
+            menus
         }
     }
 }
