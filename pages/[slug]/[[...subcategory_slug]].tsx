@@ -20,6 +20,7 @@ import BottomTabs from "@components/BottomTabs/BottomTabs";
 import SeoBlock from "@components/SeoBlock/SeoBlock";
 import classNames from "classnames";
 import {FilterAttrsProps, FilterValuesProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
+import {removeMultipleSpaces} from "@utils/stringHelper";
 
 
 interface SubCategoryProps {
@@ -49,10 +50,16 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         setProductItems(products);
     }, [products]);
 
+    console.log(pageData.category_filter)
+
     const [pageTitle, setPageTitle] = useState<string>(pageData.name);
+    const [seoTitle, setSeoTitle] = useState<string>(`${pageData.name} - купить ${pageData.name} в Украине, цена на ${pageData.name} в интернет магазине дверей ${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}`);
+    const [seoDescription, setSeoDescription] = useState<string>(`${pageData.name} ✅  - купить по самым лучшим ценам в Украине 🔝 , заказать ${pageData.name} прямо сейчас ✅ в интернет магазине ${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}`);
 
     useEffect(()=>{
-        let pageTitle:string = pageData.name;
+        let seoTitle:string = pageData.name,
+            seoDescription:string = pageData.name;
+
         const choosedAttributes:string[] = [];
 
         pageData.category_filter.filter((item:FilterAttrsProps) => item.isChoosed).forEach((item:FilterAttrsProps) => {
@@ -68,7 +75,12 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
             return item;
         });
 
-        setPageTitle(pageTitle += ` ${choosedAttributes.join(', ')}`);
+        seoTitle = seoTitle += ` ${choosedAttributes.join(', ')}`;
+        seoDescription = seoTitle += ` ${choosedAttributes.join(', ')}`;
+
+        setPageTitle(removeMultipleSpaces(`${pageData.name} ${choosedAttributes.join(', ')}`));
+        setSeoTitle(removeMultipleSpaces(`${seoTitle} - купить ${seoTitle} в Украине, цена на ${seoTitle} в интернет магазине дверей ${process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE}`));
+        setSeoDescription(removeMultipleSpaces(`${seoDescription} ✅  - купить по самым лучшим ценам в Украине 🔝 , заказать ${seoDescription} прямо сейчас ✅ в интернет магазине ${process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE}`));
     }, [pageData.name, pageData.category_filter]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
@@ -81,7 +93,7 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
             total_pages,
             page: current_page
         }}>
-            <HeadHTML seoPage={pageData.yoast_head_json} />
+            <HeadHTML seoPage={{...pageData.yoast_head_json, title: seoTitle, og_title: seoTitle, og_description: seoDescription, description: seoDescription}} />
 
             <Layout>
                 <CatalogCategoryTemplate

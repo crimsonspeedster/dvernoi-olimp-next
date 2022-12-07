@@ -12,17 +12,8 @@ const MontageSubintro: React.FC<MontageSubintroProps> = ({block}) => {
     return (
         <section className={styles['montage-subintro']}>
             <div className="container">
-                <div className={classNames(styles['montage-subintro__title'], 'title', 'title--dark')}>Установка
-                    МЕЖКОМНАТНЫХ дверей
-                </div>
+                <div className={classNames(styles['montage-subintro__title'], 'title', 'title--dark')}>{block.nazvanie_bloka}</div>
 
-                {/*<div className={styles['montage-subintro__subtitle']}>В стоимость установки межкомнатной двери входит:</div>*/}
-                {/*<ul className="montage-subintro__list">*/}
-                {/*    <li className="montage-subintro__elem">установка коробки;</li>*/}
-                {/*    <li className="montage-subintro__elem">задувка пеной;</li>*/}
-                {/*    <li className="montage-subintro__elem">монтаж комплекта наличников;</li>*/}
-                {/*    <li className="montage-subintro__elem">монтаж комплекта наличников;</li>*/}
-                {/*</ul>*/}
                 {
                     block.opisanie &&
                     <div className={styles['montage-subintro__block']} dangerouslySetInnerHTML={{__html: block.opisanie}}/>

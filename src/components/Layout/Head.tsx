@@ -30,7 +30,7 @@ export interface pageImageProps {
 
 const HeadHTML: React.FC<HeadHTMLProps> = ({seoPage}) => {
     const router = useRouter();
-    const current_url = `${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}${router.route}`;
+    const current_url = `${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}${router.asPath}`;
 
     return (
         <Head>
