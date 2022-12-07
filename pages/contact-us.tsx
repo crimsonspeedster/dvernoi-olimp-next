@@ -51,7 +51,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
         params: {
-            slug: 'contacts',
+            slug: 'contact-us',
             lang: locale,
             acf_format: 'standard'
         }
