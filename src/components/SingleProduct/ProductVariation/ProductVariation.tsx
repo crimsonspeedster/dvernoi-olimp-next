@@ -27,7 +27,6 @@ const ProductVariation:React.FC<ProductVariationProps> = (props):ReactElement =>
     const [selectValue, setSelectValue] = useState<string|number>(defaultAttribute.option);
 
     useEffect(()=>{
-        console.log('up');
         setSelectValue(defaultAttribute.option);
     }, [defaultAttribute.option]);
 

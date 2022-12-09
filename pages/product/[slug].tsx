@@ -68,7 +68,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     images={pageData.images}
                     in_stock={pageData.in_stock}
                     regular_price={pageData.regular_price}
-                    extra_attributes={pageData.acf.extra_attributes}
+                    extra_attributes={pageData.acf?.extra_attributes ?? []}
                 />
 
                 <SingleProductTabs

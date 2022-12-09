@@ -14,10 +14,15 @@ interface ProductCategoryFiltersProps {
 const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_filter}) => {
     const router = useRouter();
 
-    const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
+    let current_link:string = '';
 
-    const filterStartIndex:number = router.query.subcategory_slug?.indexOf('filter') ?? -1;
-    const filterEndIndex:number = router.query.subcategory_slug?.indexOf('apply') ?? -1;
+    if (router.route === "/brand/[[...slug]]")
+        current_link = `/brand/${router.query?.slug?.[0]}`;
+    else
+        current_link = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
+
+    const filterStartIndex:number = router.route === "/brand/[[...slug]]" ? router.query.slug?.indexOf('filter') ?? -1 : router.query.subcategory_slug?.indexOf('filter') ?? -1;
+    const filterEndIndex:number = router.route === "/brand/[[...slug]]" ?  router.query.slug?.indexOf('apply') ?? -1 : router.query.subcategory_slug?.indexOf('apply') ?? -1;
 
     const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
     const [itemsFilterIsOpen, setItemsFilterIsOpen] = useState<FilterAttrsProps[]>(category_filter);
@@ -30,20 +35,18 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
 
         if (filterStartIndex >= 0 && filterEndIndex > 0)
         {
-            setFilterItems(router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
+            setFilterItems(router.route === "/brand/[[...slug]]" ? router.query?.slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') : router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
         }
         else {
             setFilterItems([]);
         }
 
-    }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
+    }, [filterEndIndex, filterStartIndex, router.query.slug, router.query.subcategory_slug]);
 
     const removeAttrHandler = (category: string, cat_param: string):void => {
         const linkItemsFilter:string|undefined = filterItems?.filter(item => item.includes(category))[0];
         const indexInFilterItems:number = filterItems?.findIndex(item => item.includes(category)) ?? 0;
         const linkItemsArray:string[] = linkItemsFilter ? linkItemsFilter.split('-') : [];
-
-        // const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
 
         if (linkItemsFilter && !linkItemsArray.includes(cat_param))
         {

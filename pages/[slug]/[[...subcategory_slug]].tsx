@@ -50,8 +50,6 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         setProductItems(products);
     }, [products]);
 
-    console.log(pageData.category_filter)
-
     const [pageTitle, setPageTitle] = useState<string>(pageData.name);
     const [seoTitle, setSeoTitle] = useState<string>(`${pageData.name} - купить ${pageData.name} в Украине, цена на ${pageData.name} в интернет магазине дверей ${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}`);
     const [seoDescription, setSeoDescription] = useState<string>(`${pageData.name} ✅  - купить по самым лучшим ценам в Украине 🔝 , заказать ${pageData.name} прямо сейчас ✅ в интернет магазине ${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}`);
@@ -93,7 +91,15 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
             total_pages,
             page: current_page
         }}>
-            <HeadHTML seoPage={{...pageData.yoast_head_json, title: seoTitle, og_title: seoTitle, og_description: seoDescription, description: seoDescription}} />
+            <HeadHTML
+                seoPage={{
+                    ...pageData.yoast_head_json,
+                    title: seoTitle,
+                    og_title: seoTitle,
+                    og_description: seoDescription,
+                    description: seoDescription
+                }}
+            />
 
             <Layout>
                 <CatalogCategoryTemplate

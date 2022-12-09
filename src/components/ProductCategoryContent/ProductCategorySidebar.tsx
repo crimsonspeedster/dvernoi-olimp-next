@@ -51,12 +51,17 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
 
     const router = useRouter();
 
-    const current_link:string = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
+    let current_link:string = '';
 
-    const filterStartIndex:number = router.query.subcategory_slug?.indexOf('filter') ?? -1;
-    const filterEndIndex:number = router.query.subcategory_slug?.indexOf('apply') ?? -1;
+    if (router.route === "/brand/[[...slug]]")
+        current_link = `/brand/${router.query?.slug?.[0]}`;
+    else
+        current_link = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
 
-    const [filterItems, setFilterItems] = useState<string[]|undefined>(router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') ?? []);
+    const filterStartIndex:number = router.route === "/brand/[[...slug]]" ? router.query.slug?.indexOf('filter') ?? -1 : router.query.subcategory_slug?.indexOf('filter') ?? -1;
+    const filterEndIndex:number = router.route === "/brand/[[...slug]]" ?  router.query.slug?.indexOf('apply') ?? -1 : router.query.subcategory_slug?.indexOf('apply') ?? -1;
+
+    const [filterItems, setFilterItems] = useState<string[]|undefined>(router.route === "/brand/[[...slug]]" ? router.query?.slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') ?? [] : router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') ?? []);
 
     const [minPriceVal, setMinPriceVal] = useState<number>(parseInt(priceRange?.min_price ?? '0'));
     const [maxPriceVal, setMaxPriceVal] = useState<number>(parseInt(priceRange?.max_price ?? '0'));
@@ -83,11 +88,21 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
 
         if (filterStartIndex >= 0 && filterEndIndex > 0)
         {
-            setFilterItems(router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
+            setFilterItems(router.route === "/brand/[[...slug]]" ? router.query?.slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') : router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
 
-            let min_price:string = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('min_price'))?.[0] ?? '';
+            let min_price:string = '';
+            let max_price:string = '';
 
-            let max_price:string = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('max_price'))?.[0] ?? '';
+            if (router.route === "/brand/[[...slug]]")
+            {
+                min_price = [router?.query?.slug]?.flat()?.filter(item => item?.includes('min_price'))?.[0] ?? '';
+                max_price = [router?.query?.slug]?.flat()?.filter(item => item?.includes('max_price'))?.[0] ?? '';
+            }
+            else
+            {
+                min_price = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('min_price'))?.[0] ?? '';
+                max_price = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('max_price'))?.[0] ?? '';
+            }
 
             if (min_price)
             {
@@ -103,7 +118,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
             setFilterItems([]);
         }
 
-    }, [filterEndIndex, filterStartIndex, router.query.subcategory_slug]);
+    }, [filterEndIndex, filterStartIndex, router.query.slug, router.query.subcategory_slug]);
 
     useEffect(()=>{
         if (globalFilterIsOpen) setItemsFilterIsOpen(prev => prev.map(item => {item.isOpen = true; return item}));

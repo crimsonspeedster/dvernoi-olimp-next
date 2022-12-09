@@ -95,6 +95,49 @@ const ProductCategoryLoadBtn:React.FC<ProductLoadBtnProps> = ({updatePosts}) => 
                     setPostsUpdated(false);
                 });
         }
+        else {
+            let filter_items:string[]|undefined = [];
+
+            const filterStartIndex:number = router.query.slug?.indexOf('filter') ?? -1;
+            const filterEndIndex:number = router.query.slug?.indexOf('apply') ?? -1;
+
+            const productsRequestParams:any = {
+                lang: router.locale,
+                category: settings.products_category,
+                consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
+                consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
+                per_page: process.env.NEXT_PUBLIC_ENV_PRODUCTS_PER_PAGE,
+                page,
+                acf_format: 'standard',
+                ...(router.query.order) && {order: router.query.order},
+                ...(router.query.orderBy) && {orderby: router.query.orderBy}
+            };
+
+            if (filterStartIndex >= 0 && filterEndIndex > 0)
+            {
+                filter_items = router.query.slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(',');
+
+                filter_items?.map(item => item.split('-').filter(item => item !== 'is' && item !== 'or'))?.map(item => {
+                    productsRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
+
+                    return item;
+                });
+            }
+
+            axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/products`, {
+                params: productsRequestParams
+            })
+                .then((res) => {
+                    updatePosts(prev => [...prev, ...res.data.products]);
+                    setPage(prev => prev+1);
+                    setPostsUpdated(false);
+                })
+                .catch((err) => {
+                    console.log(err);
+
+                    setPostsUpdated(false);
+                });
+        }
     }
 
     if(page-1 < total_pages)

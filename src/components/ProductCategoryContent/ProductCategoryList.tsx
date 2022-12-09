@@ -72,6 +72,33 @@ const ProductCategoryList:React.FC<ProductCategoryListProps> = (props) => {
 
            router.push(updated_url);
         }
+        else {
+            let updated_url:string = '';
+
+            if (router?.query?.slug && router?.query?.slug?.length > 1)
+            {
+                if (router?.query?.slug?.[1] === 'page')
+                {
+                    //@ts-ignore
+                    updated_url = selectedItem.selected+1 === 1 ? `/brand/${router.query.slug[0]}` : `/brand/${router.query.slug[0]}/page/${selectedItem.selected+1}`;
+                }
+                else {
+                    //@ts-ignore
+                    updated_url = selectedItem.selected+1 === 1 ? `/brand/${router?.query?.slug?.filter((item, i, arr) => item !== 'page' && arr[i-1] !== 'page' && item !== 'order' && item !== 'orderBy')?.join('/')}` : `/brand/${router?.query?.slug?.filter((item, i, arr) => item !== 'page' && arr[i-1] !== 'page' && item !== 'order' && item !== 'orderBy')?.join('/')}/page/${selectedItem.selected+1}`;
+                }
+            }
+            else {
+                //@ts-ignore
+                updated_url = selectedItem.selected+1 === 1 ? `/brand/${router.query.slug[0]}` : `/brand/${router.query.slug[0]}/page/${selectedItem.selected+1}`;
+            }
+
+            if (router.query.order)
+            {
+                updated_url+=`?order=${router.query.order}&orderBy=${router.query.orderBy}`;
+            }
+
+            router.push(updated_url);
+        }
     }
 
     return (

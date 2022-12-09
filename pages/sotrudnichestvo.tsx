@@ -53,8 +53,6 @@ const Cooperation:React.FC<CooperationProps> = (props) => {
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
-    console.log(pageData);
-
     return (
         <SettingsContext.Provider value={{
             settings: settingsData,
