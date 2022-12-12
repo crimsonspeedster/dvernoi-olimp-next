@@ -8,6 +8,7 @@ import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 import {SettingsContext} from "@pages/_app";
 import Layout from "@components/Layout";
 import CartIntro from "@components/Cart/Intro";
+import {getCookies} from "cookies-next";
 
 
 interface CartPage {
@@ -15,7 +16,8 @@ interface CartPage {
     settingsData: any,
     menus: any,
     nonce: string,
-    cart: any
+    cart: any,
+    test: any
 }
 
 const Cart:React.FC<CartPage> = (props) => {
@@ -24,10 +26,11 @@ const Cart:React.FC<CartPage> = (props) => {
         settingsData,
         menus,
         nonce,
-        cart
+        cart,
+        test
     } = props;
 
-    console.log(nonce);
+    console.log(test);
 
     useEffect(()=>{
         axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/wc/store/v1/cart`, {
@@ -90,7 +93,7 @@ const Cart:React.FC<CartPage> = (props) => {
 
 export default Cart;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, req}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, req, res}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
@@ -106,7 +109,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req}) => {
             lang: locale
         },
         withCredentials: true,
-        headers: req?.headers?.cookie ? { cookie: req.headers.cookie } : undefined,
+        headers: {
+            Cookie: req.headers.cookie
+        }
     });
 
     // const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
@@ -119,7 +124,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req}) => {
         }
     });
 
-    const res = await axios.all([pageRequest, settingsRequest, cartRequest]).then(axios.spread(function(page, settings, cart) {
+    const resData = await axios.all([pageRequest, settingsRequest, cartRequest]).then(axios.spread(function(page, settings, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
@@ -187,11 +192,12 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req}) => {
 
     return {
         props: {
-            pageData: res.page,
-            settingsData: res.settings,
+            pageData: resData.page,
+            settingsData: resData.settings,
             menus,
-            nonce: res.nonce,
-            cart: res.cart
+            nonce: resData.nonce,
+            cart: resData.cart,
+            test:  getCookies({req, res})
         }
     }
 }
