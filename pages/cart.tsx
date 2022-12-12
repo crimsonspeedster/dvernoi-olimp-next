@@ -93,6 +93,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             lang: locale
         },
         withCredentials: true,
+        headers: {
+            'Content-Type': 'application/json',
+        }
     });
 
     // const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
