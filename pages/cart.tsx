@@ -93,13 +93,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             lang: locale
         },
         withCredentials: true,
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Headless-WP': true,
-        }
     });
 
-    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+    // const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
     const settingsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/options`, {
         params: {
@@ -109,11 +105,11 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
         }
     });
 
-    const res = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
+    const res = await axios.all([pageRequest, settingsRequest, cartRequest]).then(axios.spread(function(page, settings, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
-            nonce: nonce.data?.nonce ?? '',
+            nonce: cart.headers.nonce ?? '',
             cart: cart.data
         };
     }));
