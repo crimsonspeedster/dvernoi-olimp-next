@@ -91,6 +91,10 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             lang: locale
         },
         withCredentials: true,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json'
+        }
         // headers: {
             // Nonce: '9e13fc2560',
             // 'X-Headless-WP': true,
