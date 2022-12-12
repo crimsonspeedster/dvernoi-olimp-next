@@ -35,7 +35,7 @@ const Cart:React.FC<CartPage> = (props) => {
             withCredentials: true,
             headers: {
                 Nonce: nonce,
-                'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
+                // 'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
             }
         })
             .then((res) => {
@@ -91,10 +91,11 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             lang: locale
         },
         withCredentials: true,
-        headers: {
-            'X-Headless-WP': true,
-            'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
-        }
+        // headers: {
+            // Nonce: '9e13fc2560',
+            // 'X-Headless-WP': true,
+            // 'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
+        // }
     });
 
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
