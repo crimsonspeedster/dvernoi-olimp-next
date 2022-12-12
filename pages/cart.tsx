@@ -27,6 +27,8 @@ const Cart:React.FC<CartPage> = (props) => {
         cart
     } = props;
 
+    console.log(nonce);
+
     useEffect(()=>{
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/wc/store/v1/cart/add-item`, {
             id: 864,
