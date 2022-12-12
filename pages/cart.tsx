@@ -30,6 +30,19 @@ const Cart:React.FC<CartPage> = (props) => {
     console.log(nonce);
 
     useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/wc/store/v1/cart`, {
+            params: {
+                lang: 'ru',
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/wc/store/v1/cart/add-item`, {
             id: 864,
             quantity: 2,
