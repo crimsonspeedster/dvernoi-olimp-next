@@ -94,7 +94,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
         },
         withCredentials: true,
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8',
+            "Access-Control-Allow-Origin": "*",
         }
     });
 
