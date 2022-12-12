@@ -90,7 +90,7 @@ const Cart:React.FC<CartPage> = (props) => {
 
 export default Cart;
 
-export const getServerSideProps:GetServerSideProps = async ({locale}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, req}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
@@ -106,10 +106,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             lang: locale
         },
         withCredentials: true,
-        headers: {
-            'Content-Type': 'application/json;charset=UTF-8',
-            "Access-Control-Allow-Origin": "*",
-        }
+        headers: req?.headers?.cookie ? { cookie: req.headers.cookie } : undefined,
     });
 
     // const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
