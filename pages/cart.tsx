@@ -29,24 +29,24 @@ const Cart:React.FC<CartPage> = (props) => {
 
     console.log(nonce);
 
-    // useEffect(()=>{
-    //     axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/wc/store/v1/cart/add-item`, {
-    //         id: 864,
-    //         quantity: 2,
-    //     }, {
-    //         withCredentials: true,
-    //         headers: {
-    //             Nonce: '9e13fc2560',
-    //             // 'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
-    //         }
-    //     })
-    //         .then((res) => {
-    //             console.log(res);
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //         })
-    // }, []);
+    useEffect(()=>{
+        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/wc/store/v1/cart/add-item`, {
+            id: 864,
+            quantity: 2,
+        }, {
+            withCredentials: true,
+            headers: {
+                Nonce: nonce,
+                // 'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
+            }
+        })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }, []);
 
     console.log(cart);
 
