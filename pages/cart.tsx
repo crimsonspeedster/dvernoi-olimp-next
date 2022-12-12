@@ -36,7 +36,7 @@ const Cart:React.FC<CartPage> = (props) => {
         }, {
             withCredentials: true,
             headers: {
-                Nonce: nonce,
+                Nonce: '9e13fc2560',
                 // 'X-WC-Session': 't_53cb1fad1300ace0ea11afb81a9c03'
             }
         })
