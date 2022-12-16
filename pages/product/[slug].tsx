@@ -16,6 +16,9 @@ import {If, Then} from "react-if";
 import { getCookies, getCookie, setCookies, removeCookies } from 'cookies-next';
 import styles from '@styles/SingleProduct.module.scss';
 import {extraAttributesProps} from "@components/SingleProduct/Intro/SingleProductContent";
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/router";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface ProductPageProps {
@@ -23,7 +26,8 @@ interface ProductPageProps {
     settingsData: any,
     menus: any,
     products: ProductCardProps[],
-    reviewed_products: ProductCardProps[]
+    reviewed_products: ProductCardProps[],
+    nonce: string
 }
 
 const ProductPage:React.FC<ProductPageProps> = (props) => {
@@ -33,9 +37,27 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
         menus,
         products,
         reviewed_products,
+        nonce
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     useEffect(()=>{
         const reviewed_products_ids:number[] = JSON.parse(getCookie('reviewed_products')?.toString() ?? '[]');
@@ -48,6 +70,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
             settings: settingsData,
             translates: pageData.translated_slugs,
             menus,
+            nonce
         }}>
             <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -67,8 +90,8 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     default_attributes={pageData.default_attributes}
                     images={pageData.images}
                     in_stock={pageData.in_stock}
-                    regular_price={pageData.regular_price}
-                    extra_attributes={pageData.acf?.extra_attributes ?? []}
+                    regular_price={pageData.price.default}
+                    extra_attributes={pageData.acf?.extra_attributes ? pageData.acf?.extra_attributes : []}
                 />
 
                 <SingleProductTabs
@@ -137,10 +160,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     });
 
-    const resultDat = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
         return {
             page: page.data ?? [],
             settings: settings.data,
+            nonce: nonce.data
         };
     }));
 
@@ -253,7 +279,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             settingsData: resultDat.settings,
             menus,
             products,
-            reviewed_products
+            reviewed_products,
+            nonce: resultDat.nonce.nonce
         }
     };
 }

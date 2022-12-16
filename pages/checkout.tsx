@@ -1,27 +1,25 @@
-import React, {useEffect} from "react";
-import HeadHTML from "@components/Layout/Head";
-import {SettingsContext} from "@pages/_app";
-import Layout from "@components/Layout";
-import styles from '@styles/PoliticsPage.module.scss';
+import React from "react";
 import {GetServerSideProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
 import {GetMenu} from "@components/Layout/graphql";
-import classNames from "classnames";
-import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
-import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
-import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {useDispatch} from "react-redux";
+import HeadHTML from "@components/Layout/Head";
+import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
+import {SettingsContext} from "@pages/_app";
+import Layout from "@components/Layout";
+import CheckoutIntro from "@components/Checkout/Intro";
 
 
-interface PoliticsProps {
+interface CheckoutProps {
     pageData: any,
     settingsData: any,
     menus: any,
-    nonce: string
+    nonce: string,
 }
 
-const Politics:React.FC<PoliticsProps> = (props) => {
+const Checkout:React.FC<CheckoutProps> = (props) => {
     const {
         pageData,
         settingsData,
@@ -29,59 +27,49 @@ const Politics:React.FC<PoliticsProps> = (props) => {
         nonce
     } = props;
 
+    const router = useRouter();
+    const dispatch = useDispatch();
+
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
-    const dispatch = useDispatch();
-    const router = useRouter();
-
-    useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
-
     return (
-        <SettingsContext.Provider value={{
-            settings: settingsData,
-            translates: pageData.translated_slugs,
-            menus,
-            nonce
-        }}>
-            <Layout>
-                <HeadHTML seoPage={pageData.yoast_head_json} />
+        <>
+            <SettingsContext.Provider value={{
+                settings: settingsData,
+                translates: pageData.translated_slugs,
+                menus,
+                nonce
+            }}>
+                <Layout>
+                    <HeadHTML seoPage={pageData.yoast_head_json} />
 
-                <Breadcrumbs
-                    list={breadcrumbs}
-                />
+                    <Breadcrumbs
+                        list={breadcrumbs}
+                    />
 
-                <section className={classNames('article', styles['politics'])}>
-                    <div className="container" dangerouslySetInnerHTML={{__html: pageData.content.rendered ?? ''}} />
-                </section>
-            </Layout>
-        </SettingsContext.Provider>
+                    <CheckoutIntro
+                        title={pageData.title.rendered}
+                    />
+                </Layout>
+            </SettingsContext.Provider>
+        </>
     );
 }
 
-export default Politics;
+export default Checkout;
 
 export const getServerSideProps:GetServerSideProps = async ({locale}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
         params: {
-            slug: 'politika-konfidentsialnosti',
+            slug: 'checkout',
             lang: locale,
             acf_format: 'standard'
         }
     });
+
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
     const settingsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/options`, {
         params: {
@@ -91,9 +79,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
         }
     });
 
-    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
-
-    const res = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
+    const resData = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
         return {
             page: page.data[0],
             settings: settings.data,
@@ -160,10 +146,10 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
 
     return {
         props: {
-            pageData: res.page,
-            settingsData: res.settings,
+            pageData: resData.page,
+            settingsData: resData.settings,
             menus,
-            nonce: res.nonce.nonce
+            nonce: resData.nonce.nonce,
         }
     }
 }

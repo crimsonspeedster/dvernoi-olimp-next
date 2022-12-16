@@ -1,14 +1,15 @@
-import React from "react";
+import React, {useContext} from "react";
 import styles from './ProductCard.module.scss';
 import Link from "next/link";
 import Image from "next/image";
 import classNames from "classnames";
-import {Else, If, Then} from "react-if";
+import {If, Then} from "react-if";
 import YoutubeIco from '@icons/yootube-ico.svg';
-import labelNew from '@icons/label-new.svg';
-import labelShare from '@icons/label-share.svg';
-import labelTop from "@icons/label-top.svg";
 import {variation_arrayProps} from "@components/SingleProduct/Intro/SingleProductContent";
+import axios from "axios";
+import {SettingsContext} from "@pages/_app";
+import {useDispatch} from "react-redux";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 export interface ProductCardProps {
     id: number,
@@ -58,8 +59,33 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
         labels,
         slug,
         type,
-        variations
+        variations,
+        variation_array
     } = props;
+
+    const settingsCtx = useContext(SettingsContext);
+    const dispatch = useDispatch();
+
+    const buyHandler = ():void => {
+        if (type === 'simple')
+        {
+            axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
+                nonce: settingsCtx.nonce,
+                id,
+                quantity: 1
+            }, {
+                withCredentials: true
+            })
+                .then((res)=>{
+                    dispatch(setCartServerData(res.data));
+                    dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+                })
+                .catch((error) => {console.log(error)});
+        }
+        else {
+            console.log(variation_array);
+        }
+    }
 
     return (
         <div className={classNames(styles['productCard'], `product-${id}`)}>
@@ -104,9 +130,12 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
             <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
 
             <div className={styles['productCard-bottom']}>
-                <p className={styles['productCard__price']}>{(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+                <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
 
-                <Link className={classNames('button', styles['productCard__btn'])} href="/">Купить</Link>
+                <div
+                    className={classNames('button', styles['productCard__btn'])}
+                    onClick={buyHandler}
+                >Купить</div>
             </div>
         </div>
     );

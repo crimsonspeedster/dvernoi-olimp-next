@@ -10,6 +10,9 @@ import BrandsIntro from "@components/Brands/Intro/Intro";
 import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 import {BrandProp} from "@components/Cards/BrandCard/BrandCard";
 import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/router";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface BrandsCategoryProps {
@@ -20,6 +23,7 @@ interface BrandsCategoryProps {
     total_pages: number,
     categories: categoriesProps[],
     posts: BrandProp[],
+    nonce: string
 }
 
 const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
@@ -30,10 +34,28 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
         page,
         total_pages,
         posts,
-        categories
+        categories,
+        nonce
     } = props;
 
     const [postItems, setPostItems] = useState<BrandProp[]>(posts);
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     useEffect(() => {
         setPostItems(posts);
@@ -48,6 +70,7 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
                 translates: pageData.translated_slugs,
                 menus,
                 total_pages,
+                nonce
             }}>
                 <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -107,15 +130,18 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             id: 'acf-theme-general-settings',
             acf_format: 'standard'
         }
-    })
+    });
 
-    const resultDat = await axios.all([pageRequest, settingsRequest, brands, brands_cats]).then(axios.spread(function(page, settings, brands, brands_cats) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const resultDat = await axios.all([pageRequest, settingsRequest, brands, brands_cats, nonceRequest]).then(axios.spread(function(page, settings, brands, brands_cats, nonce) {
         return {
             page: page.data[0],
             settings: settings.data,
             posts: brands.data,
             categories: brands_cats.data,
             total_pages: parseInt(brands?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
+            nonce: nonce.data
         };
     }));
 
@@ -190,7 +216,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             total_pages: resultDat.total_pages,
             categories: resultDat.categories,
             posts: resultDat.posts,
-            page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1')
+            page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
+            nonce: resultDat.nonce.nonce
         }
     }
 }

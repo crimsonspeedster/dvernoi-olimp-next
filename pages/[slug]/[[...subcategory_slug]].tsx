@@ -21,6 +21,8 @@ import SeoBlock from "@components/SeoBlock/SeoBlock";
 import classNames from "classnames";
 import {FilterAttrsProps, FilterValuesProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {removeMultipleSpaces} from "@utils/stringHelper";
+import {useDispatch} from "react-redux";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface SubCategoryProps {
@@ -30,7 +32,8 @@ interface SubCategoryProps {
     products: ProductCardProps[],
     reviewed_products: ProductCardProps[],
     total_pages: number,
-    current_page: number
+    current_page: number,
+    nonce: string
 }
 
 const SubCategory:React.FC<SubCategoryProps> = (props) => {
@@ -41,10 +44,28 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         products,
         reviewed_products,
         total_pages,
-        current_page
+        current_page,
+        nonce
     } = props;
 
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     useEffect(()=>{
         setProductItems(products);
@@ -89,7 +110,8 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
             translates: pageData.translated_slugs,
             menus,
             total_pages,
-            page: current_page
+            page: current_page,
+            nonce
         }}>
             <HeadHTML
                 seoPage={{
@@ -188,6 +210,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         });
     }
 
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
     const categoryRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_WOO_API}/products/categories`, {
         params: categoryRequestParams
     });
@@ -204,13 +228,14 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     })
 
-    const resData = await axios.all([settingsRequest, categoryRequest, productsRequest]).then(axios.spread(function(settings, category, products) {
+    const resData = await axios.all([settingsRequest, categoryRequest, productsRequest, nonceRequest]).then(axios.spread(function(settings, category, products, nonce) {
         return {
             settings: settings.data,
             pageData: category.data?.[0] ?? {},
             products: products.data.products,
             current_page: products.data.current_page,
-            total_pages: products.data.total_pages
+            total_pages: products.data.total_pages,
+            nonce: nonce.data
         };
     }));
 
@@ -314,7 +339,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             products: resData.products ?? [],
             current_page: resData.current_page,
             total_pages: resData.total_pages,
-            reviewed_products
+            reviewed_products,
+            nonce: resData.nonce.nonce
         }
     }
 }

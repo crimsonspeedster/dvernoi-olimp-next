@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import CardSlider from "@components/CardSlider/CardSlider";
 import {SettingsContext} from "@pages/_app";
 import HeadHTML from "@components/Layout/Head";
@@ -14,6 +14,8 @@ import {PostProp} from "@components/Homepage/Posts/Posts";
 import {If, Then} from "react-if";
 import styles from '@components/SinglePost/Intro/Intro.module.scss'
 import {useRouter} from "next/router";
+import {useDispatch} from "react-redux";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface SinglePostProps {
@@ -21,6 +23,7 @@ interface SinglePostProps {
     settingsData: any,
     menus: any,
     posts: PostProp[],
+    nonce: string
 }
 
 const SinglePost:React.FC<SinglePostProps> = (props) => {
@@ -28,12 +31,29 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
         pageData,
         settingsData,
         menus,
-        posts
+        posts,
+        nonce
     } = props;
 
     const router = useRouter();
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
+
+    const dispatch = useDispatch();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     const PostJsonLD = ():string => {
         return `
@@ -70,6 +90,7 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
                 settings: settingsData,
                 translates: pageData.translated_slugs,
                 menus,
+                nonce
             }}>
                 <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -136,10 +157,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     });
 
-    const resultDat = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
         return {
             page: page.data,
             settings: settings.data,
+            nonce: nonce.data
         };
     }));
 
@@ -224,7 +248,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             pageData: resultDat.page[0],
             settingsData: resultDat.settings,
             menus,
-            posts
+            posts,
+            nonce: resultDat.nonce.nonce
         }
     };
 }

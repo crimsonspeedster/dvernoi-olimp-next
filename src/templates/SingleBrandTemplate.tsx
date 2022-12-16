@@ -19,7 +19,8 @@ interface SingleBrandTemplateProps {
     productItems: ProductCardProps[],
     category_filter: FilterAttrsProps[],
     setProductItems: React.Dispatch<SetStateAction<ProductCardProps[]>>
-    priceRange?: PriceRangeProps
+    priceRange?: PriceRangeProps,
+    image?: string
 }
 
 const SingleBrandTemplate:React.FC<SingleBrandTemplateProps> = (props) => {
@@ -33,6 +34,7 @@ const SingleBrandTemplate:React.FC<SingleBrandTemplateProps> = (props) => {
         priceRange,
         setProductItems,
         productItems,
+        image
     } = props;
 
     const [ isOpenFilter, setIsOpenFilter ] = useState<boolean>(false)
@@ -46,6 +48,7 @@ const SingleBrandTemplate:React.FC<SingleBrandTemplateProps> = (props) => {
             <SingleBrandIntro
                 title={title}
                 content={content}
+                image={image}
             />
 
             <If condition={posts.length > 0}>

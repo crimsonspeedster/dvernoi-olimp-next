@@ -149,6 +149,12 @@ button, .button {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &.disabled {
+        pointer-events: none;
+        opacity: .5;
+    }
+
     @media (min-width: 1024px) {
         transition: background .2s ease;
         &:not([disabled]):hover {

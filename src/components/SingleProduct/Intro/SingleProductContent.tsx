@@ -1,4 +1,13 @@
-import React, {ChangeEvent, Dispatch, ReactElement, SetStateAction, useEffect, useRef, useState} from 'react';
+import React, {
+    ChangeEvent,
+    Dispatch,
+    ReactElement,
+    SetStateAction,
+    useContext,
+    useEffect,
+    useRef,
+    useState
+} from 'react';
 import InputMask from 'react-input-mask';
 import sprite from '@icons/sprite.svg';
 import styles from './Intro.module.scss';
@@ -9,10 +18,16 @@ import ProductVariation from "@components/SingleProduct/ProductVariation/Product
 import ProductExtra, {
     ProductExtraOptionsProps
 } from "@components/SingleProduct/ProductExtra/ProductExtra";
+import axios from "axios";
+import {SettingsContext} from "@pages/_app";
+import {getCookies} from "cookies-next";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {useDispatch} from "react-redux";
 
 
 interface SingleProductContentProps {
     id: number,
+    in_stock: boolean,
     sku: string,
     type: string,
     attributes: attributesProps[],
@@ -54,12 +69,18 @@ export interface attributesProps {
     options: string[],
 }
 
+export interface extraDataChoosed {
+    attribute_title: string,
+    attribute_choosed: ProductExtraOptionsProps
+}
+
 const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
     const {
         id,
         sku,
         type,
         attributes,
+        in_stock,
         variation_array,
         price,
         default_attributes,
@@ -67,6 +88,8 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         setCurrentVariation,
         extra_attributes
     } = props;
+
+    const settingsCtx = useContext(SettingsContext);
 
     const [counter, setCounter] = useState<string>('1');
     const [itemPrice, setItemPrice] = useState<string>(type === 'simple' ? price : currentVariation?.price ?? '0');
@@ -114,6 +137,46 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 setCounter(prev => (parseInt(prev) + 1).toString());
                 break;
         }
+    }
+
+    const dispatch = useDispatch();
+
+    const buyHandler = ():void => {
+        if (!in_stock)
+            return;
+
+        const extraData:extraDataChoosed[] = [];
+
+        extraProducts.map(item => {
+            let choosed_extra_attrs:ProductExtraOptionsProps[] = item.attribute_values.filter(subitem => subitem.choosed && subitem.slug !== 'nothing');
+
+            if (choosed_extra_attrs.length > 0)
+            {
+                extraData.push({
+                    attribute_title: item.attribute_title,
+                    attribute_choosed: choosed_extra_attrs[0]
+                });
+            }
+
+            return item;
+        });
+
+        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
+            nonce: settingsCtx.nonce,
+            id,
+            quantity: counter,
+            ...(type === 'variable') && {'variation-id': currentVariation?.id},
+            ...(extraData.length > 0) && {cart_item_data: {
+                meta_extra_products: extraData
+            }}
+        }, {
+            withCredentials: true
+        })
+            .then((res)=>{
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
     }
 
     return (
@@ -187,7 +250,10 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
 
                 <div className={styles['single-product-intro-content__controls-item']}>
                     <div className={styles['single-product-intro-content__btn-wrapper']}>
-                        <button className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--buy'], 'btn')}>
+                        <button
+                            onClick={buyHandler}
+                            className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--buy'], 'btn', !in_stock ? 'disabled' : '')}
+                        >
                             <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon')}>
                                 <svg><use href={`${sprite.src}#cart`}/></svg>
                             </span>
@@ -232,7 +298,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 </div>
 
                 <div className={styles['single-product-intro-content__bot-item']}>
-                    <button className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--cursor'], 'btn')}>
+                    <button className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--cursor'], 'btn', !in_stock ? 'disabled' : '')}>
                         <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon')}>
                             <svg><use href={`${sprite.src}#cursor`}/></svg>
                         </span>

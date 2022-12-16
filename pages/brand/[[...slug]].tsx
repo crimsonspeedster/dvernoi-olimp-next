@@ -17,6 +17,9 @@ import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 import SingleBrandIntro from "@components/SingleBrand/Intro/Intro";
 import SingleBrandCollection from "@components/SingleBrand/SingleBrandCollection/SingleBrandCollaction";
 import SingleBrandTemplate from "@root/templates/SingleBrandTemplate";
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/router";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface BrandProps {
@@ -28,7 +31,8 @@ interface BrandProps {
     total_pages: number,
     current_page: number,
     products: ProductCardProps[],
-    categoryData: any
+    categoryData: any,
+    nonce: string
 }
 
 const Brand:React.FC<BrandProps> = (props) => {
@@ -41,10 +45,28 @@ const Brand:React.FC<BrandProps> = (props) => {
         products,
         total_pages,
         categoryData,
-        current_page
+        current_page,
+        nonce
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     const [childPosts, setChildPosts] = useState<BrandProp[]>(posts);
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
@@ -65,7 +87,8 @@ const Brand:React.FC<BrandProps> = (props) => {
                 menus,
                 total_pages,
                 page: current_page,
-                products_category: pageData.category_main?.slug ?? ''
+                products_category: pageData.category_main?.slug ?? '',
+                nonce
             }}>
                 <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -80,6 +103,7 @@ const Brand:React.FC<BrandProps> = (props) => {
                         productItems={productItems}
                         setProductItems={setProductItems}
                         priceRange={categoryData.price_range}
+                        image={pageData.featured_image_link}
                     />
 
                     <If condition={reviewed_products.length > 0}>
@@ -131,10 +155,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     });
 
-    const resultDat = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
         return {
             page: page.data,
             settings: settings.data,
+            nonce: nonce.data
         };
     }));
 
@@ -290,7 +317,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             posts: subResultDat.posts,
             current_page: subResultDat.current_page,
             total_pages: subResultDat.total_pages,
-            reviewed_products
+            reviewed_products,
+            nonce: resultDat.nonce.nonce
         }
     };
 }

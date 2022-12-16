@@ -15,6 +15,8 @@ import SearchIntro from "@components/Search/Intro/Intro";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 import {useRouter} from "next/router";
 import HeadHTML from "@components/Layout/Head";
+import {useDispatch} from "react-redux";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface SearchProps {
@@ -23,7 +25,8 @@ interface SearchProps {
     menus: any,
     products: ProductCardProps[],
     total_pages: number,
-    page: number
+    page: number,
+    nonce: string
 }
 
 const Search:React.FC<SearchProps> = (props) => {
@@ -33,7 +36,8 @@ const Search:React.FC<SearchProps> = (props) => {
         menus,
         products,
         total_pages,
-        page
+        page,
+        nonce
     } = props;
 
     const router = useRouter();
@@ -42,6 +46,22 @@ const Search:React.FC<SearchProps> = (props) => {
     const [ isMobile, setIsMobile ] = useState(false);
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
     const [pageNumber, setPageNumber] = useState<number>(page);
+
+    const dispatch = useDispatch();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     useEffect(() => {
         setProductItems(products);
@@ -59,7 +79,8 @@ const Search:React.FC<SearchProps> = (props) => {
             translates: pageData.translated_slugs,
             menus,
             total_pages,
-            page
+            page,
+            nonce
         }}>
             <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -140,12 +161,15 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, query}
         }
     });
 
-    const resultData = await axios.all([pageRequest, settingsRequest, productsRequest]).then(axios.spread(function(page, settings, products) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const resultData = await axios.all([pageRequest, settingsRequest, productsRequest, nonceRequest]).then(axios.spread(function(page, settings, products, nonce) {
         return {
             page: page.data[0],
             settings: settings.data,
             products: products.data,
             total_pages: parseInt(products?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
+            nonce: nonce.data
         };
     }));
 
@@ -224,7 +248,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, query}
             menus,
             products: resultData.products,
             total_pages: resultData.total_pages,
-            page: parseInt(query.page?.toString() ?? '1')
+            page: parseInt(query.page?.toString() ?? '1'),
+            nonce: resultData.nonce.nonce
         }
     }
 }

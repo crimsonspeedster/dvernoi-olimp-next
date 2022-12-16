@@ -116,6 +116,7 @@ const ProductCategoryList:React.FC<ProductCategoryListProps> = (props) => {
                             type={item.type}
                             in_stock={item.in_stock}
                             variations={item.variations}
+                            variation_array={item.variation_array}
                             labels={item.labels}
                             key={i}
                         />

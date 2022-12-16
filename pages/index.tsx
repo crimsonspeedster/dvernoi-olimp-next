@@ -7,12 +7,16 @@ import {SettingsContext} from "@pages/_app";
 import HeadHTML from "@components/Layout/Head";
 import Layout from "@components/Layout";
 import HomeTemplate from "@root/templates/Home";
+import {useDispatch, useSelector} from "react-redux";
+import {selectAllCartData, setCartItemsAmount, setCartServerData} from "@store/cart";
+import {useRouter} from "next/router";
 
 interface HomeProps {
     pageData: any,
     settingsData: any,
     menus: any,
-    recentPosts: any
+    recentPosts: any,
+    nonce: string
 }
 
 
@@ -21,15 +25,34 @@ const Home:React.FC<HomeProps> = (props) => {
         pageData,
         settingsData,
         menus,
-        recentPosts
+        recentPosts,
+        nonce
     } = props;
+
+    const router = useRouter();
+    const dispatch = useDispatch();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     return (
         <>
             <SettingsContext.Provider value={{
                 settings: settingsData,
                 translates: pageData.translated_slugs,
-                menus
+                menus,
+                nonce
             }}>
                 <Layout>
                     <HeadHTML seoPage={pageData.yoast_head_json} />
@@ -82,11 +105,14 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
         }
     });
 
-    const res = await axios.all([pageRequest, settingsRequest, recentPosts]).then(axios.spread(function(page, settings, recentPosts) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const res = await axios.all([pageRequest, settingsRequest, recentPosts, nonceRequest]).then(axios.spread(function(page, settings, recentPosts, nonce) {
         return {
             page: page.data[0],
             settings: settings.data,
-            recentPosts: recentPosts.data
+            recentPosts: recentPosts.data,
+            nonce: nonce.data
         };
     }));
 
@@ -152,7 +178,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             pageData: res.page,
             settingsData: res.settings,
             recentPosts: res.recentPosts,
-            menus
+            menus,
+            nonce: res.nonce.nonce
         }
     }
 }

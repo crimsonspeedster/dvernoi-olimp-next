@@ -1,4 +1,4 @@
-import React, {ReactElement} from "react";
+import React, {ReactElement, useEffect} from "react";
 import {GetServerSideProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
@@ -13,12 +13,16 @@ import Credit from "@root/templates/services/Credit";
 import MontageTemplate from "@root/templates/services/Montage";
 import Error from "next/error";
 import FourOhFour from "@pages/404";
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/router";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 
 interface ServiceSingleProps {
     pageData: any,
     settingsData: any,
     menus: any,
+    nonce: string
 }
 
 const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
@@ -26,7 +30,25 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
         pageData,
         settingsData,
         menus,
+        nonce
     } = props;
+
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
@@ -68,7 +90,8 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
         <SettingsContext.Provider value={{
             settings: settingsData,
             translates: pageData.translated_slugs,
-            menus
+            menus,
+            nonce
         }}>
             <HeadHTML seoPage={pageData.yoast_head_json} />
 
@@ -102,12 +125,15 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             id: 'acf-theme-general-settings',
             acf_format: 'standard'
         }
-    })
+    });
 
-    const resultData = await axios.all([pageRequest, settingsRequest]).then(axios.spread(function(page, settings) {
+    const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
+
+    const resultData = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
         return {
             page: page.data?.[0] ?? {},
-            settings: settings.data
+            settings: settings.data,
+            nonce: nonce.data
         };
     }));
 
@@ -187,7 +213,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         props: {
             pageData: resultData.page,
             settingsData: resultData.settings,
-            menus
+            menus,
+            nonce: resultData.nonce.nonce
         }
     }
 }

@@ -63,6 +63,7 @@ const CardSlider:React.FC<cardSliderProps> = (props) => {
                         labels={data.labels}
                         type={data.type}
                         variations={data.variations}
+                        variation_array={data.variation_array}
                     />
                 );
             case 'video':

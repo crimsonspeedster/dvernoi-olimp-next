@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import NotFountIntro from "@components/NotFound/Intro";
 import {GetStaticProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
@@ -6,6 +6,9 @@ import axios from "axios";
 import {GetMenu} from "@components/Layout/graphql";
 import Layout from "@components/Layout";
 import {SettingsContext} from "@pages/_app";
+import {useDispatch} from "react-redux";
+import {useRouter} from "next/router";
+import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 interface FourOhFourProps {
     settingsData: any,
@@ -14,17 +17,36 @@ interface FourOhFourProps {
 }
 
 
-const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) => (
-    <SettingsContext.Provider value={{
-        settings: settingsData,
-        translates: pageData.translated_slugs,
-        menus
-    }}>
-        <Layout>
-            <NotFountIntro />
-        </Layout>
-    </SettingsContext.Provider>
-);
+const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) => {
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    useEffect(()=>{
+        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+            params: {
+                lang: router.locale
+            },
+            withCredentials: true
+        })
+            .then((res) => {
+                dispatch(setCartServerData(res.data));
+                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+            })
+            .catch((error) => {console.log(error)});
+    }, []);
+
+    return (
+        <SettingsContext.Provider value={{
+            settings: settingsData,
+            translates: pageData.translated_slugs,
+            menus
+        }}>
+            <Layout>
+                <NotFountIntro/>
+            </Layout>
+        </SettingsContext.Provider>
+    );
+}
 
 export default FourOhFour;
 

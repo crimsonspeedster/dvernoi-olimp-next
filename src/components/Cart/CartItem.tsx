@@ -1,66 +1,198 @@
-import React from "react";
+import React, {useContext, useState, memo, useEffect} from "react";
 import styles from "@components/Cart/Intro.module.scss";
 import Image from "next/image";
 import classNames from "classnames";
-
-
-interface CartItemProps {
-
-}
+import {CartItemProps} from "@pages/cart";
+import {Else, If, Then} from "react-if";
+import axios from "axios";
+import {SettingsContext} from "@pages/_app";
+import Link from "next/link";
+import {selectCartAmountState, setCartItemsAmount, setCartServerData} from "@store/cart";
+import {useDispatch, useSelector} from "react-redux";
 
 const CartItem:React.FC<CartItemProps> = (props) => {
     const {
-
+        id,
+        variation,
+        variation_id,
+        meta_data,
+        hash,
+        type,
+        totals,
+        product,
+        quantity,
+        setTotalPrice,
+        variation_product
     } = props;
 
+    console.log(variation_product);
+
+    const settingsCtx = useContext(SettingsContext);
+    const dispatch = useDispatch();
+    const cartAmountItems = useSelector(selectCartAmountState);
+
+    const [productExist, setProductExist] = useState<boolean>(true);
+    const [counter, setCounter] = useState<string>(quantity.toString());
+    const [dataStatus, setDataStatus] = useState<boolean>(false);
+
+    useEffect(()=>{
+        setCounter(quantity.toString());
+    }, [quantity]);
+
+    const counterHandler = (val: string):void => {
+        const filteredVal = parseInt(val);
+
+        if (isNaN(filteredVal) || filteredVal < 1) {
+            setCounter('1');
+            return;
+        }
+
+        setCounter(filteredVal.toString());
+
+        console.log(filteredVal);
+    }
+
+    const counterClickHandler = (type: string):void => {
+        setDataStatus(true);
+        let amount:number = parseInt(counter);
+
+        switch (type)
+        {
+            case 'minus':
+                setCounter(prev => (parseInt(prev) - 1) < 1 ? '1' : (parseInt(prev) - 1).toString());
+
+                amount = parseInt(counter) - 1 < 1 ? 1 : parseInt(counter) - 1;
+                break;
+            default:
+                setCounter(prev => (parseInt(prev) + 1).toString());
+
+                amount = parseInt(counter) + 1;
+                break;
+        }
+
+        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/update-item`, {
+            nonce: settingsCtx.nonce,
+            key: hash,
+            quantity: amount
+        }, {
+            withCredentials: true
+        })
+            .then(({data})=>{
+                dispatch(setCartServerData(data));
+
+                setDataStatus(false);
+            })
+            .catch((error) => {console.log(error)});
+    }
+
+    const removeItem = ():void => {
+        setProductExist(false);
+
+        if (setTotalPrice)
+            setTotalPrice(prev => prev - parseInt(totals.line_total));
+
+        dispatch(setCartItemsAmount(cartAmountItems - 1 >= 0 ? cartAmountItems-1 : 0));
+
+        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/remove-item`, {
+            nonce: settingsCtx.nonce,
+            key: hash
+        }, {
+            withCredentials: true
+        })
+            .then(({data})=>{
+                console.log(data);
+            })
+            .catch((error) => {console.log(error)});
+    }
+
     return (
-        <div className={styles['cart-list__item']}>
+        <div className={classNames(styles['cart-list__item'], !productExist ? styles['removed'] : '')}>
             <div className={styles['cart-list__item-inner']}>
-                <div className={styles['cart-list__item-preview']}>
+                <Link href={`/product/${product.slug}`} className={styles['cart-list__item-preview']}>
                     <div className={styles['cart-list__item-preview-inner']}>
-                        {/*<Image src={} alt={} width={48} height={55} />*/}
+                        <Image src={product.images.default} alt={product.name} width={48} height={55} />
                     </div>
-                </div>
+                </Link>
 
                 <div className={styles['cart-list__item-info']}>
-                    <h3 className={styles['cart-list__item-title']}></h3>
+                    <Link href={`/product/${product.slug}`} className={styles['cart-list__item-title']}>
+                        {
+                            type === 'variable' ? variation_product?.name : product.name
+                        }
+                    </Link>
 
-                    <div className={styles['cart-list__item-chars']}>
-                        <div className={styles['cart-list__item-chars-elem']}>Размер двери:
-                            610х2000 мм
-                        </div>
-                    </div>
+                    <If condition={variation.length > 0 || meta_data.meta_extra_products && meta_data.meta_extra_products?.length > 0}>
+                        <Then>
+                            <div className={styles['cart-list__item-chars']}>
+                                {
+                                    variation.length > 0 &&
+                                    variation.map((item, i) => (
+                                        <div
+                                            className={styles['cart-list__item-chars-elem']}
+                                            key={i}
+                                        >
+                                            {item.name}: {item.value}
+                                        </div>
+                                    ))
+                                }
+
+                                {
+                                    meta_data.meta_extra_products && meta_data.meta_extra_products?.length &&
+                                    meta_data.meta_extra_products.map((item, i) => (
+                                        <div
+                                            className={styles['cart-list__item-chars-elem']}
+                                            key={i}
+                                        >
+                                            {item.attribute_title}: <span dangerouslySetInnerHTML={{__html: item.attribute_choosed.value}} />
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </Then>
+                    </If>
                 </div>
             </div>
 
             <div className={styles['cart-list__item-inner']}>
-                <div className="cart-list__item-current-price">14 780 грн</div>
+                <div className="cart-list__item-current-price">{type === 'variable' ? variation_product?.price : product.price.default} грн</div>
             </div>
 
             <div className={styles['cart-list__item-inner']}>
                 <div className={styles['cart-list__item-counter']}>
                     <button
+                        onClick={()=>counterClickHandler('minus')}
+                        disabled={dataStatus}
                         className={classNames(styles['cart-list__item-counter-btn'], styles['cart-list__item-counter-btn--minus'])}
                     />
 
-                    <input className={styles['cart-list__item-counter-inp']} type="text"
-                           name="counter" autoComplete="off" value={0}/>
+                    <input
+                        className={styles['cart-list__item-counter-inp']}
+                        type="number"
+                        name="counter"
+                        autoComplete="off"
+                        value={counter}
+                        onChange={(e) => setCounter(e.currentTarget.value.trim() ?? '1')}
+                        onBlur={(e) => counterHandler(e.currentTarget.value.trim())}
+                    />
 
                     <button
+                        onClick={()=>counterClickHandler('plus')}
+                        disabled={dataStatus}
                         className={classNames(styles['cart-list__item-counter-btn'], styles['cart-list__item-counter-btn--plus'])}
                     />
                 </div>
             </div>
 
             <div className={styles['cart-list__item-inner']}>
-                <div className={styles['cart-list__item-total-price']}>14 780 грн</div>
+                <div className={styles['cart-list__item-total-price']}>{totals.line_total} грн</div>
             </div>
 
             <span
                 className={styles['cart-list__item-close']}
+                onClick={removeItem}
             />
         </div>
     );
 }
 
-export default CartItem;
+export default memo(CartItem);
