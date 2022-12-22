@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React from "react";
 import NotFountIntro from "@components/NotFound/Intro";
 import {GetStaticProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
@@ -6,34 +6,18 @@ import axios from "axios";
 import {GetMenu} from "@components/Layout/graphql";
 import Layout from "@components/Layout";
 import {SettingsContext} from "@pages/_app";
-import {useDispatch} from "react-redux";
+import HeadHTML from "@components/Layout/Head";
 import {useRouter} from "next/router";
-import {setCartItemsAmount, setCartServerData} from "@store/cart";
 
 interface FourOhFourProps {
     settingsData: any,
     menus: any,
-    pageData: any
+    pageData: any,
 }
 
 
 const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) => {
-    const dispatch = useDispatch();
     const router = useRouter();
-
-    useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
 
     return (
         <SettingsContext.Provider value={{
@@ -42,7 +26,18 @@ const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) =
             menus
         }}>
             <Layout>
-                <NotFountIntro/>
+                <HeadHTML
+                    seoPage={{
+                        title: '404 - Дверной Олимп',
+                        og_locale: router.locale ?? 'ru',
+                        og_site_name: 'Дверной Олимп',
+                        og_title: '404 - Дверной Олимп',
+                        og_type: 'article',
+                        article_modified_time: new Date().toTimeString(),
+                    }}
+                />
+
+                <NotFountIntro />
             </Layout>
         </SettingsContext.Provider>
     );
@@ -51,6 +46,7 @@ const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) =
 export default FourOhFour;
 
 export const getStaticProps:GetStaticProps = async ({locale}) => {
+
     const apolloClient = getApolloClient();
 
     const settingsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/options`, {
@@ -59,9 +55,9 @@ export const getStaticProps:GetStaticProps = async ({locale}) => {
             id: 'acf-theme-general-settings',
             acf_format: 'standard'
         }
-    })
+    });
 
-    const res = await axios.all([settingsRequest])
+    const resData = await axios.all([settingsRequest])
         .then(axios.spread(function (settings) {
             return {
                 settings: settings.data
@@ -127,16 +123,16 @@ export const getStaticProps:GetStaticProps = async ({locale}) => {
 
     return {
         props: {
-            settingsData: res.settings,
+            settingsData: resData.settings,
             pageData: {
                 translated_slugs: [
                     {
                         lang: 'ru',
-                        slug: 'home'
+                        slug: '404'
                     },
                     {
                         lang: 'uk',
-                        slug: 'home'
+                        slug: '404'
                     },
                 ]
             },

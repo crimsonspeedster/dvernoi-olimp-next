@@ -11,13 +11,16 @@ import HeadHTML from "@components/Layout/Head";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
+import {getCookie} from "cookies-next";
 
 
 interface AboutProps {
     pageData: any,
     settingsData: any,
     menus: any,
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const About:React.FC<AboutProps> = (props) => {
@@ -25,27 +28,17 @@ const About:React.FC<AboutProps> = (props) => {
         pageData,
         settingsData,
         menus,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     return (
         <SettingsContext.Provider value={{
@@ -75,7 +68,7 @@ const About:React.FC<AboutProps> = (props) => {
 
 export default About;
 
-export const getServerSideProps:GetServerSideProps = async ({locale}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, req, res}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
@@ -94,13 +87,21 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
         }
     });
 
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const res = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
+    const resData = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -163,10 +164,11 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
 
     return {
         props: {
-            pageData: res.page,
-            settingsData: res.settings,
+            pageData: resData.page,
+            settingsData: resData.settings,
             menus,
-            nonce: res.nonce.nonce
+            nonce: resData.nonce.nonce,
+            cartData: resData.cart
         }
     }
 }

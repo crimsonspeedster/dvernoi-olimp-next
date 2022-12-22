@@ -10,6 +10,7 @@ import axios from "axios";
 import {SettingsContext} from "@pages/_app";
 import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {getCookie, setCookie} from "cookies-next";
 
 export interface ProductCardProps {
     id: number,
@@ -74,9 +75,17 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
                 id,
                 quantity: 1
             }, {
-                withCredentials: true
+                headers: {
+                    'X-Headless-WP': true,
+                    ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
+                }
             })
                 .then((res)=>{
+                    if (!getCookie('X-WC-Session'))
+                    {
+                        setCookie('X-WC-Session', res.headers['x-wc-session']);
+                    }
+
                     dispatch(setCartServerData(res.data));
                     dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
                 })

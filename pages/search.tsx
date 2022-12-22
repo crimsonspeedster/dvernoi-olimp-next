@@ -17,6 +17,8 @@ import {useRouter} from "next/router";
 import HeadHTML from "@components/Layout/Head";
 import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {getCookie} from "cookies-next";
+import {CartServerDataProps} from "@pages/cart";
 
 
 interface SearchProps {
@@ -26,7 +28,8 @@ interface SearchProps {
     products: ProductCardProps[],
     total_pages: number,
     page: number,
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const Search:React.FC<SearchProps> = (props) => {
@@ -37,7 +40,8 @@ const Search:React.FC<SearchProps> = (props) => {
         products,
         total_pages,
         page,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const router = useRouter();
@@ -50,18 +54,8 @@ const Search:React.FC<SearchProps> = (props) => {
     const dispatch = useDispatch();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     useEffect(() => {
         setProductItems(products);
@@ -128,7 +122,7 @@ const Search:React.FC<SearchProps> = (props) => {
 
 export default Search;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, res, query}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, res, req, query}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
@@ -161,15 +155,23 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, query}
         }
     });
 
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const resultData = await axios.all([pageRequest, settingsRequest, productsRequest, nonceRequest]).then(axios.spread(function(page, settings, products, nonce) {
+    const resultData = await axios.all([pageRequest, settingsRequest, productsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, products, nonce, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
             products: products.data,
             total_pages: parseInt(products?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -249,7 +251,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, query}
             products: resultData.products,
             total_pages: resultData.total_pages,
             page: parseInt(query.page?.toString() ?? '1'),
-            nonce: resultData.nonce.nonce
+            nonce: resultData.nonce.nonce,
+            cartData: resultData.cart
         }
     }
 }

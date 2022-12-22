@@ -29,9 +29,9 @@ const BLogIntro:React.FC<BLogIntroProps> = ({title, categories, posts, updatePos
     // }, [router.query]);
 
     const handlePageClick = (selectedItem: {selected: number}):void => {
-        if (router.route === "/blog/[[...slug]]")
+        if (router.route === "/poleznoe/[[...slug]]")
         {
-            selectedItem.selected + 1 === 1 ? router.push('/blog') : router.push(`/blog/page/${selectedItem.selected + 1}`);
+            selectedItem.selected + 1 === 1 ? router.push('/poleznoe') : router.push(`/poleznoe/page/${selectedItem.selected + 1}`);
         }
         else {
             selectedItem.selected + 1 === 1 ? router.push(`/category/${router?.query?.slug?.[0]}`) : router.push(`/category/${router?.query?.slug?.[0]}/page/${selectedItem.selected + 1}`);

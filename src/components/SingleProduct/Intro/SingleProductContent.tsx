@@ -20,7 +20,7 @@ import ProductExtra, {
 } from "@components/SingleProduct/ProductExtra/ProductExtra";
 import axios from "axios";
 import {SettingsContext} from "@pages/_app";
-import {getCookies} from "cookies-next";
+import {getCookie, getCookies} from "cookies-next";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {useDispatch} from "react-redux";
 
@@ -170,7 +170,10 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 meta_extra_products: extraData
             }}
         }, {
-            withCredentials: true
+            headers: {
+                'X-Headless-WP': true,
+                ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
+            }
         })
             .then((res)=>{
                 dispatch(setCartServerData(res.data));

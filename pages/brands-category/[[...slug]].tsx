@@ -13,6 +13,8 @@ import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
+import {getCookie} from "cookies-next";
 
 
 interface BrandsCategoryProps {
@@ -23,7 +25,8 @@ interface BrandsCategoryProps {
     total_pages: number,
     categories: categoriesProps[],
     posts: BrandProp[],
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
@@ -35,27 +38,17 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
         total_pages,
         posts,
         categories,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const [postItems, setPostItems] = useState<BrandProp[]>(posts);
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     useEffect(() => {
         setPostItems(posts);
@@ -93,7 +86,7 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
 
 export default BrandsCategory;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/product_cat/`, {
@@ -132,16 +125,24 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     });
 
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const resultDat = await axios.all([pageRequest, settingsRequest, brands, brands_cats, nonceRequest]).then(axios.spread(function(page, settings, brands, brands_cats, nonce) {
+    const resultDat = await axios.all([pageRequest, settingsRequest, brands, brands_cats, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, brands, brands_cats, nonce, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
             posts: brands.data,
             categories: brands_cats.data,
             total_pages: parseInt(brands?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -217,7 +218,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             categories: resultDat.categories,
             posts: resultDat.posts,
             page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
-            nonce: resultDat.nonce.nonce
+            nonce: resultDat.nonce.nonce,
+            cartData: resultDat.cart
         }
     }
 }

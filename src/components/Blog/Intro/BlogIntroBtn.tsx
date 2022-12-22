@@ -26,7 +26,7 @@ const BlogIntroBtn: React.FC<PostLoadMoreProps> = ({updatePosts}) => {
     const getMoreHandler = ():void => {
         setPostsUpdated(true);
 
-        if (router.route === "/blog/[[...slug]]")
+        if (router.route === "/poleznoe/[[...slug]]")
         {
             axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/posts/`, {
                 params: {

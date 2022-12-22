@@ -22,8 +22,8 @@ const BlogIntroCategories:React.FC<BlogIntroCategoriesProps> = ({categories}) =>
     return (
         <div className={classNames(styles['blog-intro__categories'], styles['blog-intro-categories'])}>
             <Link
-                className={classNames(styles['blog-intro-categories__item'], router.route === "/blog/[[...slug]]" ? styles.active : '')}
-                href={"/blog"}
+                className={classNames(styles['blog-intro-categories__item'], router.route === "/poleznoe/[[...slug]]" ? styles.active : '')}
+                href={"/poleznoe"}
                 locale={router.locale}
             >
                 Все категории

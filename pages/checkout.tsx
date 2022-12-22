@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {GetServerSideProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
@@ -10,6 +10,9 @@ import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 import {SettingsContext} from "@pages/_app";
 import Layout from "@components/Layout";
 import CheckoutIntro from "@components/Checkout/Intro";
+import {getCookie} from "cookies-next";
+import {CartServerDataProps} from "@pages/cart";
+import {setCartServerData} from "@store/cart";
 
 
 interface CheckoutProps {
@@ -17,6 +20,7 @@ interface CheckoutProps {
     settingsData: any,
     menus: any,
     nonce: string,
+    cartData: CartServerDataProps
 }
 
 const Checkout:React.FC<CheckoutProps> = (props) => {
@@ -24,13 +28,17 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
         pageData,
         settingsData,
         menus,
-        nonce
+        nonce,
+        cartData
     } = props;
 
-    const router = useRouter();
     const dispatch = useDispatch();
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
+
+    useEffect(()=>{
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     return (
         <>
@@ -58,7 +66,7 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
 
 export default Checkout;
 
-export const getServerSideProps:GetServerSideProps = async ({locale}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
@@ -79,11 +87,19 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
         }
     });
 
-    const resData = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
+    const resData = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -150,6 +166,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale}) => {
             settingsData: resData.settings,
             menus,
             nonce: resData.nonce.nonce,
+            cartData: resData.cart
         }
     }
 }

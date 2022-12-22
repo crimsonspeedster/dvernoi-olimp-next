@@ -16,13 +16,16 @@ import FourOhFour from "@pages/404";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
+import {getCookie} from "cookies-next";
 
 
 interface ServiceSingleProps {
     pageData: any,
     settingsData: any,
     menus: any,
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
@@ -30,25 +33,15 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
         pageData,
         settingsData,
         menus,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
@@ -108,7 +101,7 @@ const ServiceSingle:React.FC<ServiceSingleProps> = (props) => {
 
 export default ServiceSingle;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/services/`, {
@@ -116,6 +109,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             slug: params?.slug ?? '',
             lang: locale,
             acf_format: 'standard'
+        }
+    });
+
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
         }
     });
 
@@ -129,11 +129,12 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const resultData = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
+    const resultData = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         return {
             page: page.data?.[0] ?? {},
             settings: settings.data,
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -214,7 +215,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             pageData: resultData.page,
             settingsData: resultData.settings,
             menus,
-            nonce: resultData.nonce.nonce
+            nonce: resultData.nonce.nonce,
+            cartData: resultData.cart
         }
     }
 }

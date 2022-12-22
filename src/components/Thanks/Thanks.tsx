@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import Link from "next/link";
 import sprite from '@icons/sprite.svg';
 import styles from './Thanks.module.scss';
@@ -6,11 +6,8 @@ import classNames from "classnames";
 import {If, Then} from "react-if";
 import {useRouter} from "next/router";
 
-interface ThanksIntroProps {
-    order?: number
-}
-
-const ThanksIntro:React.FC<ThanksIntroProps> = ({order}) => {
+const ThanksIntro = () => {
+    const router = useRouter();
 
     return (
         <section className={styles['thanks']}>
@@ -22,10 +19,10 @@ const ThanksIntro:React.FC<ThanksIntroProps> = ({order}) => {
                         </svg>
                     </div>
 
-                    <If condition={order}>
+                    <If condition={router.query?.order && router.query?.order?.length > 0}>
                         <Then>
                             <div className={styles['thanks__number']}>
-                                Заказ № <span>{order}</span>
+                                Заказ № <span>{router.query?.order}</span>
                             </div>
                         </Then>
                     </If>

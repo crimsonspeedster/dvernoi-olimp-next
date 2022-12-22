@@ -13,6 +13,8 @@ import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
+import {getCookie} from "cookies-next";
 
 
 interface BrandsProps {
@@ -23,7 +25,8 @@ interface BrandsProps {
     total_pages: number,
     categories: categoriesProps[],
     posts: BrandProp[],
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const Brands:React.FC<BrandsProps> = (props) => {
@@ -35,7 +38,8 @@ const Brands:React.FC<BrandsProps> = (props) => {
         total_pages,
         posts,
         categories,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const [postItems, setPostItems] = useState<BrandProp[]>(posts);
@@ -45,21 +49,10 @@ const Brands:React.FC<BrandsProps> = (props) => {
     }, [posts]);
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
@@ -93,7 +86,7 @@ const Brands:React.FC<BrandsProps> = (props) => {
 
 export default Brands;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
@@ -124,6 +117,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
         }
     });
 
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
     const settingsRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/options`, {
         params: {
             lang: locale,
@@ -134,14 +134,15 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
 
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const res = await axios.all([pageRequest, settingsRequest, brands, brands_cats, nonceRequest]).then(axios.spread(function(page, settings, brands, brands_cats, nonce) {
+    const resData = await axios.all([pageRequest, settingsRequest, brands, brands_cats, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, brands, brands_cats, nonce, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
             posts: brands.data,
             categories: brands_cats.data,
             total_pages: parseInt(brands?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -204,14 +205,15 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
 
     return {
         props: {
-            pageData: res.page,
-            settingsData: res.settings,
+            pageData: resData.page,
+            settingsData: resData.settings,
             menus,
-            total_pages: res.total_pages,
-            categories: res.categories,
-            posts: res.posts,
-            nonce: res.nonce.nonce,
-            page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1')
+            total_pages: resData.total_pages,
+            categories: resData.categories,
+            posts: resData.posts,
+            nonce: resData.nonce.nonce,
+            page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
+            cartData: resData.cart
         }
     }
 }

@@ -22,13 +22,18 @@ export const cartSlice = createSlice({
             state.total_amount = action.payload.total_amount;
             state.total_items = action.payload.total_items;
             state.total_price = action.payload.total_price;
+        },
+        setCartTotalPrice (state, action) {
+            state.total_price = action.payload;
         }
     }
 });
 
-export const { setCartItemsAmount, setCartServerData } = cartSlice.actions;
+export const { setCartItemsAmount, setCartServerData, setCartTotalPrice } = cartSlice.actions;
 
 export const selectCartAmountState = (state: AppState) => state.cart.total_amount;
 export const selectAllCartData = (state: AppState) => state.cart;
+
+export const selectCartTotalPrice = (state: AppState) => state.cart.total_price;
 
 export default cartSlice.reducer;

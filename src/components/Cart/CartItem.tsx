@@ -3,12 +3,18 @@ import styles from "@components/Cart/Intro.module.scss";
 import Image from "next/image";
 import classNames from "classnames";
 import {CartItemProps} from "@pages/cart";
-import {Else, If, Then} from "react-if";
+import {If, Then} from "react-if";
 import axios from "axios";
 import {SettingsContext} from "@pages/_app";
 import Link from "next/link";
-import {selectCartAmountState, setCartItemsAmount, setCartServerData} from "@store/cart";
+import {
+    selectCartAmountState,
+    selectCartTotalPrice,
+    setCartItemsAmount,
+    setCartServerData, setCartTotalPrice
+} from "@store/cart";
 import {useDispatch, useSelector} from "react-redux";
+import {getCookie} from "cookies-next";
 
 const CartItem:React.FC<CartItemProps> = (props) => {
     const {
@@ -21,15 +27,13 @@ const CartItem:React.FC<CartItemProps> = (props) => {
         totals,
         product,
         quantity,
-        setTotalPrice,
         variation_product
     } = props;
-
-    console.log(variation_product);
 
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
     const cartAmountItems = useSelector(selectCartAmountState);
+    const cartTotalPrice = useSelector(selectCartTotalPrice);
 
     const [productExist, setProductExist] = useState<boolean>(true);
     const [counter, setCounter] = useState<string>(quantity.toString());
@@ -40,6 +44,7 @@ const CartItem:React.FC<CartItemProps> = (props) => {
     }, [quantity]);
 
     const counterHandler = (val: string):void => {
+        setDataStatus(true);
         const filteredVal = parseInt(val);
 
         if (isNaN(filteredVal) || filteredVal < 1) {
@@ -49,7 +54,22 @@ const CartItem:React.FC<CartItemProps> = (props) => {
 
         setCounter(filteredVal.toString());
 
-        console.log(filteredVal);
+        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/update-item`, {
+            nonce: settingsCtx.nonce,
+            key: hash,
+            quantity: filteredVal
+        }, {
+            headers: {
+                'X-Headless-WP': true,
+                ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
+            }
+        })
+            .then(({data})=>{
+                dispatch(setCartServerData(data));
+
+                setDataStatus(false);
+            })
+            .catch((error) => {console.log(error)});
     }
 
     const counterClickHandler = (type: string):void => {
@@ -75,7 +95,10 @@ const CartItem:React.FC<CartItemProps> = (props) => {
             key: hash,
             quantity: amount
         }, {
-            withCredentials: true
+            headers: {
+                'X-Headless-WP': true,
+                ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
+            }
         })
             .then(({data})=>{
                 dispatch(setCartServerData(data));
@@ -88,20 +111,19 @@ const CartItem:React.FC<CartItemProps> = (props) => {
     const removeItem = ():void => {
         setProductExist(false);
 
-        if (setTotalPrice)
-            setTotalPrice(prev => prev - parseInt(totals.line_total));
-
         dispatch(setCartItemsAmount(cartAmountItems - 1 >= 0 ? cartAmountItems-1 : 0));
+        dispatch(setCartTotalPrice(parseFloat((cartTotalPrice - parseFloat(totals.line_total)).toFixed(2))));
 
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/remove-item`, {
             nonce: settingsCtx.nonce,
             key: hash
         }, {
-            withCredentials: true
+            headers: {
+                'X-Headless-WP': true,
+                ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
+            }
         })
-            .then(({data})=>{
-                console.log(data);
-            })
+            .then((result)=>{})
             .catch((error) => {console.log(error)});
     }
 

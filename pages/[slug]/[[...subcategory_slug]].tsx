@@ -23,6 +23,7 @@ import {FilterAttrsProps, FilterValuesProps} from "@components/ProductCategoryCo
 import {removeMultipleSpaces} from "@utils/stringHelper";
 import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
 
 
 interface SubCategoryProps {
@@ -33,7 +34,8 @@ interface SubCategoryProps {
     reviewed_products: ProductCardProps[],
     total_pages: number,
     current_page: number,
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const SubCategory:React.FC<SubCategoryProps> = (props) => {
@@ -45,27 +47,17 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         reviewed_products,
         total_pages,
         current_page,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     useEffect(()=>{
         setProductItems(products);
@@ -226,16 +218,24 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             id: 'acf-theme-general-settings',
             acf_format: 'standard'
         }
-    })
+    });
 
-    const resData = await axios.all([settingsRequest, categoryRequest, productsRequest, nonceRequest]).then(axios.spread(function(settings, category, products, nonce) {
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
+    const resData = await axios.all([settingsRequest, categoryRequest, productsRequest, nonceRequest, cartRequest]).then(axios.spread(function(settings, category, products, nonce, cart) {
         return {
             settings: settings.data,
             pageData: category.data?.[0] ?? {},
             products: products.data.products,
             current_page: products.data.current_page,
             total_pages: products.data.total_pages,
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -340,7 +340,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             current_page: resData.current_page,
             total_pages: resData.total_pages,
             reviewed_products,
-            nonce: resData.nonce.nonce
+            nonce: resData.nonce.nonce,
+            cartData: resData.cart
         }
     }
 }

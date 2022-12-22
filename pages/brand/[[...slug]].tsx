@@ -20,6 +20,7 @@ import SingleBrandTemplate from "@root/templates/SingleBrandTemplate";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
 
 
 interface BrandProps {
@@ -32,7 +33,8 @@ interface BrandProps {
     current_page: number,
     products: ProductCardProps[],
     categoryData: any,
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const Brand:React.FC<BrandProps> = (props) => {
@@ -46,27 +48,17 @@ const Brand:React.FC<BrandProps> = (props) => {
         total_pages,
         categoryData,
         current_page,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     const [childPosts, setChildPosts] = useState<BrandProp[]>(posts);
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
@@ -155,13 +147,21 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     });
 
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
+    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         return {
             page: page.data,
             settings: settings.data,
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -318,7 +318,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             current_page: subResultDat.current_page,
             total_pages: subResultDat.total_pages,
             reviewed_products,
-            nonce: resultDat.nonce.nonce
+            nonce: resultDat.nonce.nonce,
+            cartData: resultDat.cart
         }
     };
 }

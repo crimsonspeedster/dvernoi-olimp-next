@@ -16,6 +16,8 @@ import styles from '@components/SinglePost/Intro/Intro.module.scss'
 import {useRouter} from "next/router";
 import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
+import {getCookie} from "cookies-next";
 
 
 interface SinglePostProps {
@@ -23,7 +25,8 @@ interface SinglePostProps {
     settingsData: any,
     menus: any,
     posts: PostProp[],
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const SinglePost:React.FC<SinglePostProps> = (props) => {
@@ -32,7 +35,8 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
         settingsData,
         menus,
         posts,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const router = useRouter();
@@ -42,18 +46,8 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
     const dispatch = useDispatch();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     const PostJsonLD = ():string => {
         return `
@@ -137,7 +131,7 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
 
 export default SinglePost;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/posts/`, {
@@ -157,13 +151,21 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     });
 
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
+
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest]).then(axios.spread(function(page, settings, nonce) {
+    const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         return {
             page: page.data,
             settings: settings.data,
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -249,7 +251,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             settingsData: resultDat.settings,
             menus,
             posts,
-            nonce: resultDat.nonce.nonce
+            nonce: resultDat.nonce.nonce,
+            cartData: resultDat.cart
         }
     };
 }

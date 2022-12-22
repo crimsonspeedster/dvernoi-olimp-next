@@ -240,6 +240,22 @@
             border: 1px solid #D4DADE;
             padding: 0 25px;
 
+            &.pc {
+                display: block;
+
+                @media screen and (max-width: 1024px) {
+                    display: none;
+                }
+            }
+
+            &.mobile {
+                display: none;
+
+                @media screen and (max-width: 1024px) {
+                    display: block;
+                }
+            }
+
             .ReactCollapse--collapse {
                 transition: height .4s ease;
             }

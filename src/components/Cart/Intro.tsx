@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useContext} from 'react';
+import React, {Dispatch, SetStateAction, useContext, useEffect} from 'react';
 import Link from "next/link";
 import styles from './Intro.module.scss';
 import productImg from '@images/single-product.jpg';
@@ -8,32 +8,26 @@ import {CartItemProps, CartItemsProps} from "@pages/cart";
 import {Else, If, Then} from "react-if";
 import CartItem from "@components/Cart/CartItem";
 import {useSelector} from "react-redux";
-import cart, {selectCartAmountState} from "@store/cart";
+import {selectAllCartData, selectCartAmountState, selectCartTotalPrice} from "@store/cart";
 
 
 interface CartIntroProps {
-    title: string,
-    items: CartItemsProps[],
-    total_price: number,
-    setTotalPrice: Dispatch<SetStateAction<number>>
+    title: string
 }
 
 const CartIntro:React.FC<CartIntroProps> = (props) => {
     const {
         title,
-        items,
-        total_price,
-        setTotalPrice
     } = props;
 
-    const cartAmountItems = useSelector(selectCartAmountState);
+    const cartData = useSelector(selectAllCartData);
 
     return (
         <section className={classNames(styles['cart'], 'intro')}>
             <div className="container">
                 <h1 className={classNames(styles['cart__title'], 'title', 'title--dark')}>{title}</h1>
 
-                <If condition={cartAmountItems > 0}>
+                <If condition={cartData.total_amount > 0}>
                     <Then>
                         <div className={styles['cart__table']}>
                             <div className={classNames(styles['cart__header'], styles['cart-header'])}>
@@ -48,20 +42,19 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
 
                             <div className={classNames(styles['cart__list'], styles['cart-list'])}>
                                 {
-                                    Object.keys(items).map((val, i) => (
+                                    Object.keys(cartData.items).map((val, i) => (
                                         <CartItem
-                                            key={items[val].hash}
-                                            type={items[val].type}
-                                            hash={items[val].hash}
-                                            variation_product={items[val].variation_product}
-                                            meta_data={items[val].meta_data}
-                                            id={items[val].id}
-                                            quantity={items[val].quantity}
-                                            variation_id={items[val].variation_id}
-                                            variation={items[val].variation}
-                                            totals={items[val].totals}
-                                            product={items[val].product}
-                                            setTotalPrice={setTotalPrice}
+                                            key={cartData.items[val].hash}
+                                            type={cartData.items[val].type}
+                                            hash={cartData.items[val].hash}
+                                            variation_product={cartData.items[val].variation_product}
+                                            meta_data={cartData.items[val].meta_data}
+                                            id={cartData.items[val].id}
+                                            quantity={cartData.items[val].quantity}
+                                            variation_id={cartData.items[val].variation_id}
+                                            variation={cartData.items[val].variation}
+                                            totals={cartData.items[val].totals}
+                                            product={cartData.items[val].product}
                                         />
                                     ))
                                 }
@@ -75,7 +68,7 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
                                 <div className={styles['cart-footer__total-price']}>
                                     <span>Итог:</span>
 
-                                    {total_price} грн
+                                    {cartData.total_price} грн
                                 </div>
 
                                 <div className={styles['cart-footer__btns']}>

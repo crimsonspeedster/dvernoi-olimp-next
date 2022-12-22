@@ -12,6 +12,8 @@ import {PostProp} from "@components/Homepage/Posts/Posts";
 import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
+import {CartServerDataProps} from "@pages/cart";
+import {getCookie} from "cookies-next";
 
 
 interface BlogPageProps {
@@ -22,7 +24,8 @@ interface BlogPageProps {
     total_pages: number,
     categories: categoriesProps[],
     page: number,
-    nonce: string
+    nonce: string,
+    cartData: CartServerDataProps
 }
 
 const BlogPage:React.FC<BlogPageProps> = (props) => {
@@ -34,27 +37,17 @@ const BlogPage:React.FC<BlogPageProps> = (props) => {
         total_pages,
         categories,
         page,
-        nonce
+        nonce,
+        cartData
     } = props;
 
     const [postItems, setPostItems] = useState<PostProp[]>(posts);
 
     const dispatch = useDispatch();
-    const router = useRouter();
 
     useEffect(()=>{
-        axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
-            params: {
-                lang: router.locale
-            },
-            withCredentials: true
-        })
-            .then((res) => {
-                dispatch(setCartServerData(res.data));
-                dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
-            })
-            .catch((error) => {console.log(error)});
-    }, []);
+        dispatch(setCartServerData(cartData));
+    }, [dispatch, cartData]);
 
     useEffect(() => {
         setPostItems(posts);
@@ -90,12 +83,12 @@ const BlogPage:React.FC<BlogPageProps> = (props) => {
 
 export default BlogPage;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, params, req, res}) => {
     const apolloClient = getApolloClient();
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/pages/`, {
         params: {
-            slug: 'blog',
+            slug: 'poleznoe',
             lang: locale,
             acf_format: 'standard'
         }
@@ -124,18 +117,26 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
             id: 'acf-theme-general-settings',
             acf_format: 'standard'
         }
-    })
+    });
+
+    const cartRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart`, {
+        headers: {
+            'X-Headless-WP': true,
+            'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        }
+    });
 
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
-    const res = await axios.all([pageRequest, settingsRequest, posts, categories, nonceRequest]).then(axios.spread(function(page, settings, posts, categories, nonce) {
+    const resData = await axios.all([pageRequest, settingsRequest, posts, categories, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, posts, categories, nonce, cart) {
         return {
             page: page.data[0],
             settings: settings.data,
             posts: posts.data,
             categories: categories.data,
             total_pages: parseInt(posts?.headers?.['x-wp-totalpages']?.toString() ?? '1'),
-            nonce: nonce.data
+            nonce: nonce.data,
+            cart: cart.data
         };
     }));
 
@@ -198,14 +199,15 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params}) =>
 
     return {
         props: {
-            pageData: res.page,
-            settingsData: res.settings,
+            pageData: resData.page,
+            settingsData: resData.settings,
             menus,
-            posts: res.posts,
-            total_pages: res.total_pages,
-            categories: res.categories,
+            posts: resData.posts,
+            total_pages: resData.total_pages,
+            categories: resData.categories,
             page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
-            nonce: res.nonce.nonce
+            nonce: resData.nonce.nonce,
+            cartData: resData.cart
         }
     }
 }
