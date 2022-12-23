@@ -23,6 +23,7 @@
     "next": "13.0.0",
     "next-redux-wrapper": "^8.0.0",
     "nouislider-react": "^3.4.1",
+    "novaposhta": "^1.1.1",
     "react": "18.2.0",
     "react-collapse": "^5.1.1",
     "react-debounce-input": "^3.3.0",

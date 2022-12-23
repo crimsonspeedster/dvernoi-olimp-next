@@ -13,6 +13,8 @@ import CheckoutIntro from "@components/Checkout/Intro";
 import {getCookie} from "cookies-next";
 import {CartServerDataProps} from "@pages/cart";
 import {setCartServerData} from "@store/cart";
+// @ts-ignore
+import NovaPoshta from 'novaposhta';
 
 
 interface CheckoutProps {
@@ -20,7 +22,28 @@ interface CheckoutProps {
     settingsData: any,
     menus: any,
     nonce: string,
-    cartData: CartServerDataProps
+    cartData: CartServerDataProps,
+    np_cities: NPCityProps[]
+}
+
+export interface NPCityProps {
+    AreaDescription: string
+    AreaDescriptionRu: string,
+    Description: string,
+    DescriptionRu: string,
+    Ref: string,
+    value: string,
+    label: string
+}
+
+export interface NPDepartament {
+    DescriptionRu: string,
+    Description: string,
+    ShortAddress: string,
+    ShortAddressRu: string,
+    SiteKey: string,
+    value: string,
+    label: string
 }
 
 const Checkout:React.FC<CheckoutProps> = (props) => {
@@ -29,13 +52,14 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
         settingsData,
         menus,
         nonce,
-        cartData
+        cartData,
+        np_cities
     } = props;
 
     const dispatch = useDispatch();
     const router = useRouter();
 
-    console.log(cartData.items);
+    console.log(np_cities);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
@@ -65,6 +89,8 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
 
                     <CheckoutIntro
                         title={pageData.title.rendered}
+                        npCities={np_cities}
+                        deliveryShops={pageData.acf.delivery_shops}
                     />
                 </Layout>
             </SettingsContext.Provider>
@@ -101,6 +127,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) 
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
         }
     });
+
+    const novaPoshtaRequest = new NovaPoshta({ apiKey: process.env.NEXT_PUBLIC_ENV_NP_API_KEY });
 
     const resData = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         return {
@@ -174,13 +202,18 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) 
         catalog_menu: catalog_menu?.menus?.nodes?.[0]?.menuItems?.nodes ?? []
     };
 
+    const np_cities = await novaPoshtaRequest.address
+        .getCities()
+        .then((res:any) => res?.data?.map((item:NPCityProps) => ({...item, value: item.Ref, label: item.DescriptionRu})) ?? []);
+
     return {
         props: {
             pageData: resData.page,
             settingsData: resData.settings,
             menus,
             nonce: resData.nonce.nonce,
-            cartData: resData.cart
+            cartData: resData.cart,
+            np_cities: np_cities
         }
     }
 }
