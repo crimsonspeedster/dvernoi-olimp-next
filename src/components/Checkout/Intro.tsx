@@ -274,14 +274,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                     >
                                                         <span className={styles['checkout-info__select-icon']}>
                                                             <svg>
-                                                                <use href={`${sprite.src}#newpost`}/>
+                                                                <use href={`${sprite.src}#user`}/>
                                                             </svg>
                                                         </span>
 
                                                         <span className={styles['checkout-info__select-check']}/>
 
                                                         <span className={styles['checkout-info__select-desc']}>
-                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу</span>
+                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу (от магазина)</span>
                                                         </span>
                                                     </label>
                                                 </div>
@@ -379,6 +379,128 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         />
                                                     </div>
 
+                                                    <div className={styles['checkout-info__inps']}>
+                                                        <div className={styles['checkout-info__inp-wrapper']}>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-street">Улица</label>
+
+                                                            <div className={styles['checkout-info__inp-inner']}>
+                                                                <input
+                                                                    className={styles['checkout-info__inp']}
+                                                                    id="checkout-street"
+                                                                    name="np_street"
+                                                                    onChange={handleChange}
+                                                                    autoComplete="off"
+                                                                    placeholder="Улица"
+                                                                    type="text"
+                                                                    value={values.np_street}
+                                                                />
+                                                            </div>
+
+                                                            <If condition={errors.np_street && touched.np_street}>
+                                                                <Then>
+                                                                    <div className={styles['form-error__msg']}>
+                                                                        <ErrorMessage name="np_street" />
+                                                                    </div>
+                                                                </Then>
+                                                            </If>
+                                                        </div>
+
+                                                        <div className={styles['checkout-info__inp-wrapper']}>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-house">Дом</label>
+
+                                                            <div className={styles['checkout-info__inp-inner']}>
+                                                                <input
+                                                                    className={styles['checkout-info__inp']}
+                                                                    id="checkout-house"
+                                                                    name="user_surname"
+                                                                    autoComplete="off"
+                                                                    placeholder="№"
+                                                                    type="text"
+                                                                    onChange={handleChange}
+                                                                    value={values.np_house}
+                                                                />
+                                                            </div>
+
+                                                            <If condition={errors.np_house && touched.np_house}>
+                                                                <Then>
+                                                                    <div className={styles['form-error__msg']}>
+                                                                        <ErrorMessage name="np_house" />
+                                                                    </div>
+                                                                </Then>
+                                                            </If>
+                                                        </div>
+
+                                                        {/*<div className={styles['checkout-info__inp-wrapper']}>*/}
+                                                        {/*    <label className={styles['checkout-info__label']} htmlFor="checkout-floor">Этаж</label>*/}
+
+                                                        {/*    <div className={styles['checkout-info__inp-inner']}>*/}
+                                                        {/*        <input*/}
+                                                        {/*            className={styles['checkout-info__inp']}*/}
+                                                        {/*            id="checkout-floor"*/}
+                                                        {/*            name="np_floor"*/}
+                                                        {/*            autoComplete="off"*/}
+                                                        {/*            placeholder="1"*/}
+                                                        {/*            type="text"*/}
+                                                        {/*            onChange={handleChange}*/}
+                                                        {/*            value={values.np_floor}*/}
+                                                        {/*        />*/}
+                                                        {/*    </div>*/}
+
+                                                        {/*    <If condition={errors.np_floor && touched.np_floor}>*/}
+                                                        {/*        <Then>*/}
+                                                        {/*            <div className={styles['form-error__msg']}>*/}
+                                                        {/*                <ErrorMessage name="np_floor" />*/}
+                                                        {/*            </div>*/}
+                                                        {/*        </Then>*/}
+                                                        {/*    </If>*/}
+                                                        {/*</div>*/}
+
+                                                        {/*<div className={styles['checkout-info__inp-wrapper']}>*/}
+                                                        {/*    <label className={styles['checkout-info__label']} htmlFor="checkout-house">Квартира</label>*/}
+
+                                                        {/*    <div className={styles['checkout-info__inp-inner']}>*/}
+                                                        {/*        <input*/}
+                                                        {/*            className={styles['checkout-info__inp']}*/}
+                                                        {/*            id="checkout-house"*/}
+                                                        {/*            name="user_surname"*/}
+                                                        {/*            autoComplete="off"*/}
+                                                        {/*            placeholder="№"*/}
+                                                        {/*            type="text"*/}
+                                                        {/*            onChange={handleChange}*/}
+                                                        {/*            value={values.np_house}*/}
+                                                        {/*        />*/}
+                                                        {/*    </div>*/}
+
+                                                        {/*    <If condition={errors.np_house && touched.np_house}>*/}
+                                                        {/*        <Then>*/}
+                                                        {/*            <div className={styles['form-error__msg']}>*/}
+                                                        {/*                <ErrorMessage name="np_house" />*/}
+                                                        {/*            </div>*/}
+                                                        {/*        </Then>*/}
+                                                        {/*    </If>*/}
+                                                        {/*</div>*/}
+                                                    </div>
+                                                </>
+                                            }
+
+                                            {
+                                                values.delivery_type === '3' &&
+                                                <>
+                                                    <div className={styles['checkout-info__delivery-block']}>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
+
+                                                        <Select<GroupedItemOption, false, GroupedOption>
+                                                            className={styles['checkout-info__delivery-block__select']}
+                                                            options={shopGroupedElements}
+                                                            onChange={(val) => {
+                                                                setFieldValue('delivery_option', val);
+                                                                setChoosedShopDefault(val);
+                                                            }}
+                                                            placeholder="Город"
+                                                            name={'delivery_option'}
+                                                        />
+                                                    </div>
+
                                                     <div className={styles['checkout-info__delivery-block']}>
                                                         <span className={styles['checkout-info__delivery-block__title']}>Номер отделения Новая Почта:</span>
 
@@ -397,7 +519,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                             }
 
                                             {
-                                                values.delivery_type === '3' &&
+                                                values.delivery_type === '4' &&
                                                 <>
                                                     <div className={styles['checkout-info__delivery-block']}>
                                                         <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
@@ -633,7 +755,22 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                 <div className={styles['checkout-content__total-item']}>
                                                     <div className={styles['checkout-content__total-title']}>Цена доставки:</div>
 
-                                                    <div className={styles['checkout-content__total-value']}>{values.delivery_type === '1' ? 'Бесплатно' : 'По тарифам Новой почты'}</div>
+                                                    <div className={styles['checkout-content__total-value']}>
+                                                        {
+                                                            values.delivery_type === '1' &&
+                                                            <span>Бесплатно</span>
+                                                        }
+
+                                                        {
+                                                            values.delivery_type === '2'&&
+                                                            <span>Уточнить у менеджера</span>
+                                                        }
+
+                                                        {
+                                                            values.delivery_type !== '1' && values.delivery_type !== '2' &&
+                                                            <span>По тарифам Новой почты</span>
+                                                        }
+                                                    </div>
                                                 </div>
 
                                                 <div className={styles['checkout-content__total-item']}>

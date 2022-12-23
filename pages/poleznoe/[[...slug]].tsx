@@ -73,6 +73,7 @@ const BlogPage:React.FC<BlogPageProps> = (props) => {
                         categories={categories}
                         posts={postItems}
                         updatePosts={setPostItems}
+                        seoBlock={pageData.acf.seo_block}
                     />
                 </Layout>
 
