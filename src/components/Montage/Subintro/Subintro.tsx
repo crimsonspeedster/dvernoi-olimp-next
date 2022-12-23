@@ -17,9 +17,9 @@ const MontageSubintro: React.FC<MontageSubintroProps> = ({block}) => {
                     {
                         table.tablicza.map((item, i) => (
                             <div key={i} className={styles['montage-subintro__table-row']}>
-                                <div className={styles['montage-subintro__table-title']}>{item.tip_dverei}</div>
+                                <div className={styles['montage-subintro__table-title']} dangerouslySetInnerHTML={{__html: item.tip_dverei}} />
 
-                                <div className={styles['montage-subintro__table-value']}>{item.stoimost}</div>
+                                <div className={styles['montage-subintro__table-value']} dangerouslySetInnerHTML={{__html: item.stoimost}} />
                             </div>
                         ))
                     }

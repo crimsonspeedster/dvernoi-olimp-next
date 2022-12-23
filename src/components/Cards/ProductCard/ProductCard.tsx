@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, {useContext, useState, memo} from "react";
 import styles from './ProductCard.module.scss';
 import Link from "next/link";
 import Image from "next/image";
@@ -67,7 +67,11 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
 
+    const [dataStatus, setDataStatus] = useState<boolean>(false);
+
     const buyHandler = ():void => {
+        setDataStatus(true);
+
         if (type === 'simple')
         {
             axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
@@ -88,11 +92,14 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
 
                     dispatch(setCartServerData(res.data));
                     dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+
+                    setDataStatus(false);
                 })
                 .catch((error) => {console.log(error)});
         }
         else {
             console.log(variation_array);
+            setDataStatus(false);
         }
     }
 
@@ -141,13 +148,14 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
             <div className={styles['productCard-bottom']}>
                 <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
 
-                <div
-                    className={classNames('button', styles['productCard__btn'])}
+                <button
+                    disabled={dataStatus}
+                    className={classNames('button', styles['productCard__btn'], dataStatus ? styles['updating'] : '')}
                     onClick={buyHandler}
-                >Купить</div>
+                >Купить</button>
             </div>
         </div>
     );
 }
 
-export default ProductCard;
+export default memo(ProductCard);

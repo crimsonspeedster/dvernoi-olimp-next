@@ -19,12 +19,12 @@ export interface ContactsInfoProps {
     showPhotos: boolean
 }
 
-interface CitiesProps {
+export interface CitiesProps {
     gorod: string,
     magaziny: ShopProps[]
 }
 
-interface ShopProps {
+export interface ShopProps {
     adres: string,
     adres_iframe: string,
     nomera: NomerProps[],

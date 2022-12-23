@@ -52,7 +52,7 @@ export interface CartItemProps {
     product: ProductCardProps,
 }
 
-interface CartVariationProps {
+export interface CartVariationProps {
     name: string,
     attr_slug: string,
     value: string

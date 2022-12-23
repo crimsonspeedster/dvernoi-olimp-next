@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import styles from './Intro.module.scss';
 import classNames from "classnames";
 import axios from "axios";
@@ -9,16 +9,52 @@ import Image from "next/image";
 import * as Yup from "yup";
 import CheckoutList from "@components/Checkout/CheckoutList";
 import sprite from "@icons/sprite.svg";
+import {useSelector} from "react-redux";
+import {selectAllCartData} from "@store/cart";
+import {SettingsContext} from "@pages/_app";
+import {CitiesProps, ShopProps} from "@components/ContactsInfo/ContactsInfo";
+import Select, {SingleValue} from "react-select";
 
 
 interface CheckoutIntroProps {
     title: string,
 }
 
+interface GroupedOption {
+    label: string;
+    options: GroupedItemOption[];
+}
+
+interface GroupedItemOption {
+    label: string,
+    value: string,
+    dni_raboty: string,
+    city: string
+}
+
 const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
     const {
         title,
     } = props;
+
+    const cartData = useSelector(selectAllCartData);
+    const shopsArray:CitiesProps[] = useContext(SettingsContext).settings?.nashi_magaziny?.povtoritel ?? [];
+
+    const shopGroupedElements:GroupedOption[] = shopsArray.map(item => {
+        return {
+            label: item.gorod,
+            options: item.magaziny.map(subitem => {
+                return {
+                    label: subitem.adres,
+                    value: `${item.gorod}_${subitem.adres}`,
+                    dni_raboty: subitem.dni_raboty,
+                    city: item.gorod
+                }
+            })
+        }
+    });
+
+    const [choosedShopDefault, setChoosedShopDefault] = useState<GroupedItemOption|null|SingleValue<GroupedItemOption>>(shopGroupedElements[0].options[0]);
 
     const validateFormSchema = Yup.object().shape({
 
@@ -39,6 +75,16 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                         user_agreed: true,
                         user_promo: '',
                         delivery_type: "1",
+                        delivery_option: choosedShopDefault,
+                        np_city: '',
+                        np_department: '',
+                        np_street: '',
+                        np_house: '',
+                        shop_city: '',
+                        shop_street: '',
+                        shop_house: '',
+                        shop_floor: '',
+                        shop_apartment: '',
                         payment_type: "1"
                     }}
                     // validationSchema={validateFormSchema}
@@ -51,6 +97,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                 >
                     {
                         ({
+                             setFieldValue,
                              values,
                              errors,
                              touched,
@@ -234,9 +281,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         <span className={styles['checkout-info__select-check']}/>
 
                                                         <span className={styles['checkout-info__select-desc']}>
-                                                            <span className={styles['checkout-info__select-text']}>В отделение «Новая Почта»</span>
-
-                                                            <span className={styles['checkout-info__select-subtext']}>Доставка от +350 грн»</span>
+                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу</span>
                                                         </span>
                                                     </label>
                                                 </div>
@@ -263,13 +308,215 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         <span className={styles['checkout-info__select-check']}/>
 
                                                         <span className={styles['checkout-info__select-desc']}>
-                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу</span>
+                                                            <span className={styles['checkout-info__select-text']}>В отделение «Новая Почта»</span>
+                                                        </span>
+                                                    </label>
+                                                </div>
 
-                                                            <span className={styles['checkout-info__select-subtext']}>Доставка от +450 грн</span>
+                                                <div className={styles['checkout-info__select-item']}>
+                                                    <Field
+                                                        type="radio"
+                                                        id="checkout-delivery-4"
+                                                        name="delivery_type"
+                                                        className={styles['checkout-info__select-radio']}
+                                                        value="4"
+                                                    />
+
+                                                    <label
+                                                        className={styles['checkout-info__select-btn']}
+                                                        htmlFor="checkout-delivery-4"
+                                                    >
+                                                        <span className={styles['checkout-info__select-icon']}>
+                                                            <svg>
+                                                                <use href={`${sprite.src}#newpost`}/>
+                                                            </svg>
+                                                        </span>
+
+                                                        <span className={styles['checkout-info__select-check']}/>
+
+                                                        <span className={styles['checkout-info__select-desc']}>
+                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу</span>
                                                         </span>
                                                     </label>
                                                 </div>
                                             </div>
+
+                                            {
+                                                values.delivery_type === '1' &&
+                                                <div className={styles['checkout-info__delivery-block']}>
+                                                    <span className={styles['checkout-info__delivery-block__title']}>Выберите удобный магазин:</span>
+
+                                                    <Select<GroupedItemOption, false, GroupedOption>
+                                                        className={styles['checkout-info__delivery-block__select']}
+                                                        options={shopGroupedElements}
+                                                        onChange={(val) => {
+                                                            setFieldValue('delivery_option', val);
+                                                            setChoosedShopDefault(val);
+                                                        }}
+                                                        defaultValue={values.delivery_option}
+                                                        name={'delivery_option'}
+                                                    />
+
+                                                    <p className={styles['checkout-info__delivery-block__info']}>График работы магазина: {choosedShopDefault?.dni_raboty?.replace(/<\/?[^>]+(>|$)/g, "")}</p>
+                                                </div>
+                                            }
+
+                                            {
+                                                values.delivery_type === '2' &&
+                                                <>
+                                                    <div className={styles['checkout-info__delivery-block']}>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
+
+                                                        <Select<GroupedItemOption, false, GroupedOption>
+                                                            className={styles['checkout-info__delivery-block__select']}
+                                                            options={shopGroupedElements}
+                                                            onChange={(val) => {
+                                                                setFieldValue('delivery_option', val);
+                                                                setChoosedShopDefault(val);
+                                                            }}
+                                                            placeholder="Город"
+                                                            name={'delivery_option'}
+                                                        />
+                                                    </div>
+
+                                                    <div className={styles['checkout-info__delivery-block']}>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>Номер отделения Новая Почта:</span>
+
+                                                        <Select<GroupedItemOption, false, GroupedOption>
+                                                            className={styles['checkout-info__delivery-block__select']}
+                                                            options={shopGroupedElements}
+                                                            onChange={(val) => {
+                                                                setFieldValue('delivery_option', val);
+                                                                setChoosedShopDefault(val);
+                                                            }}
+                                                            placeholder="Отделение"
+                                                            name={'delivery_option'}
+                                                        />
+                                                    </div>
+                                                </>
+                                            }
+
+                                            {
+                                                values.delivery_type === '3' &&
+                                                <>
+                                                    <div className={styles['checkout-info__delivery-block']}>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
+
+                                                        <Select<GroupedItemOption, false, GroupedOption>
+                                                            className={styles['checkout-info__delivery-block__select']}
+                                                            options={shopGroupedElements}
+                                                            onChange={(val) => {
+                                                                setFieldValue('delivery_option', val);
+                                                                setChoosedShopDefault(val);
+                                                            }}
+                                                            placeholder="Город"
+                                                            name={'delivery_option'}
+                                                        />
+                                                    </div>
+
+                                                    <div className={styles['checkout-info__inps']}>
+                                                        <div className={styles['checkout-info__inp-wrapper']}>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-street">Улица</label>
+
+                                                            <div className={styles['checkout-info__inp-inner']}>
+                                                                <input
+                                                                    className={styles['checkout-info__inp']}
+                                                                    id="checkout-street"
+                                                                    name="np_street"
+                                                                    onChange={handleChange}
+                                                                    autoComplete="off"
+                                                                    placeholder="Улица"
+                                                                    type="text"
+                                                                    value={values.np_street}
+                                                                />
+                                                            </div>
+
+                                                            <If condition={errors.np_street && touched.np_street}>
+                                                                <Then>
+                                                                    <div className={styles['form-error__msg']}>
+                                                                        <ErrorMessage name="np_street" />
+                                                                    </div>
+                                                                </Then>
+                                                            </If>
+                                                        </div>
+
+                                                        <div className={styles['checkout-info__inp-wrapper']}>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-house">Дом</label>
+
+                                                            <div className={styles['checkout-info__inp-inner']}>
+                                                                <input
+                                                                    className={styles['checkout-info__inp']}
+                                                                    id="checkout-house"
+                                                                    name="user_surname"
+                                                                    autoComplete="off"
+                                                                    placeholder="№"
+                                                                    type="text"
+                                                                    onChange={handleChange}
+                                                                    value={values.np_house}
+                                                                />
+                                                            </div>
+
+                                                            <If condition={errors.np_house && touched.np_house}>
+                                                                <Then>
+                                                                    <div className={styles['form-error__msg']}>
+                                                                        <ErrorMessage name="np_house" />
+                                                                    </div>
+                                                                </Then>
+                                                            </If>
+                                                        </div>
+
+                                                        {/*<div className={styles['checkout-info__inp-wrapper']}>*/}
+                                                        {/*    <label className={styles['checkout-info__label']} htmlFor="checkout-floor">Этаж</label>*/}
+
+                                                        {/*    <div className={styles['checkout-info__inp-inner']}>*/}
+                                                        {/*        <input*/}
+                                                        {/*            className={styles['checkout-info__inp']}*/}
+                                                        {/*            id="checkout-floor"*/}
+                                                        {/*            name="np_floor"*/}
+                                                        {/*            autoComplete="off"*/}
+                                                        {/*            placeholder="1"*/}
+                                                        {/*            type="text"*/}
+                                                        {/*            onChange={handleChange}*/}
+                                                        {/*            value={values.np_floor}*/}
+                                                        {/*        />*/}
+                                                        {/*    </div>*/}
+
+                                                        {/*    <If condition={errors.np_floor && touched.np_floor}>*/}
+                                                        {/*        <Then>*/}
+                                                        {/*            <div className={styles['form-error__msg']}>*/}
+                                                        {/*                <ErrorMessage name="np_floor" />*/}
+                                                        {/*            </div>*/}
+                                                        {/*        </Then>*/}
+                                                        {/*    </If>*/}
+                                                        {/*</div>*/}
+
+                                                        {/*<div className={styles['checkout-info__inp-wrapper']}>*/}
+                                                        {/*    <label className={styles['checkout-info__label']} htmlFor="checkout-house">Квартира</label>*/}
+
+                                                        {/*    <div className={styles['checkout-info__inp-inner']}>*/}
+                                                        {/*        <input*/}
+                                                        {/*            className={styles['checkout-info__inp']}*/}
+                                                        {/*            id="checkout-house"*/}
+                                                        {/*            name="user_surname"*/}
+                                                        {/*            autoComplete="off"*/}
+                                                        {/*            placeholder="№"*/}
+                                                        {/*            type="text"*/}
+                                                        {/*            onChange={handleChange}*/}
+                                                        {/*            value={values.np_house}*/}
+                                                        {/*        />*/}
+                                                        {/*    </div>*/}
+
+                                                        {/*    <If condition={errors.np_house && touched.np_house}>*/}
+                                                        {/*        <Then>*/}
+                                                        {/*            <div className={styles['form-error__msg']}>*/}
+                                                        {/*                <ErrorMessage name="np_house" />*/}
+                                                        {/*            </div>*/}
+                                                        {/*        </Then>*/}
+                                                        {/*    </If>*/}
+                                                        {/*</div>*/}
+                                                    </div>
+                                                </>
+                                            }
                                         </div>
                                     </div>
 
@@ -365,10 +612,12 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                 <input
                                                     className={styles['checkout-content__code-inp']}
                                                     id="checkout-code"
-                                                    name="code"
+                                                    name="user_promo"
+                                                    onChange={handleChange}
                                                     autoComplete="off"
-                                                    placeholder="Есть промокод? А если найду?"
+                                                    placeholder="Есть промокод? Укажите его здесь"
                                                     type="text"
+                                                    value={values.user_promo}
                                                 />
                                             </div>
                                         </div>
@@ -378,19 +627,19 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                 <div className={styles['checkout-content__total-item']}>
                                                     <div className={styles['checkout-content__total-title']}>Вместе:</div>
 
-                                                    <div className={styles['checkout-content__total-value']}>2 товар на сумму</div>
+                                                    <div className={styles['checkout-content__total-value']}>{cartData.total_amount} {cartData.total_amount > 1 ? 'товара': 'товар'} на сумму</div>
                                                 </div>
 
                                                 <div className={styles['checkout-content__total-item']}>
                                                     <div className={styles['checkout-content__total-title']}>Цена доставки:</div>
 
-                                                    <div className={styles['checkout-content__total-value']}>Бесплатно</div>
+                                                    <div className={styles['checkout-content__total-value']}>{values.delivery_type === '1' ? 'Бесплатно' : 'По тарифам Новой почты'}</div>
                                                 </div>
 
                                                 <div className={styles['checkout-content__total-item']}>
                                                     <div className={styles['checkout-content__total-title']}>Итого:</div>
 
-                                                    <div className={styles['checkout-content__total-value']}>4 303 грн</div>
+                                                    <div className={styles['checkout-content__total-value']}>{cartData.total_price} грн</div>
                                                 </div>
                                             </div>
 

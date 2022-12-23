@@ -15,6 +15,7 @@ import {
 } from "@store/cart";
 import {useDispatch, useSelector} from "react-redux";
 import {getCookie} from "cookies-next";
+import Preloader from '@icons/load-spinner.gif';
 
 const CartItem:React.FC<CartItemProps> = (props) => {
     const {
@@ -109,10 +110,7 @@ const CartItem:React.FC<CartItemProps> = (props) => {
     }
 
     const removeItem = ():void => {
-        setProductExist(false);
-
-        dispatch(setCartItemsAmount(cartAmountItems - 1 >= 0 ? cartAmountItems-1 : 0));
-        dispatch(setCartTotalPrice(parseFloat((cartTotalPrice - parseFloat(totals.line_total)).toFixed(2))));
+        setDataStatus(true);
 
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/remove-item`, {
             nonce: settingsCtx.nonce,
@@ -123,13 +121,31 @@ const CartItem:React.FC<CartItemProps> = (props) => {
                 ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
             }
         })
-            .then((result)=>{})
+            .then((result)=>{
+                setDataStatus(false);
+                setProductExist(false);
+
+                dispatch(setCartItemsAmount(cartAmountItems - 1 >= 0 ? cartAmountItems-1 : 0));
+                dispatch(setCartTotalPrice(parseFloat((cartTotalPrice - parseFloat(totals.line_total)).toFixed(2))));
+            })
             .catch((error) => {console.log(error)});
     }
 
     return (
         <div className={classNames(styles['cart-list__item'], !productExist ? styles['removed'] : '')}>
-            <div className={styles['cart-list__item-inner']}>
+            <If condition={dataStatus}>
+                <Then>
+                    <div className={styles['cart-list-preloader']}>
+                        <div className={styles['cart-list-preloader__backdrop']} />
+
+                        <div className={styles['cart-list-preloader__img']}>
+                            <Image src={Preloader.src} alt={'preloader'} width={50} height={50} />
+                        </div>
+                    </div>
+                </Then>
+            </If>
+
+            <div className={classNames(styles['cart-list__item-inner'], styles['preview'])}>
                 <Link href={`/product/${product.slug}`} className={styles['cart-list__item-preview']}>
                     <div className={styles['cart-list__item-preview-inner']}>
                         <Image src={product.images.default} alt={product.name} width={48} height={55} />
@@ -175,11 +191,11 @@ const CartItem:React.FC<CartItemProps> = (props) => {
                 </div>
             </div>
 
-            <div className={styles['cart-list__item-inner']}>
+            <div className={classNames(styles['cart-list__item-inner'], styles['price-local'])}>
                 <div className="cart-list__item-current-price">{type === 'variable' ? variation_product?.price : product.price.default} грн</div>
             </div>
 
-            <div className={styles['cart-list__item-inner']}>
+            <div className={classNames(styles['cart-list__item-inner'], styles['counter'])}>
                 <div className={styles['cart-list__item-counter']}>
                     <button
                         onClick={()=>counterClickHandler('minus')}
@@ -205,7 +221,7 @@ const CartItem:React.FC<CartItemProps> = (props) => {
                 </div>
             </div>
 
-            <div className={styles['cart-list__item-inner']}>
+            <div className={classNames(styles['cart-list__item-inner'], styles['price-total'])}>
                 <div className={styles['cart-list__item-total-price']}>{totals.line_total} грн</div>
             </div>
 

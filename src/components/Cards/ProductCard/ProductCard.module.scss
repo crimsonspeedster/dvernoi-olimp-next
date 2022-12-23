@@ -214,7 +214,20 @@
         border: 1px solid transparent;
         transition: all ease .4s;
 
-        &:hover {
+        &.updating {
+            background: #000;
+            color: transparent;
+
+            &::before {
+                background: url('load-spinner.gif') center no-repeat;
+                background-size: contain;
+                width: 100%;
+                height: 100%;
+                left: 0;
+            }
+        }
+
+        &:hover:not(.updating) {
             background-color: #fff;
             color: #A4AC14;
             border-color: #A4AC14;

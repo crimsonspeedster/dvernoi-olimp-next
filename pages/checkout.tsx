@@ -33,12 +33,20 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
     } = props;
 
     const dispatch = useDispatch();
+    const router = useRouter();
+
+    console.log(cartData.items);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
     useEffect(()=>{
         dispatch(setCartServerData(cartData));
-    }, [dispatch, cartData]);
+
+        if (cartData.items.length === 0)
+        {
+            router.push('/404');
+        }
+    }, [router, dispatch, cartData]);
 
     return (
         <>
@@ -102,6 +110,12 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) 
             cart: cart.data
         };
     }));
+
+    if (resData.cart.items.length === 0)
+    {
+        res.writeHead(301, { Location: '/404' });
+        res.end();
+    }
 
     const {data: footer_company} = await apolloClient.query({
         query: GetMenu,
