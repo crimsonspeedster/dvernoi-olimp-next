@@ -88,7 +88,7 @@ const Brand:React.FC<BrandProps> = (props) => {
                     <SingleBrandTemplate
                         breadcrumbs={breadcrumbs}
                         title={pageData.title.rendered}
-                        content={pageData.content.rendered}
+                        content={pageData.acf.kratkoe_opisanie}
                         posts={childPosts}
                         collectionTitle={'Колекции'}
                         category_filter={categoryData.category_filter}
@@ -96,6 +96,7 @@ const Brand:React.FC<BrandProps> = (props) => {
                         setProductItems={setProductItems}
                         priceRange={categoryData.price_range}
                         image={pageData.featured_image_link}
+                        seoBlock={pageData.acf.seo_block}
                     />
 
                     <If condition={reviewed_products.length > 0}>

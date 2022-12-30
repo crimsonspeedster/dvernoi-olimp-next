@@ -95,6 +95,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
     const [itemPrice, setItemPrice] = useState<string>(type === 'simple' ? price : currentVariation?.price ?? '0');
     const [extraPrice, setExtraPrice] = useState<string>('0');
     const [extraProducts, setExtraProducts] = useState<extraAttributesProps[]>(extra_attributes);
+    const [dataStatus, setDataStatus] = useState<boolean>(false);
 
     useEffect(()=>{
         setItemPrice(type === 'simple' ? price : currentVariation?.price ?? '0');
@@ -145,6 +146,8 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         if (!in_stock)
             return;
 
+        setDataStatus(true);
+
         const extraData:extraDataChoosed[] = [];
 
         extraProducts.map(item => {
@@ -159,6 +162,16 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
             }
 
             return item;
+        });
+
+        console.log({
+            nonce: settingsCtx.nonce,
+            id,
+            quantity: counter,
+            ...(type === 'variable') && {'variation-id': currentVariation?.id},
+            ...(extraData.length > 0) && {cart_item_data: {
+                    meta_extra_products: extraData
+                }}
         });
 
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
@@ -178,6 +191,8 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
             .then((res)=>{
                 dispatch(setCartServerData(res.data));
                 dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
+
+                setDataStatus(false);
             })
             .catch((error) => {console.log(error)});
     }
@@ -254,14 +269,15 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 <div className={styles['single-product-intro-content__controls-item']}>
                     <div className={styles['single-product-intro-content__btn-wrapper']}>
                         <button
+                            disabled={dataStatus}
                             onClick={buyHandler}
-                            className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--buy'], 'btn', !in_stock ? 'disabled' : '')}
+                            className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--buy'], 'btn', !in_stock ? 'disabled' : '', dataStatus ? styles['updating'] : '')}
                         >
-                            <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon')}>
+                            <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon', dataStatus ? styles['updating'] : '')}>
                                 <svg><use href={`${sprite.src}#cart`}/></svg>
                             </span>
 
-                            <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text')}>Купить</span>
+                            <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text', dataStatus ? styles['updating'] : '')}>Купить</span>
                         </button>
                     </div>
                 </div>
@@ -301,7 +317,10 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 </div>
 
                 <div className={styles['single-product-intro-content__bot-item']}>
-                    <button className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--cursor'], 'btn', !in_stock ? 'disabled' : '')}>
+                    <button
+                        disabled={dataStatus}
+                        className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--cursor'], 'btn', !in_stock ? 'disabled' : '')}
+                    >
                         <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon')}>
                             <svg><use href={`${sprite.src}#cursor`}/></svg>
                         </span>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import styles from './Intro.module.scss';
 import classNames from "classnames";
 import {If, Then} from "react-if";
@@ -8,12 +8,16 @@ import * as Yup from "yup";
 import CheckoutList from "@components/Checkout/CheckoutList";
 import sprite from "@icons/sprite.svg";
 import {useSelector} from "react-redux";
-import {selectAllCartData} from "@store/cart";
+import {selectAllCartData, setCartItemsAmount, setCartServerData} from "@store/cart";
 import Select, {SingleValue} from "react-select";
 import {NPCityProps, NPDepartament} from "@pages/checkout";
 import "yup-phone";
 // @ts-ignore
 import NovaPoshta from "novaposhta";
+import {SettingsContext} from "@pages/_app";
+import axios from "axios";
+import {getCookie, setCookie} from "cookies-next";
+import LiqpayPopup from "@components/Modal/LiqpayPopup";
 
 
 interface CheckoutIntroProps {
@@ -42,10 +46,12 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
     } = props;
 
     const cartData = useSelector(selectAllCartData);
+    const settingsCtx = useContext(SettingsContext);
 
     const novaPoshtaRequest = new NovaPoshta({ apiKey: process.env.NEXT_PUBLIC_ENV_NP_API_KEY });
 
     const [departament, setDepartament] = useState<NPDepartament[]>([]);
+    const [liqpayForm, setLiqpayForm] = useState<string>('');
 
     const validateFormSchema = Yup.object().shape({
         user_name: Yup.string()
@@ -89,12 +95,30 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                         shop_apartment: '',
                         payment_type: "1"
                     }}
-                    validationSchema={validateFormSchema}
+                    // validationSchema={validateFormSchema}
                     onSubmit={(values, {setSubmitting}) => {
                         setSubmitting(true);
                         console.log(values);
 
-                        setSubmitting(false);
+                        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/orders/create`, {
+                            nonce: settingsCtx.nonce,
+                        }, {
+                            headers: {
+                                'X-Headless-WP': true,
+                                ...(getCookie('X-WC-Session')) && {'X-WC-Session': getCookie('X-WC-Session')}
+                            }
+                        })
+                            .then((res)=>{
+                                if (!getCookie('X-WC-Session'))
+                                {
+                                    setCookie('X-WC-Session', res.headers['x-wc-session']);
+                                }
+
+                                console.log(res.data);
+                                setSubmitting(false);
+                                setLiqpayForm(res.data.form);
+                            })
+                            .catch((error) => {console.log(error)});
                     }}
                 >
                     {
@@ -788,6 +812,8 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                     }
                 </Formik>
             </div>
+
+            <LiqpayPopup form={liqpayForm} />
         </section>
     );
 }

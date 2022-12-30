@@ -8,6 +8,7 @@ import ProductCategoryContent from "@components/ProductCategoryContent/ProductCa
 import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 import {PriceRangeProps} from "@root/templates/CatalogCategoryTemplate";
+import SeoBlock, {seoBlockProps} from "@components/SeoBlock/SeoBlock";
 
 
 interface SingleBrandTemplateProps {
@@ -21,6 +22,7 @@ interface SingleBrandTemplateProps {
     setProductItems: React.Dispatch<SetStateAction<ProductCardProps[]>>
     priceRange?: PriceRangeProps,
     image?: string
+    seoBlock?: seoBlockProps
 }
 
 const SingleBrandTemplate:React.FC<SingleBrandTemplateProps> = (props) => {
@@ -34,7 +36,8 @@ const SingleBrandTemplate:React.FC<SingleBrandTemplateProps> = (props) => {
         priceRange,
         setProductItems,
         productItems,
-        image
+        image,
+        seoBlock
     } = props;
 
     const [ isOpenFilter, setIsOpenFilter ] = useState<boolean>(false)
@@ -69,6 +72,13 @@ const SingleBrandTemplate:React.FC<SingleBrandTemplateProps> = (props) => {
                 setProductItems={setProductItems}
                 priceRange={priceRange}
             />
+
+            {
+                seoBlock?.title &&
+                <SeoBlock
+                    seoBlock={seoBlock}
+                />
+            }
         </>
     )
 }
