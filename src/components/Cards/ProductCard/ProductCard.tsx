@@ -3,7 +3,7 @@ import styles from './ProductCard.module.scss';
 import Link from "next/link";
 import Image from "next/image";
 import classNames from "classnames";
-import {If, Then} from "react-if";
+import {Else, If, Then} from "react-if";
 import YoutubeIco from '@icons/yootube-ico.svg';
 import {variation_arrayProps} from "@components/SingleProduct/Intro/SingleProductContent";
 import axios from "axios";
@@ -107,65 +107,119 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
 
     return (
         <>
-            <div className={classNames(styles['productCard'], `product-${id}`)} data-fancybox='variable' data-src={`#variable-modal-${id}`}>
-                <span className={styles['productCard__sku']}>Код: {id}</span>
-
-                <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
-                    <Then>
-                        <div className={styles['productCard-labels']}>
-                            {
-                                labels.new_card &&
-                                <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
-                            }
-
-                            {
-                                labels.sale &&
-                                <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
-                            }
-
-                            {
-                                labels.is_hit &&
-                                <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
-                            }
-
-                            {
-                                labels.video &&
-                                <span className={styles['productCard-label--video']}>
-                                <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
-                            </span>
-                            }
-                        </div>
-                    </Then>
-                </If>
-
-                <Link href={`/product/${slug}`} className={styles['productCard__img']}>
-                    <Image width={160} height={288} src={images.default} alt={name} />
-                </Link>
-
-                <div className={styles['productCard-row']}>
-                    <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
-                </div>
-
-                <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
-
-                <div className={styles['productCard-bottom']}>
-                    <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
-
-                    <button
-                        disabled={dataStatus}
-                        className={classNames('button', styles['productCard__btn'], dataStatus ? styles['updating'] : '')}
-                        onClick={buyHandler}
-                    >Купить</button>
-                </div>
-            </div>
-
             <If condition={type === 'variable'}>
                 <Then>
+                    <div className={classNames(styles['productCard'], `product-${id}`)} data-fancybox={type} data-src={`#variable-modal-${id}`}>
+                        <span className={styles['productCard__sku']}>Код: {id}</span>
+
+                        <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
+                            <Then>
+                                <div className={styles['productCard-labels']}>
+                                    {
+                                        labels.new_card &&
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
+                                    }
+
+                                    {
+                                        labels.sale &&
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
+                                    }
+
+                                    {
+                                        labels.is_hit &&
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
+                                    }
+
+                                    {
+                                        labels.video &&
+                                        <span className={styles['productCard-label--video']}>
+                                <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
+                            </span>
+                                    }
+                                </div>
+                            </Then>
+                        </If>
+
+                        <Link href={`/product/${slug}`} className={styles['productCard__img']}>
+                            <Image width={160} height={288} src={images.default} alt={name} />
+                        </Link>
+
+                        <div className={styles['productCard-row']}>
+                            <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
+                        </div>
+
+                        <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
+
+                        <div className={styles['productCard-bottom']}>
+                            <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+
+                            <button
+                                disabled={dataStatus}
+                                className={classNames('button', styles['productCard__btn'], dataStatus ? styles['updating'] : '')}
+                                onClick={buyHandler}
+                            >Купить</button>
+                        </div>
+                    </div>
+
                     <VariationPopup
                         variations={variation_array ?? []}
                         id={id}
                     />
                 </Then>
+
+                <Else>
+                    <div className={classNames(styles['productCard'], `product-${id}`)}>
+                        <span className={styles['productCard__sku']}>Код: {id}</span>
+
+                        <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
+                            <Then>
+                                <div className={styles['productCard-labels']}>
+                                    {
+                                        labels.new_card &&
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
+                                    }
+
+                                    {
+                                        labels.sale &&
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
+                                    }
+
+                                    {
+                                        labels.is_hit &&
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
+                                    }
+
+                                    {
+                                        labels.video &&
+                                        <span className={styles['productCard-label--video']}>
+                                <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
+                            </span>
+                                    }
+                                </div>
+                            </Then>
+                        </If>
+
+                        <Link href={`/product/${slug}`} className={styles['productCard__img']}>
+                            <Image width={160} height={288} src={images.default} alt={name} />
+                        </Link>
+
+                        <div className={styles['productCard-row']}>
+                            <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
+                        </div>
+
+                        <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
+
+                        <div className={styles['productCard-bottom']}>
+                            <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+
+                            <button
+                                disabled={dataStatus}
+                                className={classNames('button', styles['productCard__btn'], dataStatus ? styles['updating'] : '')}
+                                onClick={buyHandler}
+                            >Купить</button>
+                        </div>
+                    </div>
+                </Else>
             </If>
         </>
     );

@@ -7,7 +7,7 @@ import InputMask from "react-input-mask";
 import * as Yup from "yup";
 import CheckoutList from "@components/Checkout/CheckoutList";
 import sprite from "@icons/sprite.svg";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {selectAllCartData, setCartItemsAmount, setCartServerData} from "@store/cart";
 import Select, {SingleValue} from "react-select";
 import {NPCityProps, NPDepartament} from "@pages/checkout";
@@ -17,7 +17,10 @@ import NovaPoshta from "novaposhta";
 import {SettingsContext} from "@pages/_app";
 import axios from "axios";
 import {getCookie, setCookie} from "cookies-next";
-import LiqpayPopup from "@components/Modal/LiqpayPopup";
+import {useRouter} from "next/router";
+//@ts-ignore
+import {Fancybox} from '@fancyapps/ui';
+import '@fancyapps/ui/dist/fancybox.css';
 
 
 interface CheckoutIntroProps {
@@ -47,14 +50,21 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
 
     const cartData = useSelector(selectAllCartData);
     const settingsCtx = useContext(SettingsContext);
+    const dispatch = useDispatch();
+    const router = useRouter();
 
     const novaPoshtaRequest = new NovaPoshta({ apiKey: process.env.NEXT_PUBLIC_ENV_NP_API_KEY });
 
     const [departament, setDepartament] = useState<NPDepartament[]>([]);
-    const [liqpayForm, setLiqpayForm] = useState<string>('');
 
     const validateFormSchema = Yup.object().shape({
         user_name: Yup.string()
+            .min(2, 'Too Short!')
+            .max(50, 'Too Long!')
+            .matches(/^[\p{Script=Cyrl}\s]*$/u, 'Is not in correct format')
+            .trim()
+            .required('Required'),
+        user_surname: Yup.string()
             .min(2, 'Too Short!')
             .max(50, 'Too Long!')
             .matches(/^[\p{Script=Cyrl}\s]*$/u, 'Is not in correct format')
@@ -66,7 +76,62 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
         user_email: Yup.string()
             .email()
             .required('Required'),
+        delivery_type: Yup.string(),
         user_agreed: Yup.bool().oneOf([true], 'Field must be checked'),
+        shop_department: Yup.object().shape({
+            label: Yup.string(),
+            value: Yup.string().when('delivery_type', {
+                is: (arg:string) => arg === '2',
+                then: Yup.string().required('Field is required'),
+                otherwise: Yup.string()
+            }),
+            schedule: Yup.string(),
+            city: Yup.string()
+        }),
+        shop_city: Yup.object().shape({
+            label: Yup.string(),
+            value: Yup.string().when('delivery_type', {
+                is: (arg:string) => arg === '2',
+                then: Yup.string().required('Field is required'),
+                otherwise: Yup.string()
+            }),
+            schedule: Yup.string(),
+            city: Yup.string()
+        }),
+        shop_street: Yup.string().when('delivery_type', {
+            is: (arg:string) => arg === '2',
+            then: Yup.string().required('Field is required'),
+            otherwise: Yup.string()
+        }),
+        shop_house: Yup.number().when('delivery_type', {
+            is: (arg:string) => arg === '2',
+            then: Yup.number().required('Field is required'),
+            otherwise: Yup.number()
+        }),
+        np_department: Yup.object().shape({
+            value: Yup.string().when('delivery_type', {
+                is: (arg:string) => arg === '3',
+                then: Yup.string().required('Field is required').nullable(),
+                otherwise: Yup.string().nullable()
+            }),
+        }),
+        np_city: Yup.object().shape({
+            value: Yup.string().when('delivery_type', {
+                is: (arg:string) => arg === '3' || arg === '4',
+                then: Yup.string().required('Field is required'),
+                otherwise: Yup.string()
+            }),
+        }),
+        np_street: Yup.string().when('delivery_type', {
+            is: (arg:string) => arg === '4',
+            then: Yup.string().required('Field is required'),
+            otherwise: Yup.string()
+        }),
+        np_house: Yup.number().when('delivery_type', {
+            is: (arg:string) => arg === '4',
+            then: Yup.number().min(1).required('Field is required'),
+            otherwise: Yup.number()
+        }),
     });
 
     return (
@@ -83,25 +148,76 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                         user_comment: '',
                         user_agreed: true,
                         user_promo: '',
-                        delivery_type: "1",
-                        np_city: {},
-                        np_department: '',
+                        delivery_type: '1',
+                        np_city: {
+                            value: ''
+                        },
+                        np_department: {
+                            value: ''
+                        },
                         np_street: '',
                         np_house: '',
                         shop_city: deliveryShops[0].options[0],
+                        shop_department: deliveryShops[0].options[0],
                         shop_street: '',
                         shop_house: '',
                         shop_floor: '',
                         shop_apartment: '',
-                        payment_type: "1"
+                        payment_type: '1',
                     }}
                     // validationSchema={validateFormSchema}
                     onSubmit={(values, {setSubmitting}) => {
                         setSubmitting(true);
                         console.log(values);
 
+                        setSubmitting(false);
+
+                        let shipping_title: string = '';
+                        let payment_method: string = values.payment_type === '1' ? 'Наличными' : 'Картой на сайте';
+
+                        switch (values.delivery_type)
+                        {
+                            case '1':
+                                shipping_title = 'Самовывоз из магазина';
+                                break;
+                            case '2':
+                                shipping_title = 'Курьером по адресу (от магазина)';
+                                break;
+                            case '3':
+                                shipping_title = 'В отделение «Новая Почта»';
+                                break;
+                            case '4':
+                                shipping_title = 'Курьером по адресу (Новая почта)';
+                                break;
+                            default:
+                                shipping_title = '';
+                                break;
+                        }
+
                         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/orders/create`, {
                             nonce: settingsCtx.nonce,
+                            data_user: {
+                                shipping_title,
+                                payment_method,
+                                first_name: values.user_name,
+                                last_name: values.user_surname,
+                                email: values.user_email,
+                                phone: values.user_phone,
+                                comment: values.user_comment,
+                                meta_shipping_type: values.delivery_type,
+                                shipping_shop_choosed: values.shop_department,
+                                shipping_delivery_city: values.shop_city,
+                                shipping_delivery_street: values.shop_street,
+                                shipping_delivery_house: values.shop_house,
+                                shipping_delivery_floor: values.shop_floor,
+                                shipping_delivery_apartment: values.shop_apartment,
+                                shipping_np_city: values.np_city,
+                                shipping_np_department: values.np_department,
+                                shipping_np_street: values.np_street,
+                                shipping_np_house: values.np_house,
+                                payment_type: values.payment_type,
+                                coupon_code: values.user_promo
+                            }
                         }, {
                             headers: {
                                 'X-Headless-WP': true,
@@ -114,9 +230,26 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                     setCookie('X-WC-Session', res.headers['x-wc-session']);
                                 }
 
-                                console.log(res.data);
+                                dispatch(setCartServerData(res.data.cart));
+                                dispatch(setCartItemsAmount(res.data.cart.total_amount ?? 0));
+
                                 setSubmitting(false);
-                                setLiqpayForm(res.data.form);
+
+                                if (values.payment_type === '1')
+                                {
+                                    router.push({
+                                        pathname: '/thanks',
+                                        query: {order: res.data.order_id ?? ''}
+                                    });
+                                }
+                                else {
+                                    new Fancybox([
+                                        {
+                                            src: res.data.form,
+                                            type: "html",
+                                        },
+                                    ]).open();
+                                }
                             })
                             .catch((error) => {console.log(error)});
                     }}
@@ -376,15 +509,15 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         className={styles['checkout-info__delivery-block__select']}
                                                         options={deliveryShops}
                                                         onChange={(val) => {
-                                                            setFieldValue('shop_city', val);
+                                                            setFieldValue('shop_department', val);
 
                                                             console.log(val);
                                                         }}
-                                                        defaultValue={values.shop_city}
-                                                        name={'shop_city'}
+                                                        defaultValue={values.shop_department}
+                                                        name={'shop_department'}
                                                     />
 
-                                                    <p className={styles['checkout-info__delivery-block__info']}>{values.shop_city.schedule}</p>
+                                                    <p className={styles['checkout-info__delivery-block__info']}>{values.shop_department.schedule}</p>
                                                 </div>
                                             }
 
@@ -399,6 +532,8 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             options={deliveryShops}
                                                             onChange={(val) => {
                                                                 setFieldValue('shop_city', val);
+
+                                                                console.log(val);
                                                             }}
                                                             defaultValue={values.shop_city}
                                                             placeholder="Город"
@@ -522,7 +657,8 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             defaultValue={values.np_city}
                                                             onChange={(val) => {
                                                                 setFieldValue('np_city', val);
-                                                                setFieldValue('np_department', '');
+                                                                console.log(val);
+                                                                setFieldValue('np_department', {value: ''});
                                                                 setDepartament([]);
 
                                                                 novaPoshtaRequest.address
@@ -548,6 +684,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             placeholder="Город"
                                                             name={'np_city'}
                                                         />
+
+                                                        <If condition={errors.np_department?.value && touched.np_department?.value}>
+                                                            <Then>
+                                                                <div className={styles['form-error__msg']}>
+                                                                    <ErrorMessage name="np_department" />
+                                                                </div>
+                                                            </Then>
+                                                        </If>
                                                     </div>
 
                                                     <div className={styles['checkout-info__delivery-block']}>
@@ -558,6 +702,8 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             options={departament}
                                                             onChange={(val) => {
                                                                 setFieldValue('np_department', val);
+
+                                                                console.log(val);
                                                             }}
                                                             placeholder="№"
                                                             name={'np_department'}
@@ -695,7 +841,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
 
                                                         <span className={styles['checkout-info__select-check']}/>
 
-                                                        <span className={styles['checkout-info__select-text']}>Картой на сайте»</span>
+                                                        <span className={styles['checkout-info__select-text']}>Картой на сайте</span>
                                                     </label>
                                                 </div>
                                             </div>
@@ -812,8 +958,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                     }
                 </Formik>
             </div>
-
-            <LiqpayPopup form={liqpayForm} />
         </section>
     );
 }
