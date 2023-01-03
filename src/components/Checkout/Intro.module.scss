@@ -524,6 +524,7 @@
                     align-items: center;
                     cursor: pointer;
                     user-select: none;
+
                     @media (min-width: 1024px) {
                         &:hover {
                             .checkout-content__total-privacy-icon {
@@ -569,6 +570,26 @@
 
             &-btn {
                 width: 100%;
+
+                &.updating {
+                    background: #000;
+                    position: relative;
+
+                    :global(.btn__text) {
+                        color: transparent;
+                    }
+
+                    &::before {
+                        background: url('load-spinner.gif') center no-repeat;
+                        background-size: contain;
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                        left: 0;
+                        top: 0;
+                        content: '';
+                    }
+                }
             }
         }
     }

@@ -25,13 +25,20 @@ import '@fancyapps/ui/dist/fancybox.css';
 
 interface CheckoutIntroProps {
     title: string,
-    npCities: NPCityProps[]
-    deliveryShops: DeliverShopsProps[]
+    npCities: NPCityProps[],
+    deliveryShops: DeliverShopsProps[],
+    deliveryCities: DeliveryCitiesProps[]
 }
 
-interface DeliverShopsProps {
-    label: string;
-    options: DeliverShopProps[];
+export interface DeliveryCitiesProps {
+    label: string,
+    value: string,
+}
+
+export interface DeliverShopsProps {
+    label: string,
+    value: string,
+    options: DeliverShopProps[]
 }
 
 interface DeliverShopProps {
@@ -45,8 +52,11 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
     const {
         title,
         npCities,
+        deliveryCities,
         deliveryShops
     } = props;
+
+    console.log(deliveryShops);
 
     const cartData = useSelector(selectAllCartData);
     const settingsCtx = useContext(SettingsContext);
@@ -78,26 +88,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
             .required('Required'),
         delivery_type: Yup.string(),
         user_agreed: Yup.bool().oneOf([true], 'Field must be checked'),
-        shop_department: Yup.object().shape({
-            label: Yup.string(),
-            value: Yup.string().when('delivery_type', {
-                is: (arg:string) => arg === '2',
-                then: Yup.string().required('Field is required'),
-                otherwise: Yup.string()
-            }),
-            schedule: Yup.string(),
-            city: Yup.string()
-        }),
-        shop_city: Yup.object().shape({
-            label: Yup.string(),
-            value: Yup.string().when('delivery_type', {
-                is: (arg:string) => arg === '2',
-                then: Yup.string().required('Field is required'),
-                otherwise: Yup.string()
-            }),
-            schedule: Yup.string(),
-            city: Yup.string()
-        }),
         shop_street: Yup.string().when('delivery_type', {
             is: (arg:string) => arg === '2',
             then: Yup.string().required('Field is required'),
@@ -109,15 +99,15 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
             otherwise: Yup.number()
         }),
         np_department: Yup.object().shape({
+            delivery_type: Yup.string(),
+            DescriptionRu: Yup.string(),
+            Description: Yup.string(),
+            ShortAddress: Yup.string(),
+            ShortAddressRu: Yup.string(),
+            SiteKey: Yup.string(),
+            label: Yup.string(),
             value: Yup.string().when('delivery_type', {
                 is: (arg:string) => arg === '3',
-                then: Yup.string().required('Field is required').nullable(),
-                otherwise: Yup.string().nullable()
-            }),
-        }),
-        np_city: Yup.object().shape({
-            value: Yup.string().when('delivery_type', {
-                is: (arg:string) => arg === '3' || arg === '4',
                 then: Yup.string().required('Field is required'),
                 otherwise: Yup.string()
             }),
@@ -149,15 +139,18 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                         user_agreed: true,
                         user_promo: '',
                         delivery_type: '1',
-                        np_city: {
-                            value: ''
+                        np_city: npCities[0] ?? {
+                            value: '',
+                            label: ''
                         },
                         np_department: {
-                            value: ''
+                            value: '',
+                            label: '',
+                            delivery_type: '1'
                         },
                         np_street: '',
                         np_house: '',
-                        shop_city: deliveryShops[0].options[0],
+                        shop_city: deliveryCities[0],
                         shop_department: deliveryShops[0].options[0],
                         shop_street: '',
                         shop_house: '',
@@ -165,12 +158,9 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                         shop_apartment: '',
                         payment_type: '1',
                     }}
-                    // validationSchema={validateFormSchema}
+                    validationSchema={validateFormSchema}
                     onSubmit={(values, {setSubmitting}) => {
                         setSubmitting(true);
-                        console.log(values);
-
-                        setSubmitting(false);
 
                         let shipping_title: string = '';
                         let payment_method: string = values.payment_type === '1' ? 'Наличными' : 'Картой на сайте';
@@ -205,14 +195,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                 phone: values.user_phone,
                                 comment: values.user_comment,
                                 meta_shipping_type: values.delivery_type,
-                                shipping_shop_choosed: values.shop_department,
-                                shipping_delivery_city: values.shop_city,
+                                shipping_shop_choosed: `${values.shop_department.label} (${values.shop_department.city})`,
+                                shipping_delivery_city: values.shop_city.label,
                                 shipping_delivery_street: values.shop_street,
                                 shipping_delivery_house: values.shop_house,
                                 shipping_delivery_floor: values.shop_floor,
                                 shipping_delivery_apartment: values.shop_apartment,
-                                shipping_np_city: values.np_city,
-                                shipping_np_department: values.np_department,
+                                shipping_np_city: `${values.np_city.DescriptionRu}, Область - ${values.np_city.AreaDescriptionRu}`,
+                                shipping_np_department: values.np_department.label,
                                 shipping_np_street: values.np_street,
                                 shipping_np_house: values.np_house,
                                 payment_type: values.payment_type,
@@ -400,6 +390,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         name="delivery_type"
                                                         className={styles['checkout-info__select-radio']}
                                                         value="1"
+                                                        onChange={()=>{
+                                                            setFieldValue('delivery_type', '1');
+                                                            setFieldValue('np_department', {
+                                                                value: '',
+                                                                label: '',
+                                                                delivery_type: '1'
+                                                            });
+                                                        }}
                                                     />
 
                                                     <label
@@ -425,6 +423,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         name="delivery_type"
                                                         className={styles['checkout-info__select-radio']}
                                                         value="2"
+                                                        onChange={()=>{
+                                                            setFieldValue('delivery_type', '2');
+                                                            setFieldValue('np_department', {
+                                                                value: '',
+                                                                label: '',
+                                                                delivery_type: '2'
+                                                            });
+                                                        }}
                                                     />
 
                                                     <label
@@ -452,6 +458,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         name="delivery_type"
                                                         className={styles['checkout-info__select-radio']}
                                                         value="3"
+                                                        onChange={()=>{
+                                                            setFieldValue('delivery_type', '3');
+                                                            setFieldValue('np_department', {
+                                                                value: '',
+                                                                label: '',
+                                                                delivery_type: '3'
+                                                            });
+                                                        }}
                                                     />
 
                                                     <label
@@ -479,6 +493,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         name="delivery_type"
                                                         className={styles['checkout-info__select-radio']}
                                                         value="4"
+                                                        onChange={()=>{
+                                                            setFieldValue('delivery_type', '4');
+                                                            setFieldValue('np_department', {
+                                                                value: '',
+                                                                label: '',
+                                                                delivery_type: '4'
+                                                            });
+                                                        }}
                                                     />
 
                                                     <label
@@ -527,9 +549,9 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                     <div className={styles['checkout-info__delivery-block']}>
                                                         <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
 
-                                                        <Select<DeliverShopProps, false, DeliverShopsProps>
+                                                        <Select
                                                             className={styles['checkout-info__delivery-block__select']}
-                                                            options={deliveryShops}
+                                                            options={deliveryCities}
                                                             onChange={(val) => {
                                                                 setFieldValue('shop_city', val);
 
@@ -654,11 +676,10 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         <Select
                                                             className={styles['checkout-info__delivery-block__select']}
                                                             options={npCities}
-                                                            defaultValue={values.np_city}
+                                                            defaultValue={npCities[0] ?? values.np_city}
                                                             onChange={(val) => {
                                                                 setFieldValue('np_city', val);
-                                                                console.log(val);
-                                                                setFieldValue('np_department', {value: ''});
+                                                                setFieldValue('np_department', {value: '', label: '', delivery_type: values.delivery_type});
                                                                 setDepartament([]);
 
                                                                 novaPoshtaRequest.address
@@ -672,8 +693,9 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                         res.data.map((item:NPDepartament) => {
                                                                             data.push({
                                                                                 ...item,
-                                                                                value: item.DescriptionRu,
-                                                                                label: item.DescriptionRu
+                                                                                value: item.DescriptionRu ?? '',
+                                                                                label: item.DescriptionRu ?? '',
+                                                                                delivery_type: values.delivery_type
                                                                             })
                                                                         });
 
@@ -684,14 +706,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             placeholder="Город"
                                                             name={'np_city'}
                                                         />
-
-                                                        <If condition={errors.np_department?.value && touched.np_department?.value}>
-                                                            <Then>
-                                                                <div className={styles['form-error__msg']}>
-                                                                    <ErrorMessage name="np_department" />
-                                                                </div>
-                                                            </Then>
-                                                        </If>
                                                     </div>
 
                                                     <div className={styles['checkout-info__delivery-block']}>
@@ -708,6 +722,13 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             placeholder="№"
                                                             name={'np_department'}
                                                         />
+
+                                                        {
+                                                            errors.np_department?.value && touched.np_department?.value &&
+                                                            <div className={styles['form-error__msg']}>
+                                                                <ErrorMessage name="np_department.value" />
+                                                            </div>
+                                                        }
                                                     </div>
                                                 </>
                                             }
@@ -724,7 +745,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             onChange={(val) => {
                                                                 setFieldValue('np_city', val);
                                                             }}
-                                                            defaultValue={values.np_city}
+                                                            defaultValue={npCities[0] ?? values.np_city}
                                                             placeholder="Город"
                                                             name={'np_city'}
                                                         />
@@ -946,7 +967,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                             </div>
 
                                             <div className={styles['checkout-content__total-btn-wrapper']}>
-                                                <button disabled={isSubmitting} type="submit" className={classNames(styles['checkout-content__total-btn'], 'btn')}>
+                                                <button disabled={isSubmitting} type="submit" className={classNames('btn', styles['checkout-content__total-btn'], isSubmitting ? styles.updating : '')}>
                                                     <span className={classNames(styles['checkout-content__total-btn-text'], 'btn__text')}>Оформить заказ</span>
                                                 </button>
                                             </div>

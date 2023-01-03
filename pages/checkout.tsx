@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {GetServerSideProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
@@ -9,7 +9,7 @@ import HeadHTML from "@components/Layout/Head";
 import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 import {SettingsContext} from "@pages/_app";
 import Layout from "@components/Layout";
-import CheckoutIntro from "@components/Checkout/Intro";
+import CheckoutIntro, {DeliverShopsProps, DeliveryCitiesProps} from "@components/Checkout/Intro";
 import {getCookie} from "cookies-next";
 import {CartServerDataProps} from "@pages/cart";
 import {setCartServerData} from "@store/cart";
@@ -37,11 +37,12 @@ export interface NPCityProps {
 }
 
 export interface NPDepartament {
-    DescriptionRu: string,
-    Description: string,
-    ShortAddress: string,
-    ShortAddressRu: string,
-    SiteKey: string,
+    DescriptionRu?: string,
+    delivery_type: string,
+    Description?: string,
+    ShortAddress?: string,
+    ShortAddressRu?: string,
+    SiteKey?: string,
     value: string,
     label: string
 }
@@ -91,6 +92,12 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
                         title={pageData.title.rendered}
                         npCities={np_cities}
                         deliveryShops={pageData.acf.delivery_shops}
+                        deliveryCities={pageData.acf.delivery_shops.map((item:DeliveryCitiesProps) => {
+                            return {
+                                label: item.label,
+                                value: item.label
+                            };
+                        })}
                     />
                 </Layout>
             </SettingsContext.Provider>
