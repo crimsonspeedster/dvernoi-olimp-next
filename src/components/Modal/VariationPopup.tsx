@@ -26,8 +26,6 @@ const VariationPopup:React.FC<VariationPopupProps> = (props) => {
         id
     } = props;
 
-    console.log(variations);
-
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
 
@@ -74,8 +72,6 @@ const VariationPopup:React.FC<VariationPopupProps> = (props) => {
             }
         })
             .then((res)=>{
-                console.log(res);
-
                 if (!getCookie('X-WC-Session'))
                 {
                     setCookie('X-WC-Session', res.headers['x-wc-session']);

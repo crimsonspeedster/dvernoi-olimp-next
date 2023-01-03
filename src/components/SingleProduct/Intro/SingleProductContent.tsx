@@ -164,16 +164,6 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
             return item;
         });
 
-        console.log({
-            nonce: settingsCtx.nonce,
-            id,
-            quantity: counter,
-            ...(type === 'variable') && {'variation-id': currentVariation?.id},
-            ...(extraData.length > 0) && {cart_item_data: {
-                    meta_extra_products: extraData
-                }}
-        });
-
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
             nonce: settingsCtx.nonce,
             id,

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {GetServerSideProps} from "next";
 import {getApolloClient} from "@services/graphql/conf/apolloClient";
 import axios from "axios";
@@ -9,7 +9,7 @@ import HeadHTML from "@components/Layout/Head";
 import Breadcrumbs from "@components/Breadcrumbs/Breadcrumbs";
 import {SettingsContext} from "@pages/_app";
 import Layout from "@components/Layout";
-import CheckoutIntro, {DeliverShopsProps, DeliveryCitiesProps} from "@components/Checkout/Intro";
+import CheckoutIntro, {DeliveryCitiesProps} from "@components/Checkout/Intro";
 import {getCookie} from "cookies-next";
 import {CartServerDataProps} from "@pages/cart";
 import {setCartServerData} from "@store/cart";
@@ -59,8 +59,6 @@ const Checkout:React.FC<CheckoutProps> = (props) => {
 
     const dispatch = useDispatch();
     const router = useRouter();
-
-    console.log(np_cities);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 

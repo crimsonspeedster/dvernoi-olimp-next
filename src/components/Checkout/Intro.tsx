@@ -9,7 +9,7 @@ import CheckoutList from "@components/Checkout/CheckoutList";
 import sprite from "@icons/sprite.svg";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAllCartData, setCartItemsAmount, setCartServerData} from "@store/cart";
-import Select, {SingleValue} from "react-select";
+import Select from "react-select";
 import {NPCityProps, NPDepartament} from "@pages/checkout";
 import "yup-phone";
 // @ts-ignore
@@ -18,9 +18,6 @@ import {SettingsContext} from "@pages/_app";
 import axios from "axios";
 import {getCookie, setCookie} from "cookies-next";
 import {useRouter} from "next/router";
-//@ts-ignore
-import {Fancybox} from '@fancyapps/ui';
-import '@fancyapps/ui/dist/fancybox.css';
 
 
 interface CheckoutIntroProps {
@@ -56,8 +53,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
         deliveryShops
     } = props;
 
-    console.log(deliveryShops);
-
     const cartData = useSelector(selectAllCartData);
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
@@ -66,6 +61,16 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
     const novaPoshtaRequest = new NovaPoshta({ apiKey: process.env.NEXT_PUBLIC_ENV_NP_API_KEY });
 
     const [departament, setDepartament] = useState<NPDepartament[]>([]);
+    const [paymentForm, setPaymentForm] = useState<string>('');
+
+    const paymentFormRef = useRef<HTMLHeadingElement>(null);
+
+    useEffect(()=>{
+        if (paymentFormRef.current?.querySelector('form'))
+        {
+            paymentFormRef.current.querySelector('form')?.submit();
+        }
+    }, [paymentForm]);
 
     const validateFormSchema = Yup.object().shape({
         user_name: Yup.string()
@@ -233,12 +238,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                     });
                                 }
                                 else {
-                                    new Fancybox([
-                                        {
-                                            src: res.data.form,
-                                            type: "html",
-                                        },
-                                    ]).open();
+                                    setPaymentForm(res.data.form);
                                 }
                             })
                             .catch((error) => {console.log(error)});
@@ -532,8 +532,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         options={deliveryShops}
                                                         onChange={(val) => {
                                                             setFieldValue('shop_department', val);
-
-                                                            console.log(val);
                                                         }}
                                                         defaultValue={values.shop_department}
                                                         name={'shop_department'}
@@ -554,8 +552,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             options={deliveryCities}
                                                             onChange={(val) => {
                                                                 setFieldValue('shop_city', val);
-
-                                                                console.log(val);
                                                             }}
                                                             defaultValue={values.shop_city}
                                                             placeholder="Город"
@@ -716,8 +712,6 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                             options={departament}
                                                             onChange={(val) => {
                                                                 setFieldValue('np_department', val);
-
-                                                                console.log(val);
                                                             }}
                                                             placeholder="№"
                                                             name={'np_department'}
@@ -979,6 +973,8 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                     }
                 </Formik>
             </div>
+
+            <div style={{display: 'none'}} ref={paymentFormRef} dangerouslySetInnerHTML={{__html: paymentForm}} />
         </section>
     );
 }
