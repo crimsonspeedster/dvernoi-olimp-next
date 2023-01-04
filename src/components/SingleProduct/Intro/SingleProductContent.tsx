@@ -20,9 +20,10 @@ import ProductExtra, {
 } from "@components/SingleProduct/ProductExtra/ProductExtra";
 import axios from "axios";
 import {SettingsContext} from "@pages/_app";
-import {getCookie, getCookies} from "cookies-next";
+import {getCookie, getCookies, setCookie} from "cookies-next";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {useDispatch} from "react-redux";
+import {setProductSelectedPrice} from "@store/product";
 
 
 interface SingleProductContentProps {
@@ -53,6 +54,7 @@ export interface default_attributesProps {
 export interface variation_arrayProps {
     id: number,
     name: string,
+    parent_id: number,
     slug: string,
     status: string,
     attribute_summary: variationsProps[],
@@ -90,6 +92,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
     } = props;
 
     const settingsCtx = useContext(SettingsContext);
+    const dispatch = useDispatch();
 
     const [counter, setCounter] = useState<string>('1');
     const [itemPrice, setItemPrice] = useState<string>(type === 'simple' ? price : currentVariation?.price ?? '0');
@@ -104,6 +107,10 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
     useEffect(()=>{
         setExtraProducts(extra_attributes);
     }, [extra_attributes]);
+
+    useEffect(()=>{
+        dispatch(setProductSelectedPrice(parseInt(itemPrice) + parseInt(extraPrice)));
+    }, [itemPrice, extraPrice]);
 
     useEffect(()=>{
         let total_price:number = 0;
@@ -139,8 +146,6 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 break;
         }
     }
-
-    const dispatch = useDispatch();
 
     const buyHandler = ():void => {
         if (!in_stock)
@@ -179,6 +184,13 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
             }
         })
             .then((res)=>{
+                if (!getCookie('X-WC-Session'))
+                {
+                    setCookie('X-WC-Session', res.headers['x-wc-session']);
+                }
+
+                console.log(res.data);
+
                 dispatch(setCartServerData(res.data));
                 dispatch(setCartItemsAmount(res.data.total_amount ?? 0));
 

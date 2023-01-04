@@ -9,6 +9,8 @@ import SingleProductContent, {
 import SingleProductInfo from './SingleProductInfo'
 import classNames from "classnames";
 import {ImageProductProps} from "@components/Cards/ProductCard/ProductCard";
+import {useDispatch} from "react-redux";
+import {setProductFull, setProductSelectedName, setProductSelectedStock} from "@store/product";
 
 
 interface SingleProductIntroProps {
@@ -42,12 +44,32 @@ const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
         extra_attributes
     } = props;
 
+    const dispatch = useDispatch();
+
     const [variation, setVariation] = useState<variation_arrayProps|undefined>(type === 'variable' ? variation_array.filter(item => item.slug === `${slug}-${default_attributes.sort((a, b)=> a.id > b.id ? 1 : -1).map(item => item.option).join('-')}`)[0] : undefined);
     const [stock, setStock] = useState<boolean>(type === 'simple' ? in_stock : variation?.in_stock ?? false);
 
     useEffect(()=>{
         setStock(type === 'simple' ? in_stock : variation?.in_stock ?? false);
-    }, [variation, type, in_stock]);
+
+        dispatch(setProductSelectedName(type === 'variable' ? variation?.name ?? '' : title));
+        dispatch(setProductSelectedStock(type === 'simple' ? in_stock : variation?.in_stock ?? false));
+
+        dispatch(setProductFull(type === 'variable' ? variation : {
+            id,
+            title,
+            sku,
+            in_stock,
+            type,
+            slug,
+            attributes,
+            variation_array,
+            default_attributes,
+            images,
+            regular_price,
+            extra_attributes
+        }))
+    }, [variation, type, title, in_stock]);
 
     return (
         <section className={classNames(styles['single-product-intro'], 'intro')}>

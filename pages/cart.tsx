@@ -36,7 +36,15 @@ export interface CartItemsProps {
 }
 
 interface CartItemMeta {
-    meta_extra_products?: extraDataChoosed[]
+    meta_extra_products?: extraDataChoosed[],
+    meta_bundle?:MetaBundleProps
+}
+
+export interface MetaBundleProps {
+    product: ProductCardProps|variation_arrayProps,
+    product_price: string,
+    product_type: string,
+    product_image: ''
 }
 
 export interface CartItemProps {

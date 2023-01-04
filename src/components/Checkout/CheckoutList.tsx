@@ -10,6 +10,7 @@ import Link from "next/link";
 import {If, Then} from "react-if";
 import {CartVariationProps} from "@pages/cart";
 import {extraDataChoosed} from "@components/SingleProduct/Intro/SingleProductContent";
+import IconPlus from '@icons/bundle_plus.svg';
 
 
 interface CheckoutListProps {
@@ -49,7 +50,7 @@ const CheckoutList:React.FC<CheckoutListProps> = (props) => {
                                             </div>
                                         </Link>
 
-                                        <Link href={`/product/${cartData.items[val].product.slug}`} className={styles['checkout-content__list-title']} data-test={cartData.items[val].type}>{cartData.items[val].type === 'variable' ? cartData.items[val].variation_product?.name : cartData.items[val].product.name}</Link>
+                                        <Link href={`/product/${cartData.items[val].product.slug}`} className={styles['checkout-content__list-title']}>{cartData.items[val].type === 'variable' ? cartData.items[val].variation_product?.name : cartData.items[val].product.name}</Link>
                                     </div>
 
                                     <div className={styles['checkout-content__list-count']}>х{cartData.items[val].quantity}</div>
@@ -90,6 +91,27 @@ const CheckoutList:React.FC<CheckoutListProps> = (props) => {
                                         </div>
                                     </Then>
                                 </If>
+
+                                {
+                                    cartData.items[val].meta_data.meta_bundle &&
+                                    <>
+                                        <div className={styles['checkout-content__list-plus']}>
+                                            <Image src={IconPlus.src} alt={'bundle'} width={12} height={12} />
+                                        </div>
+
+                                        <div className={classNames(styles['checkout-content__list-top'], styles['bundle'])}>
+                                            <div className={styles['checkout-content__list-info']}>
+                                                <div className={styles['checkout-content__list-preview']}>
+                                                    <div className={styles['checkout-content__list-preview-inner']}>
+                                                        <Image src={cartData.items[val].meta_data.meta_bundle.product_image} alt={cartData.items[val].meta_data.meta_bundle.product.name} width={48} height={55} />
+                                                    </div>
+                                                </div>
+
+                                                <p className={styles['checkout-content__list-title']}>{cartData.items[val].meta_data.meta_bundle.product.name}</p>
+                                            </div>
+                                        </div>
+                                    </>
+                                }
                             </div>
                         ))
                     }

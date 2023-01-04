@@ -16,6 +16,7 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {getCookie} from "cookies-next";
 import Preloader from '@icons/load-spinner.gif';
+import IconPlus from '@icons/bundle_plus.svg';
 
 const CartItem:React.FC<CartItemProps> = (props) => {
     const {
@@ -131,8 +132,10 @@ const CartItem:React.FC<CartItemProps> = (props) => {
             .catch((error) => {console.log(error)});
     }
 
+    console.log(meta_data);
+
     return (
-        <div className={classNames(styles['cart-list__item'], !productExist ? styles['removed'] : '')}>
+        <div className={classNames(styles['cart-list__wrapper'], !productExist ? styles['removed'] : '')}>
             <If condition={dataStatus}>
                 <Then>
                     <div className={styles['cart-list-preloader']}>
@@ -145,90 +148,117 @@ const CartItem:React.FC<CartItemProps> = (props) => {
                 </Then>
             </If>
 
-            <div className={classNames(styles['cart-list__item-inner'], styles['preview'])}>
-                <Link href={`/product/${product.slug}`} className={styles['cart-list__item-preview']}>
-                    <div className={styles['cart-list__item-preview-inner']}>
-                        <Image src={product.images.default} alt={product.name} width={48} height={55} />
-                    </div>
-                </Link>
-
-                <div className={styles['cart-list__item-info']}>
-                    <Link href={`/product/${product.slug}`} className={styles['cart-list__item-title']}>
-                        {
-                            type === 'variable' ? variation_product?.name : product.name
-                        }
+            <div className={styles['cart-list__item']}>
+                <div className={classNames(styles['cart-list__item-inner'], styles['preview'])}>
+                    <Link href={`/product/${product.slug}`} className={styles['cart-list__item-preview']}>
+                        <div className={styles['cart-list__item-preview-inner']}>
+                            <Image src={product.images.default} alt={product.name} width={48} height={55} />
+                        </div>
                     </Link>
 
-                    <If condition={variation.length > 0 || meta_data.meta_extra_products && meta_data.meta_extra_products?.length > 0}>
-                        <Then>
-                            <div className={styles['cart-list__item-chars']}>
-                                {
-                                    variation.length > 0 &&
-                                    variation.map((item, i) => (
-                                        <div
-                                            className={styles['cart-list__item-chars-elem']}
-                                            key={i}
-                                        >
-                                            {item.name}: {item.value}
-                                        </div>
-                                    ))
-                                }
+                    <div className={styles['cart-list__item-info']}>
+                        <Link href={`/product/${product.slug}`} className={styles['cart-list__item-title']}>
+                            {
+                                type === 'variable' ? variation_product?.name : product.name
+                            }
+                        </Link>
 
-                                {
-                                    meta_data.meta_extra_products && meta_data.meta_extra_products?.length &&
-                                    meta_data.meta_extra_products.map((item, i) => (
-                                        <div
-                                            className={styles['cart-list__item-chars-elem']}
-                                            key={i}
-                                        >
-                                            {item.attribute_title}: <span dangerouslySetInnerHTML={{__html: item.attribute_choosed.value}} />
-                                        </div>
-                                    ))
-                                }
+                        <If condition={variation.length > 0 || meta_data.meta_extra_products && meta_data.meta_extra_products?.length > 0}>
+                            <Then>
+                                <div className={styles['cart-list__item-chars']}>
+                                    {
+                                        variation.length > 0 &&
+                                        variation.map((item, i) => (
+                                            <div
+                                                className={styles['cart-list__item-chars-elem']}
+                                                key={i}
+                                            >
+                                                {item.name}: {item.value}
+                                            </div>
+                                        ))
+                                    }
+
+                                    {
+                                        meta_data.meta_extra_products && meta_data.meta_extra_products?.length &&
+                                        meta_data.meta_extra_products.map((item, i) => (
+                                            <div
+                                                className={styles['cart-list__item-chars-elem']}
+                                                key={i}
+                                            >
+                                                {item.attribute_title}: <span dangerouslySetInnerHTML={{__html: item.attribute_choosed.value}} />
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </Then>
+                        </If>
+                    </div>
+                </div>
+
+                <div className={classNames(styles['cart-list__item-inner'], styles['price-local'])}>
+                    <div className="cart-list__item-current-price">{type === 'variable' ? variation_product?.price : product.price.default} грн</div>
+                </div>
+
+                <div className={classNames(styles['cart-list__item-inner'], styles['counter'])}>
+                    <div className={styles['cart-list__item-counter']}>
+                        <button
+                            onClick={()=>counterClickHandler('minus')}
+                            disabled={dataStatus}
+                            className={classNames(styles['cart-list__item-counter-btn'], styles['cart-list__item-counter-btn--minus'])}
+                        />
+
+                        <input
+                            className={styles['cart-list__item-counter-inp']}
+                            type="number"
+                            name="counter"
+                            autoComplete="off"
+                            value={counter}
+                            onChange={(e) => setCounter(e.currentTarget.value.trim() ?? '1')}
+                            onBlur={(e) => counterHandler(e.currentTarget.value.trim())}
+                        />
+
+                        <button
+                            onClick={()=>counterClickHandler('plus')}
+                            disabled={dataStatus}
+                            className={classNames(styles['cart-list__item-counter-btn'], styles['cart-list__item-counter-btn--plus'])}
+                        />
+                    </div>
+                </div>
+
+                <div className={classNames(styles['cart-list__item-inner'], styles['price-total'])}>
+                    <div className={styles['cart-list__item-total-price']}>{totals.line_total} грн</div>
+                </div>
+
+                <span
+                    className={styles['cart-list__item-close']}
+                    onClick={removeItem}
+                />
+            </div>
+
+            {
+                meta_data.meta_bundle &&
+                <>
+                    <div className={styles['cart-list__plus']}>
+                        <Image src={IconPlus.src} alt={'bundle'} width={24} height={24} />
+                    </div>
+
+                    <div className={styles['cart-list__item']}>
+                        <div className={classNames(styles['cart-list__item-inner'], styles['preview'])}>
+                            <div className={styles['cart-list__item-preview-inner']}>
+                                <Image src={meta_data.meta_bundle.product_image} alt={meta_data.meta_bundle.product.name} width={48} height={55} />
                             </div>
-                        </Then>
-                    </If>
-                </div>
-            </div>
 
-            <div className={classNames(styles['cart-list__item-inner'], styles['price-local'])}>
-                <div className="cart-list__item-current-price">{type === 'variable' ? variation_product?.price : product.price.default} грн</div>
-            </div>
+                            <div className={styles['cart-list__item-info']}>
+                                <p className={styles['cart-list__item-title']}>{meta_data.meta_bundle.product.name}</p>
+                            </div>
+                        </div>
 
-            <div className={classNames(styles['cart-list__item-inner'], styles['counter'])}>
-                <div className={styles['cart-list__item-counter']}>
-                    <button
-                        onClick={()=>counterClickHandler('minus')}
-                        disabled={dataStatus}
-                        className={classNames(styles['cart-list__item-counter-btn'], styles['cart-list__item-counter-btn--minus'])}
-                    />
-
-                    <input
-                        className={styles['cart-list__item-counter-inp']}
-                        type="number"
-                        name="counter"
-                        autoComplete="off"
-                        value={counter}
-                        onChange={(e) => setCounter(e.currentTarget.value.trim() ?? '1')}
-                        onBlur={(e) => counterHandler(e.currentTarget.value.trim())}
-                    />
-
-                    <button
-                        onClick={()=>counterClickHandler('plus')}
-                        disabled={dataStatus}
-                        className={classNames(styles['cart-list__item-counter-btn'], styles['cart-list__item-counter-btn--plus'])}
-                    />
-                </div>
-            </div>
-
-            <div className={classNames(styles['cart-list__item-inner'], styles['price-total'])}>
-                <div className={styles['cart-list__item-total-price']}>{totals.line_total} грн</div>
-            </div>
-
-            <span
-                className={styles['cart-list__item-close']}
-                onClick={removeItem}
-            />
+                        <div className={classNames(styles['cart-list__item-inner'], styles['price-local'])}>
+                            <div className="cart-list__item-current-price">{meta_data.meta_bundle.product_price} грн</div>
+                        </div>
+                    </div>
+                </>
+            }
         </div>
     );
 }

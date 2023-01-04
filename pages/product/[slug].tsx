@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import HeadHTML from "@components/Layout/Head";
 import {SettingsContext} from "@pages/_app";
 import Layout from "@components/Layout";
@@ -20,6 +20,10 @@ import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
+import SingleProductTogether, {
+    SingleProductTogetherProps
+} from "@components/SingleProduct/SingleProductTogether/SingleProductTogether";
+import {setProductSelectedImage} from "@store/product";
 
 
 interface ProductPageProps {
@@ -30,6 +34,12 @@ interface ProductPageProps {
     reviewed_products: ProductCardProps[],
     nonce: string,
     cartData: CartServerDataProps
+}
+
+export interface productsTogetherProps {
+    product: ProductCardProps,
+    product_variation_id?: string,
+    discount_percentage: string
 }
 
 const ProductPage:React.FC<ProductPageProps> = (props) => {
@@ -53,6 +63,8 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
 
     useEffect(()=>{
         const reviewed_products_ids:number[] = JSON.parse(getCookie('reviewed_products')?.toString() ?? '[]');
+
+        dispatch(setProductSelectedImage(pageData.images.default));
 
         reviewed_products_ids.filter(item => item === pageData.id).length  === 0 ? setCookies('reviewed_products', [...reviewed_products_ids, pageData.id], {maxAge: 3600*24*7}) : null;
     }, [pageData]);
@@ -90,6 +102,21 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     acf={pageData.acf}
                     description={pageData.description}
                 />
+
+                {
+                    pageData.acf?.products_together?.length > 0 &&
+                    <section className={styles['section-bundle']}>
+                        <div className="container">
+                            <CardSlider
+                                block_title={'Вместе покупают'}
+                                sliderItems={pageData.acf.products_together}
+                                perViewAmount={1}
+                                cardType={'bundle'}
+                                perCard={0}
+                            />
+                        </div>
+                    </section>
+                }
 
                 <If condition={products.length > 0}>
                     <Then>

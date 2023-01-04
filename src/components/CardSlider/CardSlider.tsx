@@ -12,6 +12,7 @@ import VideoCard from "@components/Cards/VideoCard/VideoCard";
 import {PhotoProps} from "@components/About/Intro/Intro";
 import BlogCard from "@components/Cards/BlogCard/BlogCard";
 import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
+import SingleProductTogether from "@components/SingleProduct/SingleProductTogether/SingleProductTogether";
 
 interface cardSliderProps {
     block_title: string,
@@ -84,6 +85,14 @@ const CardSlider:React.FC<cardSliderProps> = (props) => {
                         id={data.id}
                         locale_date={data.locale_date}
                         category_main={data.category_main}
+                    />
+                );
+            case 'bundle':
+                return (
+                    <SingleProductTogether
+                        product={data.product}
+                        discount_percentage={data.discount_percentage}
+                        product_variation_id={data.product_variation_id}
                     />
                 );
             default:

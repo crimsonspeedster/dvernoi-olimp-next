@@ -1,5 +1,4 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {HYDRATE} from "next-redux-wrapper";
 import { AppState } from "./store";
 import {CartServerDataProps} from "@pages/cart";
 
