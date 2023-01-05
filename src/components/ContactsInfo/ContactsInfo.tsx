@@ -12,6 +12,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import {PhotoProps} from "@components/About/Intro/Intro";
 import {If, Then} from "react-if";
+import {useTranslation} from "next-i18next";
 
 export interface ContactsInfoProps {
     zagolovok: string,
@@ -46,6 +47,7 @@ export interface LinkProps {
 
 const ContactsInfo:React.FC<ContactsInfoProps> = ({zagolovok, povtoritel, showPhotos}) => {
     const [mapiframe, setMapiframe] = useState<string>('');
+    const {t} = useTranslation('common');
 
     useEffect(()=>{
         setMapiframe(povtoritel[0].magaziny[0].adres_iframe);
@@ -178,7 +180,7 @@ const ContactsInfo:React.FC<ContactsInfoProps> = ({zagolovok, povtoritel, showPh
                                     <If condition={showPhotos}>
                                         <Then>
                                             <div className={styles['shop-cards']}>
-                                                <h2 className={classNames('title', 'title--dark', styles['shop-cards__title'])}>Ждем вас в наших магазинах</h2>
+                                                <h2 className={classNames('title', 'title--dark', styles['shop-cards__title'])}>{t('waitingForYou')}</h2>
 
                                                 <div className={styles['shop-cards__flex']}>
                                                     {

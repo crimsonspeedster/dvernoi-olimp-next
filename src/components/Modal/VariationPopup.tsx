@@ -13,6 +13,8 @@ import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {SettingsContext} from "@pages/_app";
 import {useDispatch} from "react-redux";
 import {If, Then} from "react-if";
+import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 interface VariationPopupProps {
@@ -28,6 +30,8 @@ const VariationPopup:React.FC<VariationPopupProps> = (props) => {
 
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
+    const router = useRouter();
+    const {t} = useTranslation('common');
 
     const [dataStatus, setDataStatus] = useState<boolean>(false);
 
@@ -63,6 +67,7 @@ const VariationPopup:React.FC<VariationPopupProps> = (props) => {
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
             nonce: settingsCtx.nonce,
             id,
+            lang: router.locale,
             'variation-id': variation_id,
             quantity: 1
         }, {
@@ -101,7 +106,7 @@ const VariationPopup:React.FC<VariationPopupProps> = (props) => {
                             disabled={dataStatus}
                             className={classNames('button', styles['productCard__btn'])}
                             onClick={()=>{buyHandler(item.id)}}
-                        >Купить</button>
+                        >{t('buyTitle')}</button>
                     </div>
                 ))
             }

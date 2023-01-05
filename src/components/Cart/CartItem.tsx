@@ -17,6 +17,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {getCookie} from "cookies-next";
 import Preloader from '@icons/load-spinner.gif';
 import IconPlus from '@icons/bundle_plus.svg';
+import {useRouter} from "next/router";
 
 const CartItem:React.FC<CartItemProps> = (props) => {
     const {
@@ -34,6 +35,7 @@ const CartItem:React.FC<CartItemProps> = (props) => {
 
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
+    const router = useRouter();
     const cartAmountItems = useSelector(selectCartAmountState);
     const cartTotalPrice = useSelector(selectCartTotalPrice);
 
@@ -59,6 +61,7 @@ const CartItem:React.FC<CartItemProps> = (props) => {
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/update-item`, {
             nonce: settingsCtx.nonce,
             key: hash,
+            lang: router.locale,
             quantity: filteredVal
         }, {
             headers: {
@@ -95,6 +98,7 @@ const CartItem:React.FC<CartItemProps> = (props) => {
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/update-item`, {
             nonce: settingsCtx.nonce,
             key: hash,
+            lang: router.locale,
             quantity: amount
         }, {
             headers: {
@@ -115,7 +119,8 @@ const CartItem:React.FC<CartItemProps> = (props) => {
 
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/remove-item`, {
             nonce: settingsCtx.nonce,
-            key: hash
+            key: hash,
+            lang: router.locale
         }, {
             headers: {
                 'X-Headless-WP': true,

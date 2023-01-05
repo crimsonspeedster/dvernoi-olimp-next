@@ -11,6 +11,7 @@ import {getCookie} from "cookies-next";
 import {CartServerDataProps} from "@pages/cart";
 import {useDispatch} from "react-redux";
 import {setCartServerData} from "@store/cart";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 interface HomeProps {
     pageData: any,
@@ -101,6 +102,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req, res}) 
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -180,7 +184,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req, res}) 
             recentPosts: resData.recentPosts,
             menus,
             nonce: resData.nonce.nonce,
-            cartData: resData.cart
+            cartData: resData.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

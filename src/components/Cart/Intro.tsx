@@ -9,6 +9,7 @@ import {Else, If, Then} from "react-if";
 import CartItem from "@components/Cart/CartItem";
 import {useSelector} from "react-redux";
 import {selectAllCartData, selectCartAmountState, selectCartTotalPrice} from "@store/cart";
+import {useTranslation} from "next-i18next";
 
 
 interface CartIntroProps {
@@ -21,6 +22,7 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
     } = props;
 
     const cartData = useSelector(selectAllCartData);
+    const {t} = useTranslation('common');
 
     return (
         <section className={classNames(styles['cart'], 'intro')}>
@@ -31,13 +33,13 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
                     <Then>
                         <div className={styles['cart__table']}>
                             <div className={classNames(styles['cart__header'], styles['cart-header'])}>
-                                <div className={styles['cart-header__item']}>Товары</div>
+                                <div className={styles['cart-header__item']}>{t('productsTitle')}</div>
 
-                                <div className={styles['cart-header__item']}>Цена</div>
+                                <div className={styles['cart-header__item']}>{t('priceTitle')}</div>
 
-                                <div className={styles['cart-header__item']}>Количество</div>
+                                <div className={styles['cart-header__item']}>{t('amountTitle')}</div>
 
-                                <div className={styles['cart-header__item']}>Сумма</div>
+                                <div className={styles['cart-header__item']}>{t('sumTitle')}</div>
                             </div>
 
                             <div className={classNames(styles['cart__list'], styles['cart-list'])}>
@@ -62,11 +64,11 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
 
                             <div className={classNames(styles['cart__footer'], styles['cart-footer'])}>
                                 <Link href="/catalog" className={classNames(styles['cart-footer__btn'], styles['cart-footer__btn--back'])}>
-                                    Назад к покупкакам
+                                    {t('backToBuy')}
                                 </Link>
 
                                 <div className={styles['cart-footer__total-price']}>
-                                    <span>Итог:</span>
+                                    <span>{t('totle')}:</span>
 
                                     {cartData.total_price} грн
                                 </div>
@@ -78,14 +80,14 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
                                         data-fancybox="quick"
                                         data-src="#quick-modal"
                                     >
-                                        Быстрый заказ
+                                        {t('fastOrderTitle')}
                                     </button>
 
                                     <Link
                                         href={`checkout/`}
                                         className={classNames(styles['cart-footer__btn'], styles['cart-footer__btn--checkout'])}
                                     >
-                                        Перейти к оформлению
+                                        {t('toCheckout')}
                                     </Link>
                                 </div>
                             </div>
@@ -93,9 +95,9 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
                     </Then>
                     <Else>
                         <div className={styles['cart-empty']}>
-                            <p className={styles['cart-empty__title']}>Корзина пуста</p>
+                            <p className={styles['cart-empty__title']}>{t('cartEmpty')}</p>
 
-                            <Link className={classNames(styles['cart-footer__btn'], styles['cart-footer__btn--back'])} href="/catalog">Назад к покупкам</Link>
+                            <Link className={classNames(styles['cart-footer__btn'], styles['cart-footer__btn--back'])} href="/catalog">{t('backToBuy')}</Link>
                         </div>
                     </Else>
                 </If>

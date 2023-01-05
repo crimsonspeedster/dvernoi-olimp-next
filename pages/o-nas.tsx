@@ -13,6 +13,7 @@ import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
 import {getCookie} from "cookies-next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface AboutProps {
@@ -91,6 +92,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req, res}) 
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -168,7 +172,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, req, res}) 
             settingsData: resData.settings,
             menus,
             nonce: resData.nonce.nonce,
-            cartData: resData.cart
+            cartData: resData.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

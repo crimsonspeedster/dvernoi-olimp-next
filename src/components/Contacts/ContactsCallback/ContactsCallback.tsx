@@ -11,23 +11,25 @@ import Toast from "@components/Toast/Toast";
 import ToastThank from "@components/ToastThank/ToastThank";
 import loadSpinner from '@icons/load-spinner.gif';
 import Image from "next/image";
+import {useTranslation} from "next-i18next";
 
 const ContactsCallback = () => {
+    const {t} = useTranslation('common');
+
     const validateFormSchema = Yup.object().shape({
         user_name: Yup.string()
-            .min(2, 'Too Short!')
-            .max(50, 'Too Long!')
-            .matches(/^[\p{Script=Cyrl}\s]*$/u, 'Is not in correct format')
+            .min(2, t('errorShort') ?? '')
+            .max(50, t('errorLong') ?? '')
+            .matches(/^[\p{Script=Cyrl}\s]*$/u, t('errorNotCorrectFormat') ?? '')
             .trim()
-            .required('Required'),
+            .required(t('fieldRequired') ?? ''),
         user_phone: Yup.string()
-            .phone()
-            .required('Required'),
+            .phone('380', false, t('fieldRequired') ?? ''),
         user_time: Yup.string()
-            .min(2, 'Too Short!')
+            .min(2, t('errorShort') ?? '')
             .trim()
-            .matches(/^[\d|:\- ]*$/, 'Is not in correct format')
-            .max(50, 'Too Long!')
+            .matches(/^[\d|:\- ]*$/, t('errorNotCorrectFormat') ?? '')
+            .max(50, t('errorLong') ?? '')
     });
 
     const [toastStatus, setToastStatus] = useState<boolean>(false);
@@ -36,7 +38,7 @@ const ContactsCallback = () => {
         <>
             <div className={styles['contacts-callback']}>
                 <div className="container">
-                    <div className={styles['contacts-callback__title']}>Заказать обратный звонок</div>
+                    <div className={styles['contacts-callback__title']}>{t('orderCallBack')}</div>
 
                     <Formik
                         initialValues={{
@@ -79,7 +81,7 @@ const ContactsCallback = () => {
                                 <form className={classNames(styles['contacts-callback__form'], 'form-420')} onSubmit={handleSubmit}>
                                     <div className={styles['contacts-callback__inner']}>
                                         <div className={styles['contacts-callback__inp-wrapper']}>
-                                            <label className={styles['contacts-callback__label']} htmlFor="contacts-name">Ваше имя</label>
+                                            <label className={styles['contacts-callback__label']} htmlFor="contacts-name">{t('modalCallbackPlaceholderName')}</label>
 
                                             <div className={styles['contacts-callback__inp-inner']}>
                                                 <input
@@ -89,7 +91,7 @@ const ContactsCallback = () => {
                                                     onChange={handleChange}
                                                     value={values.user_name}
                                                     id="contacts-name"
-                                                    placeholder="Как Вас зовут?"
+                                                    placeholder={t('modalCallbackLabelName') ?? ''}
                                                     autoComplete="off"
                                                 />
                                             </div>
@@ -104,7 +106,7 @@ const ContactsCallback = () => {
                                         </div>
 
                                         <div className={styles['contacts-callback__inp-wrapper']}>
-                                            <label className={styles['contacts-callback__label']} htmlFor="contacts-phone">Ваш номер телефона</label>
+                                            <label className={styles['contacts-callback__label']} htmlFor="contacts-phone">{t('formCallbackLabelPhone')}</label>
 
                                             <div className={styles['contacts-callback__inp-inner']}>
                                                 <InputMask
@@ -131,7 +133,7 @@ const ContactsCallback = () => {
                                         </div>
 
                                         <div className={styles['contacts-callback__inp-wrapper']}>
-                                            <label className={styles['contacts-callback__label']} htmlFor="contacts-time">Желаемое время звонка</label>
+                                            <label className={styles['contacts-callback__label']} htmlFor="contacts-time">{t('phoneTime')}</label>
 
                                             <div className={styles['contacts-callback__inp-inner']}>
                                                 <input
@@ -157,7 +159,7 @@ const ContactsCallback = () => {
                                     </div>
 
                                     <div className={styles['contacts-callback__bot']}>
-                                        <p className={styles['contacts-callback__text']}>Нажимая на кнопку, вы соглашаетесь на обработку <a href="#" target="_blank" rel="noreferrer">персональных данных</a></p>
+                                        <p className={styles['contacts-callback__text']} dangerouslySetInnerHTML={{__html: t('personalData')}} />
 
                                         <button
                                             className={classNames(styles['contacts-callback__btn'], 'btn')}
@@ -166,11 +168,11 @@ const ContactsCallback = () => {
                                         >
                                             <If condition={isSubmitting}>
                                                 <Then>
-                                                    <Image src={loadSpinner.src} alt={'загрузка'} width={30} height={30} />
+                                                    <Image src={loadSpinner.src} alt={t('loading')} width={30} height={30} />
                                                 </Then>
                                             </If>
 
-                                            <span className={classNames(styles['contacts-callback__btn-text'], 'btn__text')}>Отправить сообщение</span>
+                                            <span className={classNames(styles['contacts-callback__btn-text'], 'btn__text')}>{t('sendMessage')}</span>
                                         </button>
                                     </div>
                                 </form>

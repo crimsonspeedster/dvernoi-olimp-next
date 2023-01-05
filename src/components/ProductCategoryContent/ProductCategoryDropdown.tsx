@@ -4,6 +4,7 @@ import sprite from '@icons/sprite.svg';
 import classNames from "classnames";
 import styles from './ProductCategoryContent.module.scss';
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 interface ProductCategoryDropdownProps {
@@ -20,34 +21,35 @@ export interface SortDropdownProps {
 
 const ProductCategoryDropdown:React.FC<ProductCategoryDropdownProps> = ({}) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const {t} = useTranslation('common');
 
     const router = useRouter();
 
     const [dropdownList, setDropdownList] = useState<SortDropdownProps[]>([
         {
             id: 1,
-            title: 'По новизне (от новых к старым)',
+            title: t('filterNewDESC'),
             order: 'desc',
             orderBy: 'date',
             isActive: router.query.order === 'desc' && router.query.orderBy === 'date'
         },
         {
             id: 2,
-            title: 'По новизне (от старых к новым)',
+            title: t('filterNewASC'),
             isActive: router.query.order === 'asc' && router.query.orderBy === 'date',
             order: 'asc',
             orderBy: 'date',
         },
         {
             id: 3,
-            title: 'По цене (от меньшего к большему)',
+            title: t('filterPriceDESC'),
             isActive: router.query.order === 'desc' && router.query.orderBy === 'price',
             order: 'desc',
             orderBy: 'price',
         },
         {
             id: 4,
-            title: 'По цене (от большего к меньшему)',
+            title: t('filterPriceASC'),
             isActive: router.query.order === 'asc' && router.query.orderBy === 'price',
             order: 'asc',
             orderBy: 'price',

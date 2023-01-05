@@ -11,6 +11,7 @@ import {If, Then} from "react-if";
 import {CartVariationProps} from "@pages/cart";
 import {extraDataChoosed} from "@components/SingleProduct/Intro/SingleProductContent";
 import IconPlus from '@icons/bundle_plus.svg';
+import {useTranslation} from "next-i18next";
 
 
 interface CheckoutListProps {
@@ -25,6 +26,7 @@ const CheckoutList:React.FC<CheckoutListProps> = (props) => {
     const [isOpen, setIsOpen] = useState<boolean>(true);
 
     const cartData = useSelector(selectAllCartData);
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['checkout-content__list'], isOpen ? styles['open'] : '', styles[classStr])}>
@@ -32,7 +34,7 @@ const CheckoutList:React.FC<CheckoutListProps> = (props) => {
                 className={styles['checkout-content__list-header']}
                 onClick={() => setIsOpen(prev => !prev)}
             >
-                <div className={styles['checkout-content__list-header-title']}>Ваш выбор</div>
+                <div className={styles['checkout-content__list-header-title']}>{t('fastOrderSelected')}</div>
 
                 <div className={styles['checkout-content__list-header-icon']} />
             </div>

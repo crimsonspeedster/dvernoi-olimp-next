@@ -9,6 +9,7 @@ import sprite from '@icons/sprite.svg'
 import productImg from '@images/single-product.jpg';
 import classNames from "classnames";
 import Image from "next/image";
+import {useTranslation} from "next-i18next";
 
 
 const QuickModal = () => {
@@ -33,14 +34,16 @@ const QuickModal = () => {
         return () => {
             Fancybox.destroy()
         }
-    }, [])
+    }, []);
+
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['modal'], styles['modal-quick'])} id="quick-modal" style={{display: 'none'}}>
-            <div className={styles['modal__title']}>Быстрый заказ</div>
+            <div className={styles['modal__title']}>{t('fastOrderTitle')}</div>
 
             <div className={classNames(styles['modal__choice'], styles['modal-choice'])}>
-                <div className={styles['modal-choice__title']}>Ваш выбор:</div>
+                <div className={styles['modal-choice__title']}>{t('fastOrderSelected')}:</div>
 
                 <div className={styles['modal-choice__info']}>
                     <div className={styles['modal-choice__preview']}>
@@ -49,11 +52,11 @@ const QuickModal = () => {
                         </div>
                     </div>
 
-                    <div className={styles['modal-choice__name']}>Входные двери B 3.11 Венге/Белый супермат М2, Mottura</div>
+                    <div className={styles['modal-choice__name']}>Product 1</div>
                 </div>
 
                 <div className={styles['modal-choice__controls']}>
-                    <div className={styles['modal-choice__subtitle']}>Общая стоимость:</div>
+                    <div className={styles['modal-choice__subtitle']}>{t('selectedPrice')}:</div>
 
                     <div className={styles['modal-choice__inner']}>
                         <div className={styles['modal-choice__counter']}>
@@ -71,7 +74,7 @@ const QuickModal = () => {
 
             <form className={styles['modal__form']}>
                 <div className={styles['modal__inp-wrapper']}>
-                    <label className={styles['modal__label']} htmlFor="modal-quick-name">Имя</label>
+                    <label className={styles['modal__label']} htmlFor="modal-quick-name">{t('modalCallbackLabelName')}</label>
 
                     <div className={styles['modal__inp-inner']}>
                         <input
@@ -80,13 +83,13 @@ const QuickModal = () => {
                             type="text"
                             name="modal-callback-name"
                             autoComplete="off"
-                            placeholder="Ваше имя"
+                            placeholder={t('modalCallbackPlaceholderName') ?? ''}
                         />
                     </div>
                 </div>
 
                 <div className={styles['modal__inp-wrapper']}>
-                    <label className={styles['modal__label']} htmlFor="modal-quick-phone">Телефон</label>
+                    <label className={styles['modal__label']} htmlFor="modal-quick-phone">{t('modalCallbackLabelPhone')}</label>
 
                     <div className={styles['modal__inp-inner']}>
                         <input
@@ -107,7 +110,7 @@ const QuickModal = () => {
                                 <svg><use href={`${sprite.src}#cart`}/></svg>
                             </span>
 
-                            <span className={classNames(styles['modal__btn-text'], 'btn__text')}>Купить</span>
+                            <span className={classNames(styles['modal__btn-text'], 'btn__text')}>{t('buyTitle')}</span>
                         </button>
                     </div>
                 </div>

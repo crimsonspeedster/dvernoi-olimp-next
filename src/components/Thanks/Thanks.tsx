@@ -5,9 +5,11 @@ import styles from './Thanks.module.scss';
 import classNames from "classnames";
 import {If, Then} from "react-if";
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 const ThanksIntro = () => {
     const router = useRouter();
+    const {t} = useTranslation('thanks');
 
     return (
         <section className={styles['thanks']}>
@@ -22,18 +24,18 @@ const ThanksIntro = () => {
                     <If condition={router.query?.order && router.query?.order?.length > 0}>
                         <Then>
                             <div className={styles['thanks__number']}>
-                                Заказ № <span>{router.query?.order}</span>
+                                {t('order')} № <span>{router.query?.order}</span>
                             </div>
                         </Then>
                     </If>
 
-                    <h1 className={styles['thanks__title']}>Спасибо что выбрали нас</h1>
+                    <h1 className={styles['thanks__title']}>{t('thanks_title')}</h1>
 
-                    <p className={styles['thanks__desc']}>Наши менеджеры свяжутся с вами в ближайшее время</p>
+                    <p className={styles['thanks__desc']}>{t('thanks_desc')}</p>
 
                     <div className={styles['thanks__btn-wrapper']}>
                         <Link className={classNames(styles['thanks__btn'], 'btn')} href={'/'}>
-                            <span className={classNames(styles['thanks__btn-text'], 'btn__text')}>На главную</span>
+                            <span className={classNames(styles['thanks__btn-text'], 'btn__text')}>{t('thanks_btn')}</span>
                         </Link>
                     </div>
                 </div>

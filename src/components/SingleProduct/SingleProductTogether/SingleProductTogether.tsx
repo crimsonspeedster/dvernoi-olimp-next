@@ -19,6 +19,8 @@ import axios from "axios";
 import {getCookie, setCookie} from "cookies-next";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {SettingsContext} from "@pages/_app";
+import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 export interface SingleProductTogetherProps {
@@ -37,6 +39,8 @@ const SingleProductTogether: React.FC<SingleProductTogetherProps> = (props) => {
     const firstProductStock = useSelector(getProductSelectedStock);
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
+    const router = useRouter();
+    const {t} = useTranslation('common');
 
     const firstProduct = useSelector(getProductSelectedFull);
 
@@ -100,6 +104,7 @@ const SingleProductTogether: React.FC<SingleProductTogetherProps> = (props) => {
             // @ts-ignore
             id: firstProduct?.type ? firstProduct.id : firstProduct.parent_id,
             quantity: 1,
+            lang: router.locale,
             // @ts-ignore
             ...(!firstProduct.type) && {'variation-id': firstProduct.id},
             cart_item_data: {
@@ -190,7 +195,7 @@ const SingleProductTogether: React.FC<SingleProductTogetherProps> = (props) => {
                                 <svg><use href={`${sprite.src}#cart`}/></svg>
                             </span>
 
-                            <span className={classNames(styles['single-product-together-slider__item-btn-text'], 'btn__text')}>Купить комплект</span>
+                            <span className={classNames(styles['single-product-together-slider__item-btn-text'], 'btn__text')}>{t('buyTogether')}</span>
                         </button>
                     </div>
                 </div>

@@ -6,6 +6,7 @@ import {useRouter} from "next/router";
 import {SettingsContext} from "@pages/_app";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 import axios from "axios";
+import {useTranslation} from "next-i18next";
 
 
 interface ProductLoadBtnProps {
@@ -14,6 +15,7 @@ interface ProductLoadBtnProps {
 
 const ProductCategoryLoadBtn:React.FC<ProductLoadBtnProps> = ({updatePosts}) => {
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     const [postsUpdated, setPostsUpdated] = useState<boolean>(false);
 
@@ -151,7 +153,7 @@ const ProductCategoryLoadBtn:React.FC<ProductLoadBtnProps> = ({updatePosts}) => 
                         </svg>
                     </span>
 
-                    <span className={classNames(styles['product-category__btn-text'], 'load-btn__text')}>Загрузить еще</span>
+                    <span className={classNames(styles['product-category__btn-text'], 'load-btn__text')}>{t('loadMore')}</span>
                 </button>
             </div>
         );

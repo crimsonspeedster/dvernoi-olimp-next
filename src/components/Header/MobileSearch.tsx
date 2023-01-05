@@ -6,10 +6,12 @@ import classNames from "classnames";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
 import {useRouter} from "next/router";
 import axios from "axios";
+import {useTranslation} from "next-i18next";
 
 const MobileSearch = () => {
     let [search, setSearch] = useState<string>('');
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     const submitForm = (e:FormEvent):void => {
         e.preventDefault()
@@ -29,7 +31,7 @@ const MobileSearch = () => {
                         type="text"
                         name="search"
                         autoComplete="off"
-                        placeholder="Поиск..."
+                        placeholder={`${t('searchTitle')}...`}
                         value={search}
                         onChange={e => setSearch(e.currentTarget.value)}
                     />

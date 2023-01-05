@@ -12,6 +12,7 @@ import styles from './Intro.module.scss';
 import classNames from "classnames";
 import {ImageProductProps} from "@components/Cards/ProductCard/ProductCard";
 import {Else, If, Then} from "react-if";
+import {useTranslation} from "next-i18next";
 
 
 interface SingleProductSliderProps {
@@ -25,12 +26,14 @@ const SingleProductSlider:React.FC<SingleProductSliderProps> = (props) => {
         in_stock
     } = props;
 
+    const {t} = useTranslation('common');
+
     return (
         <div className={styles['single-product-intro__slider-wrapper']}>
             <div className={styles['single-product-intro__slider-pagination']}/>
 
             <div className={styles['single-product-intro__slider-inner']}>
-                <div className={classNames(styles['single-product-intro__slider-stock'], in_stock ? styles['avaliable'] : styles['disavaliable'])}>{in_stock ? 'В наличии' : 'Нет в наличии'}</div>
+                <div className={classNames(styles['single-product-intro__slider-stock'], in_stock ? styles['avaliable'] : styles['disavaliable'])}>{in_stock ? t('productInStock') : t('productOutStock')}</div>
 
                 <If condition={images.gallery.length > 1}>
                     <Then>

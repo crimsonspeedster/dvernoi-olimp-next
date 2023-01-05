@@ -5,6 +5,7 @@ import classNames from "classnames";
 import {SettingsContext} from "@pages/_app";
 import {PhotoProps} from "@components/About/Intro/Intro";
 import Image from "next/image";
+import {useTranslation} from "next-i18next";
 
 
 export interface workTimeProps {
@@ -19,10 +20,11 @@ export interface socialLinkProps {
 
 const FooterContacts = () => {
     const settingsCtx = useContext(SettingsContext).settings;
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['footer__contacts'], styles['footer-contacts'])}>
-            <div className={classNames(styles['footer-contacts__title'], styles['footer-title'])}>Контакты</div>
+            <div className={classNames(styles['footer-contacts__title'], styles['footer-title'])}>{t('contactsTitle')}</div>
 
             <a className={styles['footer-contacts__phone']} href={settingsCtx.header_phone.url}>{settingsCtx.header_phone.title}</a>
 

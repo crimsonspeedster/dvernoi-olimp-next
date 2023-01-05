@@ -5,6 +5,8 @@ import styles from './Footer.module.scss';
 import sprite from '@icons/sprite.svg';
 import classNames from "classnames";
 import {MenuContext, SettingsContext} from "@pages/_app";
+import {useTranslation} from "next-i18next";
+import {Else, If, Then} from "react-if";
 
 
 export interface menuProps {
@@ -22,20 +24,21 @@ export interface menuLabelProps {
 const FooterLinks = () => {
 
     const settingsCtx = useContext(SettingsContext);
+    const {t} = useTranslation('common');
 
     const [menus, setMenus] = useState<menuLabelProps[]>([
         {
-            label: 'О КОМПАНИИ',
+            label: t('aboutCompanyLabel'),
             isOpen: true,
             items: settingsCtx?.menus?.footer_company ?? []
         },
         {
-            label: 'ОБЩИЕ ВОПРОСЫ',
+            label: t('questionsLabel'),
             isOpen: true,
             items: settingsCtx?.menus?.footer_questions ?? []
         },
         {
-            label: 'КАТАЛОГ ДВЕРЕЙ',
+            label: t('catalogLabel'),
             isOpen: true,
             items: settingsCtx?.menus?.footer_catalog ?? []
         },
@@ -71,12 +74,25 @@ const FooterLinks = () => {
 
     const GenerateMenuItem = (item:menuProps):ReactElement => (
         <li className={styles['footer-links__list-item']}>
-            <Link
-                className={classNames(styles['footer-links__list-link'], item.cssClasses)}
-                href={item.url ?? ''}
-            >
-                {item.label}
-            </Link>
+            <If condition={item.url}>
+                <Then>
+                    <Link
+                        className={classNames(styles['footer-links__list-link'], item.cssClasses)}
+                        href={item.url ?? ''}
+                    >
+                        {item.label}
+                    </Link>
+                </Then>
+
+                <Else>
+                    <span
+                        className={classNames(styles['footer-links__list-link'], item.cssClasses)}
+                    >
+                        {item.label}
+                    </span>
+                </Else>
+            </If>
+
 
             <svg className={styles['footer-links__list-icon']}>
                 <use href={`${sprite.src}#big-item-arrow`}/>

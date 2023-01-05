@@ -7,6 +7,7 @@ import {PostProp} from "@components/Homepage/Posts/Posts";
 import {If, Then} from "react-if";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 const SinglePostIntro:React.FC<PostProp> = (props) => {
@@ -21,6 +22,7 @@ const SinglePostIntro:React.FC<PostProp> = (props) => {
     } = props;
 
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     return (
         <section className={classNames(styles['single-post-intro'], 'intro', `post-${id}`)}>
@@ -49,7 +51,7 @@ const SinglePostIntro:React.FC<PostProp> = (props) => {
                 <article className={classNames(styles['single-post-intro__article'], 'article')} dangerouslySetInnerHTML={{__html: content?.rendered ?? ''}} />
 
                 <SinglePostShare
-                    title={`Оцени этот пост ${title.rendered}`}
+                    title={t('ratePost').replace('%s', title.rendered)}
                 />
             </div>
         </section>

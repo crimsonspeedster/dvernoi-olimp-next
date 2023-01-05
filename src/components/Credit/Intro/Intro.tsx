@@ -10,6 +10,7 @@ import {EffectFade, type Swiper as SwiperType} from 'swiper';
 import Image from "next/image";
 import 'swiper/css';
 import 'swiper/css/effect-fade';
+import {useTranslation} from "next-i18next";
 
 
 interface CreditIntroProps {
@@ -21,6 +22,7 @@ const CreditIntro:React.FC<CreditIntroProps> = ({title, items}) => {
     const [currentTabIndex, setCurrentTabIndex] = useState<number>(0);
     const [allItems, setAllItems] = useState<bankiRepeater[]>([]);
     const [sliderInstance, setSliderInstance] = useState<null|SwiperType>(null);
+    const {t} = useTranslation('common');
 
     useEffect(()=>{
         const res:bankiRepeater[] = [];
@@ -48,7 +50,7 @@ const CreditIntro:React.FC<CreditIntroProps> = ({title, items}) => {
                         <div
                             onClick={()=>{setCurrentTabIndex(0)}}
                             className={classNames(styles['credit-tab__nav-item'], currentTabIndex === 0 ? styles.active : '')}
-                        >Все варианты</div>
+                        >{t('allVariations')}</div>
 
                         {
                             items.map((item, i) => (

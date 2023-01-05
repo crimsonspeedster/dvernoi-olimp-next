@@ -10,6 +10,7 @@ import {
 import sprite from '@icons/sprite.svg';
 import styles from './Intro.module.scss';
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 interface SinglePostShareProps {
@@ -19,10 +20,11 @@ interface SinglePostShareProps {
 const SinglePostShare:React.FC<SinglePostShareProps> = ({title}) => {
     const router = useRouter();
     const current_link = `${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}${router.asPath}`;
+    const {t} = useTranslation('common');
 
     return (
         <div className={styles['single-post-intro__share']}>
-            <div className={styles['single-post-intro__share-text']}>Поделиться:</div>
+            <div className={styles['single-post-intro__share-text']}>{t('shareTitle')}:</div>
 
             <div className={styles['single-post-intro__share-inner']}>
                 <EmailShareButton

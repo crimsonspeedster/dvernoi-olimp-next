@@ -3,6 +3,7 @@ import styles from './Support.module.scss';
 import {PhotoProps} from "@components/About/Intro/Intro";
 import classNames from "classnames";
 import Image from "next/image";
+import {useTranslation} from "next-i18next";
 
 
 export interface MainSupportProps {
@@ -13,6 +14,8 @@ export interface MainSupportProps {
 }
 
 const MainSupport: React.FC<MainSupportProps> = ({description, image_big, image_small, title}) => {
+    const {t} = useTranslation('common');
+
     return (
         <div className={styles['main-support']}>
             <div className={styles['main-support__inner']}>
@@ -30,7 +33,7 @@ const MainSupport: React.FC<MainSupportProps> = ({description, image_big, image_
                             <div className={styles['main-support-content__desc']} dangerouslySetInnerHTML={{__html: description}} />
 
                             <button className={classNames(styles['main-support-content__btn'], 'btn')}>
-                                <span className={classNames(styles['main-support-content__btn-text'], 'btn__text')}>Узнать больше</span>
+                                <span className={classNames(styles['main-support-content__btn-text'], 'btn__text')}>{t('watchMore')}</span>
                             </button>
                         </div>
                     </div>

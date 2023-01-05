@@ -14,6 +14,7 @@ import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
 import {getCookie} from "cookies-next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface BlogPageProps {
@@ -124,12 +125,21 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, req
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
     const resData = await axios.all([pageRequest, settingsRequest, posts, categories, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, posts, categories, nonce, cart) {
+        if (!page.data?.[0]?.id)
+        {
+            res.writeHead(301, { Location: '/404' });
+            res.end();
+        }
+
         return {
             page: page.data[0],
             settings: settings.data,
@@ -208,7 +218,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, req
             categories: resData.categories,
             page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
             nonce: resData.nonce.nonce,
-            cartData: resData.cart
+            cartData: resData.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

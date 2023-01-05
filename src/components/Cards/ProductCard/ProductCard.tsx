@@ -14,6 +14,8 @@ import {getCookie, setCookie} from "cookies-next";
 import VariationPopup from "@components/Modal/VariationPopup";
 // @ts-ignore
 import {Fancybox} from '@fancyapps/ui';
+import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 export interface ProductCardProps {
     id: number,
@@ -69,6 +71,8 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
 
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
+    const router = useRouter();
+    const {t} = useTranslation('common');
 
     const [dataStatus, setDataStatus] = useState<boolean>(false);
 
@@ -80,6 +84,7 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
             axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
                 nonce: settingsCtx.nonce,
                 id,
+                lang: router.locale,
                 quantity: 1
             }, {
                 headers: {
@@ -110,31 +115,31 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
             <If condition={type === 'variable'}>
                 <Then>
                     <div className={classNames(styles['productCard'], `product-${id}`)} data-fancybox={type} data-src={`#variable-modal-${id}`}>
-                        <span className={styles['productCard__sku']}>Код: {id}</span>
+                        <span className={styles['productCard__sku']}>{t('code')}: {id}</span>
 
                         <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
                             <Then>
                                 <div className={styles['productCard-labels']}>
                                     {
                                         labels.new_card &&
-                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>{t('labelNew')}</span>
                                     }
 
                                     {
                                         labels.sale &&
-                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>{t('labelPromo')}</span>
                                     }
 
                                     {
                                         labels.is_hit &&
-                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>{t('labelTop')}</span>
                                     }
 
                                     {
                                         labels.video &&
                                         <span className={styles['productCard-label--video']}>
-                                <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
-                            </span>
+                                            <Image src={YoutubeIco.src} alt={t('video')} width={24} height={17} />
+                                        </span>
                                     }
                                 </div>
                             </Then>
@@ -145,19 +150,19 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
                         </Link>
 
                         <div className={styles['productCard-row']}>
-                            <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
+                            <p className={styles['productCard__stock']}>{in_stock ? t('productInStock') : t('productOutStock')}</p>
                         </div>
 
                         <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
 
                         <div className={styles['productCard-bottom']}>
-                            <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+                            <p className={styles['productCard__price']}>{type === 'variable' ? t('from'): ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
 
                             <button
                                 disabled={dataStatus}
                                 className={classNames('button', styles['productCard__btn'], dataStatus ? styles['updating'] : '')}
                                 onClick={buyHandler}
-                            >Купить</button>
+                            >{t('buyTitle')}</button>
                         </div>
                     </div>
 
@@ -169,31 +174,31 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
 
                 <Else>
                     <div className={classNames(styles['productCard'], `product-${id}`)}>
-                        <span className={styles['productCard__sku']}>Код: {id}</span>
+                        <span className={styles['productCard__sku']}>{t('code')}: {id}</span>
 
                         <If condition={labels.new_card || labels.sale || labels.is_hit || labels.video}>
                             <Then>
                                 <div className={styles['productCard-labels']}>
                                     {
                                         labels.new_card &&
-                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>Новинка</span>
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--new'])}>{t('labelNew')}</span>
                                     }
 
                                     {
                                         labels.sale &&
-                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>Акция</span>
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--sale'])}>{t('labelPromo')}</span>
                                     }
 
                                     {
                                         labels.is_hit &&
-                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>Топ</span>
+                                        <span className={classNames(styles['productCard-label'], styles['productCard-label--hit'])}>{t('labelTop')}</span>
                                     }
 
                                     {
                                         labels.video &&
                                         <span className={styles['productCard-label--video']}>
-                                <Image src={YoutubeIco.src} alt={'видео'} width={24} height={17} />
-                            </span>
+                                            <Image src={YoutubeIco.src} alt={t('video')} width={24} height={17} />
+                                        </span>
                                     }
                                 </div>
                             </Then>
@@ -204,19 +209,19 @@ const ProductCard:React.FC<ProductCardProps> = (props) => {
                         </Link>
 
                         <div className={styles['productCard-row']}>
-                            <p className={styles['productCard__stock']}>{in_stock ? 'В наличии' : 'Нет в наличии'}</p>
+                            <p className={styles['productCard__stock']}>{in_stock ? t('productInStock') : t('productOutStock')}</p>
                         </div>
 
                         <Link href={`/product/${slug}`} className={styles['productCard__title']}>{name}</Link>
 
                         <div className={styles['productCard-bottom']}>
-                            <p className={styles['productCard__price']}>{type === 'variable' ? 'от': ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
+                            <p className={styles['productCard__price']}>{type === 'variable' ? t('from'): ''} {(price.sale ? price.sale : price.default).toLocaleString()} грн</p>
 
                             <button
                                 disabled={dataStatus}
                                 className={classNames('button', styles['productCard__btn'], dataStatus ? styles['updating'] : '')}
                                 onClick={buyHandler}
-                            >Купить</button>
+                            >{t('buyTitle')}</button>
                         </div>
                     </div>
                 </Else>

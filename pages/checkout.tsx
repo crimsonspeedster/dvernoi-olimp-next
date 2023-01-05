@@ -15,6 +15,7 @@ import {CartServerDataProps} from "@pages/cart";
 import {setCartServerData} from "@store/cart";
 // @ts-ignore
 import NovaPoshta from 'novaposhta';
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface CheckoutProps {
@@ -130,6 +131,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) 
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -218,7 +222,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) 
             menus,
             nonce: resData.nonce.nonce,
             cartData: resData.cart,
-            np_cities: np_cities
+            np_cities: np_cities,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

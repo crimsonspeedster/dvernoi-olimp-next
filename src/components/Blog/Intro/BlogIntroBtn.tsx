@@ -6,6 +6,7 @@ import {PostProp} from "@components/Homepage/Posts/Posts";
 import {useRouter} from "next/router";
 import axios from "axios";
 import {SettingsContext} from "@pages/_app";
+import {useTranslation} from "next-i18next";
 
 
 interface PostLoadMoreProps {
@@ -15,6 +16,7 @@ interface PostLoadMoreProps {
 const BlogIntroBtn: React.FC<PostLoadMoreProps> = ({updatePosts}) => {
     const router = useRouter();
     const settingsCtx = useContext(SettingsContext);
+    const {t} = useTranslation('common');
 
     const [page, setPage] = useState<number>(!isNaN(parseInt(router?.query?.slug?.[router?.query?.slug?.length-1]?.toString() ?? '1') + 1) ? parseInt(router?.query?.slug?.[router?.query?.slug?.length-1]?.toString() ?? '1') + 1 : 2);
     const [postsUpdated, setPostsUpdated] = useState<boolean>(false);
@@ -82,7 +84,7 @@ const BlogIntroBtn: React.FC<PostLoadMoreProps> = ({updatePosts}) => {
                              </svg>
                         </span>
 
-                    <span className={classNames(styles['blog-intro__btn-text'], 'load-btn__text')}>Загрузить еще</span>
+                    <span className={classNames(styles['blog-intro__btn-text'], 'load-btn__text')}>{t('loadMore')}</span>
                 </button>
             </div>
         );

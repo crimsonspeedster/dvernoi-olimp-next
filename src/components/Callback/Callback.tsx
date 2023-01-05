@@ -12,14 +12,15 @@ import axios from "axios";
 import {If, Then} from "react-if";
 import ToastThank from "@components/ToastThank/ToastThank";
 import Toast from "@components/Toast/Toast";
+import {useTranslation} from "next-i18next";
 
 const Callback = () => {
     const settingsCtx = useContext(SettingsContext).settings.form_one_day;
+    const {t} = useTranslation('common');
 
     const validateFormSchema = Yup.object().shape({
         user_phone: Yup.string()
-            .phone()
-            .required('Required'),
+            .phone('380', false, t('fieldRequired') ?? '')
     });
 
     const [toastStatus, setToastStatus] = useState<boolean>(false);
@@ -74,7 +75,7 @@ const Callback = () => {
                                      }) => (
                                         <form className={classNames(styles['callback__form'], styles['callback-form'], 'form-319')} onSubmit={handleSubmit}>
                                             <div className={styles['callback__inp-wrapper']}>
-                                                <label className={styles['callback__label']} htmlFor="callback-phone">Ваш номер телефона</label>
+                                                <label className={styles['callback__label']} htmlFor="callback-phone">{t('formCallbackLabelPhone')}</label>
 
                                                 <div className={styles['callback__inp-inner']}>
                                                     <InputMask

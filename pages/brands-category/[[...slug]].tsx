@@ -15,6 +15,8 @@ import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
 import {getCookie} from "cookies-next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface BrandsCategoryProps {
@@ -42,6 +44,7 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
         cartData
     } = props;
 
+    const {t} = useTranslation('common');
     const [postItems, setPostItems] = useState<BrandProp[]>(posts);
 
     const dispatch = useDispatch();
@@ -73,7 +76,7 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
                     />
 
                     <BrandsIntro
-                        title={"Бренды"}
+                        title={t('brands')}
                         categories={categories}
                         posts={postItems}
                         updatePosts={setPostItems}
@@ -89,7 +92,7 @@ export default BrandsCategory;
 export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req}) => {
     const apolloClient = getApolloClient();
 
-    const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/product_cat/`, {
+    const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brands-category/`, {
         params: {
             slug: params?.slug?.[0] ?? '',
             lang: locale,
@@ -105,12 +108,12 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             lang: locale,
             _embed: true,
             order: 'asc',
-            tax_name: 'product_cat',
+            tax_name: 'brands-category',
             category_slug: params?.slug?.[0] ?? '',
         }
     })
 
-    const brands_cats = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/product_cat/`, {
+    const brands_cats = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brands-category/`, {
         params: {
             lang: locale,
             hide_empty: true,
@@ -129,6 +132,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -219,7 +225,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             posts: resultDat.posts,
             page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
             nonce: resultDat.nonce.nonce,
-            cartData: resultDat.cart
+            cartData: resultDat.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

@@ -6,6 +6,7 @@ import {useRouter} from "next/router";
 import {SettingsContext} from "@pages/_app";
 import axios from "axios";
 import {BrandProp} from "@components/Cards/BrandCard/BrandCard";
+import {useTranslation} from "next-i18next";
 
 
 interface BrandsIntroBtnLoadProps {
@@ -15,6 +16,7 @@ interface BrandsIntroBtnLoadProps {
 const BrandsIntroBtnLoad:React.FC<BrandsIntroBtnLoadProps> = ({updatePosts}) => {
     const router = useRouter();
     const settingsCtx = useContext(SettingsContext);
+    const {t} = useTranslation('common');
 
     const [page, setPage] = useState<number>(!isNaN(parseInt(router?.query?.slug?.[router?.query?.slug?.length-1]?.toString() ?? '1') + 1) ? parseInt(router?.query?.slug?.[router?.query?.slug?.length-1]?.toString() ?? '1') + 1 : 2);
     const [postsUpdated, setPostsUpdated] = useState<boolean>(false);
@@ -83,7 +85,7 @@ const BrandsIntroBtnLoad:React.FC<BrandsIntroBtnLoadProps> = ({updatePosts}) => 
                         </svg>
                     </span>
 
-                    <span className={classNames(styles['brands__btn-text'], 'load-btn__text')}>Загрузить еще</span>
+                    <span className={classNames(styles['brands__btn-text'], 'load-btn__text')}>{t('loadMore')}</span>
                 </button>
             </div>
         );

@@ -5,6 +5,7 @@ import {convertToDefaultAttrs, removeMultipleSlashes} from "@utils/stringHelper"
 import Link from "next/link";
 import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {If, Then} from "react-if";
+import {useTranslation} from "next-i18next";
 
 
 interface ProductCategoryFiltersProps {
@@ -13,6 +14,7 @@ interface ProductCategoryFiltersProps {
 
 const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_filter}) => {
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     let current_link:string = '';
 
@@ -97,10 +99,10 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
     {
         return (
             <div className={styles['product-category-filters']}>
-                <div className={styles['product-category-filters__text']}>Выбрано:</div>
+                <div className={styles['product-category-filters__text']}>{t('selected')}:</div>
 
                 <div className={styles['product-category-filters__list']}>
-                    <div className={styles['product-category-filters__text']}>Выбрано:</div>
+                    <div className={styles['product-category-filters__text']}>{t('selected')}:</div>
 
                     {
                         itemsFilterIsOpen.map((item, i) => (
@@ -132,7 +134,7 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
                         router.push(current_link);
                     }}
                     className={styles['product-category-filters__btn']}
-                >Сбросить все фильтры</button>
+                >{t('resetFilters')}</button>
             </div>
         )
     }

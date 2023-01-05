@@ -3,6 +3,7 @@ import styles from './ProductCategoryContent.module.scss';
 import sprite from '@icons/sprite.svg'
 import {If, Then} from "react-if";
 import classNames from "classnames";
+import {useTranslation} from "next-i18next";
 
 
 interface ProductCategoryBtnsProps {
@@ -11,6 +12,8 @@ interface ProductCategoryBtnsProps {
 }
 
 const ProductCategoryBtns: React.FC<ProductCategoryBtnsProps> = ({isSearchPage, setIsOpenFilter}) => {
+    const {t} = useTranslation('common');
+
     return (
         <div className={styles['product-category-btns']}>
             <If condition={!isSearchPage}>
@@ -25,7 +28,7 @@ const ProductCategoryBtns: React.FC<ProductCategoryBtnsProps> = ({isSearchPage, 
                             </svg>
                         </div>
 
-                        <div className={styles['product-category-btns__item-text']}>Фильтр</div>
+                        <div className={styles['product-category-btns__item-text']}>{t('filter')}</div>
                     </div>
                 </Then>
             </If>
@@ -41,7 +44,7 @@ const ProductCategoryBtns: React.FC<ProductCategoryBtnsProps> = ({isSearchPage, 
                     </svg>
                 </div>
 
-                <div className={styles['product-category-btns__item-text']}>Сортировка</div>
+                <div className={styles['product-category-btns__item-text']}>{t('sort')}</div>
             </div>
         </div>
     )

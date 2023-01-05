@@ -18,6 +18,7 @@ import {SettingsContext} from "@pages/_app";
 import axios from "axios";
 import {getCookie, setCookie} from "cookies-next";
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 interface CheckoutIntroProps {
@@ -57,6 +58,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     const novaPoshtaRequest = new NovaPoshta({ apiKey: process.env.NEXT_PUBLIC_ENV_NP_API_KEY });
 
@@ -74,33 +76,32 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
 
     const validateFormSchema = Yup.object().shape({
         user_name: Yup.string()
-            .min(2, 'Too Short!')
-            .max(50, 'Too Long!')
-            .matches(/^[\p{Script=Cyrl}\s]*$/u, 'Is not in correct format')
+            .min(2, t('errorShort') ?? '')
+            .max(50, t('errorLong') ?? '')
+            .matches(/^[\p{Script=Cyrl}\s]*$/u, t('errorNotCorrectFormat') ?? '')
             .trim()
-            .required('Required'),
+            .required(t('fieldRequired') ?? ''),
         user_surname: Yup.string()
-            .min(2, 'Too Short!')
-            .max(50, 'Too Long!')
-            .matches(/^[\p{Script=Cyrl}\s]*$/u, 'Is not in correct format')
+            .min(2, t('errorShort') ?? '')
+            .max(50, t('errorLong') ?? '')
+            .matches(/^[\p{Script=Cyrl}\s]*$/u, t('errorNotCorrectFormat') ?? '')
             .trim()
-            .required('Required'),
+            .required(t('fieldRequired') ?? ''),
         user_phone: Yup.string()
-            .phone()
-            .required('Required'),
+            .phone('380', true, t('fieldRequired') ?? ''),
         user_email: Yup.string()
             .email()
-            .required('Required'),
+            .required(t('fieldRequired') ?? ''),
         delivery_type: Yup.string(),
-        user_agreed: Yup.bool().oneOf([true], 'Field must be checked'),
+        user_agreed: Yup.bool().oneOf([true], t('fieldRequired') ?? ''),
         shop_street: Yup.string().when('delivery_type', {
             is: (arg:string) => arg === '2',
-            then: Yup.string().required('Field is required'),
+            then: Yup.string().required(t('fieldRequired') ?? ''),
             otherwise: Yup.string()
         }),
         shop_house: Yup.number().when('delivery_type', {
             is: (arg:string) => arg === '2',
-            then: Yup.number().required('Field is required'),
+            then: Yup.number().required(t('fieldRequired') ?? ''),
             otherwise: Yup.number()
         }),
         np_department: Yup.object().shape({
@@ -113,18 +114,18 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
             label: Yup.string(),
             value: Yup.string().when('delivery_type', {
                 is: (arg:string) => arg === '3',
-                then: Yup.string().required('Field is required'),
+                then: Yup.string().required(t('fieldRequired') ?? ''),
                 otherwise: Yup.string()
             }),
         }),
         np_street: Yup.string().when('delivery_type', {
             is: (arg:string) => arg === '4',
-            then: Yup.string().required('Field is required'),
+            then: Yup.string().required(t('fieldRequired') ?? ''),
             otherwise: Yup.string()
         }),
         np_house: Yup.number().when('delivery_type', {
             is: (arg:string) => arg === '4',
-            then: Yup.number().min(1).required('Field is required'),
+            then: Yup.number().min(1).required(t('fieldRequired') ?? ''),
             otherwise: Yup.number()
         }),
     });
@@ -168,21 +169,21 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                         setSubmitting(true);
 
                         let shipping_title: string = '';
-                        let payment_method: string = values.payment_type === '1' ? 'Наличными' : 'Картой на сайте';
+                        let payment_method: string = values.payment_type === '1' ? t('paymentCash') : t('paymentCard');
 
                         switch (values.delivery_type)
                         {
                             case '1':
-                                shipping_title = 'Самовывоз из магазина';
+                                shipping_title = t('shippingStorePickup');
                                 break;
                             case '2':
-                                shipping_title = 'Курьером по адресу (от магазина)';
+                                shipping_title = t('shippingStoreCourier');
                                 break;
                             case '3':
-                                shipping_title = 'В отделение «Новая Почта»';
+                                shipping_title = t('shippingNPDepartment');
                                 break;
                             case '4':
-                                shipping_title = 'Курьером по адресу (Новая почта)';
+                                shipping_title = t('shippingNPCourier');
                                 break;
                             default:
                                 shipping_title = '';
@@ -206,7 +207,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                 shipping_delivery_house: values.shop_house,
                                 shipping_delivery_floor: values.shop_floor,
                                 shipping_delivery_apartment: values.shop_apartment,
-                                shipping_np_city: `${values.np_city.DescriptionRu}, Область - ${values.np_city.AreaDescriptionRu}`,
+                                shipping_np_city: `${values.np_city.DescriptionRu}, ${t('region')} - ${values.np_city.AreaDescriptionRu}`,
                                 shipping_np_department: values.np_department.label,
                                 shipping_np_street: values.np_street,
                                 shipping_np_house: values.np_house,
@@ -252,7 +253,8 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                              touched,
                              handleChange,
                              handleSubmit,
-                             isSubmitting
+                             isSubmitting,
+                             setFieldTouched
                          }) => (
                             <form className={styles['checkout__from']} onSubmit={handleSubmit}>
                                 <div className={classNames(styles['checkout__info'], styles['checkout-info'])}>
@@ -260,21 +262,24 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                         <div className={styles['checkout-info__header']}>
                                             <div className={styles['checkout-info__header-number']}>1</div>
 
-                                            <div className={styles['checkout-info__header-title']}>Контактные данные</div>
+                                            <div className={styles['checkout-info__header-title']}>{t('contactData')}</div>
                                         </div>
 
                                         <div className={styles['checkout-info__inps']}>
                                             <div className={styles['checkout-info__inp-wrapper']}>
-                                                <label className={styles['checkout-info__label']} htmlFor="checkout-first-name">Имя</label>
+                                                <label className={styles['checkout-info__label']} htmlFor="checkout-first-name">{t('modalCallbackLabelName')}</label>
 
                                                 <div className={styles['checkout-info__inp-inner']}>
                                                     <input
                                                         className={styles['checkout-info__inp']}
                                                         id="checkout-first-name"
                                                         name="user_name"
-                                                        onChange={handleChange}
+                                                        onChange={(e)=>{
+                                                            setFieldTouched('user_name');
+                                                            handleChange(e);
+                                                        }}
                                                         autoComplete="off"
-                                                        placeholder="Ваше имя"
+                                                        placeholder={t('modalCallbackPlaceholderName') ?? ''}
                                                         type="text"
                                                         value={values.user_name}
                                                     />
@@ -290,7 +295,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                             </div>
 
                                             <div className={styles['checkout-info__inp-wrapper']}>
-                                                <label className={styles['checkout-info__label']} htmlFor="checkout-last-name">Фамилия</label>
+                                                <label className={styles['checkout-info__label']} htmlFor="checkout-last-name">{t('modalCallBackLabelSurname')}</label>
 
                                                 <div className={styles['checkout-info__inp-inner']}>
                                                     <input
@@ -298,9 +303,12 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         id="checkout-last-name"
                                                         name="user_surname"
                                                         autoComplete="off"
-                                                        placeholder="Ваша фамилия"
+                                                        placeholder={t('modalCallbackPlaceholderSurname') ?? ''}
                                                         type="text"
-                                                        onChange={handleChange}
+                                                        onChange={(e)=>{
+                                                            setFieldTouched('user_surname');
+                                                            handleChange(e);
+                                                        }}
                                                         value={values.user_surname}
                                                     />
                                                 </div>
@@ -315,7 +323,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                             </div>
 
                                             <div className={styles['checkout-info__inp-wrapper']}>
-                                                <label className={styles['checkout-info__label']} htmlFor="checkout-phone">Мобильный телефон</label>
+                                                <label className={styles['checkout-info__label']} htmlFor="checkout-phone">{t('checkoutPhoneLabel')}</label>
 
                                                 <div className={styles['checkout-info__inp-inner']}>
                                                     <InputMask
@@ -327,7 +335,10 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         maskPlaceholder="+38 (___) ___-__-__"
                                                         placeholder="+38 (000) ___ __ __"
                                                         type="tel"
-                                                        onChange={handleChange}
+                                                        onChange={(e)=>{
+                                                            setFieldTouched('user_phone');
+                                                            handleChange(e);
+                                                        }}
                                                         value={values.user_phone}
                                                     />
                                                 </div>
@@ -353,7 +364,10 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         placeholder="Email"
                                                         type="email"
                                                         value={values.user_email}
-                                                        onChange={handleChange}
+                                                        onChange={(e)=>{
+                                                            setFieldTouched('user_email');
+                                                            handleChange(e);
+                                                        }}
                                                     />
                                                 </div>
 
@@ -376,11 +390,11 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                         <div className={styles['checkout-info__header']}>
                                             <div className={styles['checkout-info__header-number']}>2</div>
 
-                                            <div className={styles['checkout-info__header-title']}>Доставка</div>
+                                            <div className={styles['checkout-info__header-title']}>{t('deliveryTitle')}</div>
                                         </div>
 
                                         <div className={classNames(styles['checkout-info__delivery'], styles['checkout-info__select'])}>
-                                            <span className={styles['checkout-info__label']}>Выберите способ доставки:</span>
+                                            <span className={styles['checkout-info__label']}>{t('deliveryType')}:</span>
 
                                             <div className={styles['checkout-info__inner']}>
                                                 <div className={styles['checkout-info__select-item']}>
@@ -412,7 +426,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
 
                                                         <span className={styles['checkout-info__select-check']}/>
 
-                                                        <span className={styles['checkout-info__select-text']}>Самовывоз из магазина</span>
+                                                        <span className={styles['checkout-info__select-text']}>{t('shippingStorePickup')}</span>
                                                     </label>
                                                 </div>
 
@@ -446,7 +460,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         <span className={styles['checkout-info__select-check']}/>
 
                                                         <span className={styles['checkout-info__select-desc']}>
-                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу (от магазина)</span>
+                                                            <span className={styles['checkout-info__select-text']}>{t('shippingStoreCourier')}</span>
                                                         </span>
                                                     </label>
                                                 </div>
@@ -481,7 +495,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         <span className={styles['checkout-info__select-check']}/>
 
                                                         <span className={styles['checkout-info__select-desc']}>
-                                                            <span className={styles['checkout-info__select-text']}>В отделение «Новая Почта»</span>
+                                                            <span className={styles['checkout-info__select-text']}>{t('shippingNPDepartment')}</span>
                                                         </span>
                                                     </label>
                                                 </div>
@@ -516,7 +530,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         <span className={styles['checkout-info__select-check']}/>
 
                                                         <span className={styles['checkout-info__select-desc']}>
-                                                            <span className={styles['checkout-info__select-text']}>Курьером по адресу</span>
+                                                            <span className={styles['checkout-info__select-text']}>{t('shippingCourier')}</span>
                                                         </span>
                                                     </label>
                                                 </div>
@@ -525,7 +539,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                             {
                                                 values.delivery_type === '1' &&
                                                 <div className={styles['checkout-info__delivery-block']}>
-                                                    <span className={styles['checkout-info__delivery-block__title']}>Выберите удобный магазин:</span>
+                                                    <span className={styles['checkout-info__delivery-block__title']}>{t('shippingShopTitle')}:</span>
 
                                                     <Select<DeliverShopProps, false, DeliverShopsProps>
                                                         className={styles['checkout-info__delivery-block__select']}
@@ -545,7 +559,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                 values.delivery_type === '2' &&
                                                 <>
                                                     <div className={styles['checkout-info__delivery-block']}>
-                                                        <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>{t('checkoutCityTitle')}:</span>
 
                                                         <Select
                                                             className={styles['checkout-info__delivery-block__select']}
@@ -554,23 +568,26 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                 setFieldValue('shop_city', val);
                                                             }}
                                                             defaultValue={values.shop_city}
-                                                            placeholder="Город"
+                                                            placeholder={t('cityTitle') ?? ''}
                                                             name={'shop_city'}
                                                         />
                                                     </div>
 
                                                     <div className={styles['checkout-info__inps']}>
                                                         <div className={styles['checkout-info__inp-wrapper']}>
-                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-street">Улица</label>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-street">{t('streetTitle')}</label>
 
                                                             <div className={styles['checkout-info__inp-inner']}>
                                                                 <input
                                                                     className={styles['checkout-info__inp']}
                                                                     id="checkout-shop-street"
                                                                     name="shop_street"
-                                                                    onChange={handleChange}
+                                                                    onChange={(e)=>{
+                                                                        setFieldTouched('shop_street');
+                                                                        handleChange(e);
+                                                                    }}
                                                                     autoComplete="off"
-                                                                    placeholder="Улица"
+                                                                    placeholder={t('streetTitle') ?? ''}
                                                                     type="text"
                                                                     value={values.shop_street}
                                                                 />
@@ -586,7 +603,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         </div>
 
                                                         <div className={styles['checkout-info__inp-wrapper']}>
-                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-house">Дом</label>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-house">{t('houseTitle')}</label>
 
                                                             <div className={styles['checkout-info__inp-inner']}>
                                                                 <input
@@ -595,8 +612,11 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                     name="shop_house"
                                                                     autoComplete="off"
                                                                     placeholder="№"
-                                                                    type="text"
-                                                                    onChange={handleChange}
+                                                                    type="number"
+                                                                    onChange={(e)=>{
+                                                                        setFieldTouched('shop_house');
+                                                                        handleChange(e);
+                                                                    }}
                                                                     value={values.shop_house}
                                                                 />
                                                             </div>
@@ -611,7 +631,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         </div>
 
                                                         <div className={styles['checkout-info__inp-wrapper']}>
-                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-floor">Этаж</label>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-floor">{t('floorTitle')}</label>
 
                                                             <div className={styles['checkout-info__inp-inner']}>
                                                                 <input
@@ -620,8 +640,11 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                     name="shop_floor"
                                                                     autoComplete="off"
                                                                     placeholder="1"
-                                                                    type="text"
-                                                                    onChange={handleChange}
+                                                                    type="number"
+                                                                    onChange={(e)=>{
+                                                                        setFieldTouched('shop_floor');
+                                                                        handleChange(e);
+                                                                    }}
                                                                     value={values.shop_floor}
                                                                 />
                                                             </div>
@@ -636,7 +659,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         </div>
 
                                                         <div className={styles['checkout-info__inp-wrapper']}>
-                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-apartment">Квартира</label>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-shop-apartment">{t('apartmentTitle')}</label>
 
                                                             <div className={styles['checkout-info__inp-inner']}>
                                                                 <input
@@ -646,7 +669,10 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                     autoComplete="off"
                                                                     placeholder="№"
                                                                     type="text"
-                                                                    onChange={handleChange}
+                                                                    onChange={(e)=>{
+                                                                        setFieldTouched('shop_apartment');
+                                                                        handleChange(e);
+                                                                    }}
                                                                     value={values.shop_apartment}
                                                                 />
                                                             </div>
@@ -667,7 +693,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                 values.delivery_type === '3' &&
                                                 <>
                                                     <div className={styles['checkout-info__delivery-block']}>
-                                                        <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>{t('checkoutCityTitle')}:</span>
 
                                                         <Select
                                                             className={styles['checkout-info__delivery-block__select']}
@@ -699,13 +725,13 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                     });
 
                                                             }}
-                                                            placeholder="Город"
+                                                            placeholder={t('cityTitle') ?? ''}
                                                             name={'np_city'}
                                                         />
                                                     </div>
 
                                                     <div className={styles['checkout-info__delivery-block']}>
-                                                        <span className={styles['checkout-info__delivery-block__title']}>Номер отделения Новая Почта:</span>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>{t('checkoutNPTitle')}:</span>
 
                                                         <Select
                                                             className={styles['checkout-info__delivery-block__select']}
@@ -731,7 +757,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                 values.delivery_type === '4' &&
                                                 <>
                                                     <div className={styles['checkout-info__delivery-block']}>
-                                                        <span className={styles['checkout-info__delivery-block__title']}>Укажите город:</span>
+                                                        <span className={styles['checkout-info__delivery-block__title']}>{t('checkoutCityTitle')}:</span>
 
                                                         <Select
                                                             className={styles['checkout-info__delivery-block__select']}
@@ -740,23 +766,26 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                 setFieldValue('np_city', val);
                                                             }}
                                                             defaultValue={npCities[0] ?? values.np_city}
-                                                            placeholder="Город"
+                                                            placeholder={t('cityTitle') ?? ''}
                                                             name={'np_city'}
                                                         />
                                                     </div>
 
                                                     <div className={styles['checkout-info__inps']}>
                                                         <div className={styles['checkout-info__inp-wrapper']}>
-                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-street">Улица</label>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-street">{t('streetTitle')}</label>
 
                                                             <div className={styles['checkout-info__inp-inner']}>
                                                                 <input
                                                                     className={styles['checkout-info__inp']}
                                                                     id="checkout-street"
                                                                     name="np_street"
-                                                                    onChange={handleChange}
+                                                                    onChange={(e)=>{
+                                                                        setFieldTouched('np_street');
+                                                                        handleChange(e);
+                                                                    }}
                                                                     autoComplete="off"
-                                                                    placeholder="Улица"
+                                                                    placeholder={t('streetTitle') ?? ''}
                                                                     type="text"
                                                                     value={values.np_street}
                                                                 />
@@ -772,7 +801,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         </div>
 
                                                         <div className={styles['checkout-info__inp-wrapper']}>
-                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-house">Дом</label>
+                                                            <label className={styles['checkout-info__label']} htmlFor="checkout-house">{t('houseTitle')}</label>
 
                                                             <div className={styles['checkout-info__inp-inner']}>
                                                                 <input
@@ -781,8 +810,11 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                                     name="np_house"
                                                                     autoComplete="off"
                                                                     placeholder="№"
-                                                                    type="text"
-                                                                    onChange={handleChange}
+                                                                    type="number"
+                                                                    onChange={(e)=>{
+                                                                        setFieldTouched('np_house');
+                                                                        handleChange(e);
+                                                                    }}
                                                                     value={values.np_house}
                                                                 />
                                                             </div>
@@ -805,11 +837,11 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                         <div className={styles['checkout-info__header']}>
                                             <div className={styles['checkout-info__header-number']}>3</div>
 
-                                            <div className={styles['checkout-info__header-title']}>Метод оплаты</div>
+                                            <div className={styles['checkout-info__header-title']}>{t('checkoutPaymentType')}</div>
                                         </div>
 
                                         <div className={classNames(styles['checkout-info__pay'], styles['checkout-info__select'])}>
-                                            <span className={styles['checkout-info__label']}>Выберите метод оплаты</span>
+                                            <span className={styles['checkout-info__label']}>{t('checkoutSelectPayment')}</span>
 
                                             <div className={styles['checkout-info__inner']}>
                                                 <div className={styles['checkout-info__select-item']}>
@@ -833,7 +865,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
 
                                                         <span className={styles['checkout-info__select-check']}/>
 
-                                                        <span className={styles['checkout-info__select-text']}>Наличными</span>
+                                                        <span className={styles['checkout-info__select-text']}>{t('paymentCash')}</span>
                                                     </label>
                                                 </div>
 
@@ -856,14 +888,14 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
 
                                                         <span className={styles['checkout-info__select-check']}/>
 
-                                                        <span className={styles['checkout-info__select-text']}>Картой на сайте</span>
+                                                        <span className={styles['checkout-info__select-text']}>{t('paymentCard')}</span>
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className={styles['checkout-info__textarea-wrapper']}>
-                                            <label className={styles['checkout-info__label']} htmlFor="checkout-message">Добавить комментарий</label>
+                                            <label className={styles['checkout-info__label']} htmlFor="checkout-message">{t('addComment')}</label>
 
                                             <div className={styles['checkout-info__textarea-inner']}>
                                                 <textarea
@@ -873,7 +905,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                     onChange={handleChange}
                                                     value={values.user_comment}
                                                     autoComplete="off"
-                                                    placeholder="Напишите что считаете важным"
+                                                    placeholder={t('commentPlaceholder') ?? ''}
                                                 />
                                             </div>
                                         </div>
@@ -887,7 +919,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                         />
 
                                         <div className={styles['checkout-content__code']}>
-                                            <label className={styles['checkout-content__code-label']} htmlFor="checkout-code">Промокод</label>
+                                            <label className={styles['checkout-content__code-label']} htmlFor="checkout-code">{t('promoTitle')}</label>
 
                                             <div className={styles['checkout-content__code-inp-wrapper']}>
                                                 <input
@@ -896,7 +928,7 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                     name="user_promo"
                                                     onChange={handleChange}
                                                     autoComplete="off"
-                                                    placeholder="Есть промокод? Укажите его здесь"
+                                                    placeholder={t('promoPlaceholder') ?? ''}
                                                     type="text"
                                                     value={values.user_promo}
                                                 />
@@ -906,34 +938,34 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                         <div className={styles['checkout-content__total']}>
                                             <div className={styles['checkout-content__total-section']}>
                                                 <div className={styles['checkout-content__total-item']}>
-                                                    <div className={styles['checkout-content__total-title']}>Вместе:</div>
+                                                    <div className={styles['checkout-content__total-title']}>{t('togetherTitle')}:</div>
 
-                                                    <div className={styles['checkout-content__total-value']}>{cartData.total_amount} {cartData.total_amount > 1 ? 'товара': 'товар'} на сумму</div>
+                                                    <div className={styles['checkout-content__total-value']}>{cartData.total_amount} {cartData.total_amount > 1 ? t('productsAmount'): t('productsSingle')} {t('priceAmount')}</div>
                                                 </div>
 
                                                 <div className={styles['checkout-content__total-item']}>
-                                                    <div className={styles['checkout-content__total-title']}>Цена доставки:</div>
+                                                    <div className={styles['checkout-content__total-title']}>{t('shippingPrice')}:</div>
 
                                                     <div className={styles['checkout-content__total-value']}>
                                                         {
                                                             values.delivery_type === '1' &&
-                                                            <span>Бесплатно</span>
+                                                            <span>{t('free')}</span>
                                                         }
 
                                                         {
                                                             values.delivery_type === '2'&&
-                                                            <span>Уточнить у менеджера</span>
+                                                            <span>{t('managerPrice')}</span>
                                                         }
 
                                                         {
                                                             values.delivery_type !== '1' && values.delivery_type !== '2' &&
-                                                            <span>По тарифам Новой почты</span>
+                                                            <span>{t('NPPrice')}</span>
                                                         }
                                                     </div>
                                                 </div>
 
                                                 <div className={styles['checkout-content__total-item']}>
-                                                    <div className={styles['checkout-content__total-title']}>Итого:</div>
+                                                    <div className={styles['checkout-content__total-title']}>{t('TotalCheckout')}:</div>
 
                                                     <div className={styles['checkout-content__total-value']}>{cartData.total_price} грн</div>
                                                 </div>
@@ -954,15 +986,21 @@ const CheckoutIntro: React.FC<CheckoutIntroProps> = (props) => {
                                                         </svg>
                                                     </span>
 
-                                                    <span className={styles['checkout-content__total-privacy-text']}>
-                                                        Подтверждая заказ, я согласен с <a href="#" target="_blank" rel="noreferrer nofollow">пользовательским соглашением</a>
-                                                    </span>
+                                                    <span className={styles['checkout-content__total-privacy-text']} dangerouslySetInnerHTML={{__html: t('agreedString')}} />
                                                 </label>
+
+                                                <If condition={errors.user_agreed && touched.user_agreed}>
+                                                    <Then>
+                                                        <div className={styles['form-error__msg']}>
+                                                            <ErrorMessage name="user_agreed" />
+                                                        </div>
+                                                    </Then>
+                                                </If>
                                             </div>
 
                                             <div className={styles['checkout-content__total-btn-wrapper']}>
                                                 <button disabled={isSubmitting} type="submit" className={classNames('btn', styles['checkout-content__total-btn'], isSubmitting ? styles.updating : '')}>
-                                                    <span className={classNames(styles['checkout-content__total-btn-text'], 'btn__text')}>Оформить заказ</span>
+                                                    <span className={classNames(styles['checkout-content__total-btn-text'], 'btn__text')}>{t('checkoutOrder')}</span>
                                                 </button>
                                             </div>
                                         </div>

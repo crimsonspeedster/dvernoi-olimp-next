@@ -13,6 +13,7 @@ import Nouislider from "nouislider-react";
 import 'nouislider/distribute/nouislider.css'
 import {PriceRangeProps} from "@root/templates/CatalogCategoryTemplate";
 import {DebounceInput} from "react-debounce-input";
+import {useTranslation} from "next-i18next";
 
 
 interface ProductCategorySidebarProps {
@@ -50,6 +51,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
     } = props;
 
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     let current_link:string = '';
 
@@ -350,7 +352,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                     </svg>
                                 </div>
 
-                                <div className={styles['product-category-sidebar__header-text']}>Фильтры</div>
+                                <div className={styles['product-category-sidebar__header-text']}>{t('filters')}</div>
                             </div>
 
                             <button
@@ -359,7 +361,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                 }}
                                 className={styles['product-category-sidebar__header-btn']}
                             >
-                                Сбросить все фильтры
+                                {t('resetFilters')}
                             </button>
                         </div>
                     </Then>
@@ -404,7 +406,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                     className={classNames(styles['product-category-sidebar__btn'], styles['product-category-sidebar__btn--show'])}
                                     onClick={()=>setGlobalFilterIsOpen(true)}
                                 >
-                                    Показать все фильтры
+                                    {t('showFilters')}
                                 </button>
                             </div>
 
@@ -412,7 +414,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                 <button
                                     onClick={()=>{router.push(current_link)}}
                                     className={classNames(styles['product-category-sidebar__btn'], styles['product-category-sidebar__btn--cancel'])}
-                                >Сбросить фильтры</button>
+                                >{t('resetFilters')}</button>
                             </div>
                         </div>
                     </Then>

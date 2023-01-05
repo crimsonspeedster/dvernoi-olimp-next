@@ -19,6 +19,8 @@ import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {getCookie} from "cookies-next";
 import {CartServerDataProps} from "@pages/cart";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useTranslation} from "next-i18next";
 
 
 interface SearchProps {
@@ -45,6 +47,7 @@ const Search:React.FC<SearchProps> = (props) => {
     } = props;
 
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     const [isOpenFilter, setIsOpenFilter] = useState<boolean>(false);
     const [ isMobile, setIsMobile ] = useState(false);
@@ -96,7 +99,7 @@ const Search:React.FC<SearchProps> = (props) => {
                     </Then>
 
                     <Else>
-                        <div style={{textAlign: "center", marginBottom: "40px", fontSize: "24px"}}>Ничего не найдено</div>
+                        <div style={{textAlign: "center", marginBottom: "40px", fontSize: "24px"}}>{t('nothingFound')}</div>
                     </Else>
                 </If>
 
@@ -159,6 +162,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req, q
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -252,7 +258,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req, q
             total_pages: resultData.total_pages,
             page: parseInt(query.page?.toString() ?? '1'),
             nonce: resultData.nonce.nonce,
-            cartData: resultData.cart
+            cartData: resultData.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

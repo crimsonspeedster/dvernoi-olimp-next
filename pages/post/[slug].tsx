@@ -18,6 +18,8 @@ import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
 import {getCookie} from "cookies-next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface SinglePostProps {
@@ -40,6 +42,7 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
     } = props;
 
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
 
@@ -60,11 +63,6 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
                 },
                 "headline": "${pageData.title.rendered}",
                 "image": "${pageData.featured_image_link}",
-                "author": {
-                    "@type": "ТРЕБА ДОДАТИ ІНФОРМАЦІЮ",
-                    "name": "ТРЕБА ДОДАТИ ІНФОРМАЦІЮ",
-                    "url": "ПОСИЛАННЯ НА АВТОРА"
-                },
                 "publisher": {
                     "@type": "Organization",
                     "name": "${settingsData.company_name}",
@@ -108,7 +106,7 @@ const SinglePost:React.FC<SinglePostProps> = (props) => {
                             <section className={styles['posts-more']}>
                                 <div className="container">
                                     <CardSlider
-                                        block_title={'Вам будет интересно'}
+                                        block_title={t('youInterested')}
                                         sliderItems={posts}
                                         perViewAmount={3}
                                         cardType={'post'}
@@ -155,6 +153,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -252,7 +253,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             menus,
             posts,
             nonce: resultDat.nonce.nonce,
-            cartData: resultDat.cart
+            cartData: resultDat.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     };
 }

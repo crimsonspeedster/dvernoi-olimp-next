@@ -3,6 +3,7 @@ import styles from './Intro.module.scss';
 import classNames from "classnames";
 import {useRouter} from "next/router";
 import Link from "next/link";
+import {useTranslation} from "next-i18next";
 
 interface BlogIntroCategoriesProps {
     categories: categoriesProps[],
@@ -18,6 +19,7 @@ export interface categoriesProps {
 
 const BlogIntroCategories:React.FC<BlogIntroCategoriesProps> = ({categories}) => {
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['blog-intro__categories'], styles['blog-intro-categories'])}>
@@ -26,7 +28,7 @@ const BlogIntroCategories:React.FC<BlogIntroCategoriesProps> = ({categories}) =>
                 href={"/poleznoe"}
                 locale={router.locale}
             >
-                Все категории
+                {t('allCategories')}
             </Link>
 
             {

@@ -15,6 +15,7 @@ import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
 import {getCookie} from "cookies-next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface BrandsProps {
@@ -108,11 +109,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         }
     })
 
-    const brands_cats = axios.get(`${process.env.NEXT_PUBLIC_ENV_WOO_API}/products/categories`, {
+    const brands_cats = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brands-category/`, {
         params: {
             lang: locale,
-            consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
-            consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
             hide_empty: true,
         }
     });
@@ -121,6 +120,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -213,7 +215,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             posts: resData.posts,
             nonce: resData.nonce.nonce,
             page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
-            cartData: resData.cart
+            cartData: resData.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

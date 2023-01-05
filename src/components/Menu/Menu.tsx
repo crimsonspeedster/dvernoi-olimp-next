@@ -7,6 +7,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import {menuItemProp} from "@components/Header/interfaces";
 import {Else, If, Then} from "react-if";
+import {useTranslation} from "next-i18next";
 
 interface MenuProps {
     isTablet: boolean
@@ -20,6 +21,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
     const settingsCtx = useContext(SettingsContext).menus;
     const header_top_menu: menuItemProp[] = settingsCtx.header_top;
     const catalog_menu: menuItemProp[] = settingsCtx.header_catalog;
+    const {t} = useTranslation('common');
 
     return (
         <nav className={styles['menu']}>
@@ -27,7 +29,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                 {
                     isTablet &&
                     <li className={classNames(styles['menu-list__item'], styles['menu-list__item--has-children'])}>
-                        <Link className={styles['menu-list__link']} href={'/'}>Каталог товарів</Link>
+                        <span className={styles['menu-list__link']}>{t('catalogTitle')}</span>
 
                         <svg
                             className={styles['menu-list__icon']}
@@ -45,7 +47,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                                         <svg><use href={`${sprite.src}#catalog-arrow`}/></svg>
                                     </span>
 
-                                    <span className={styles['menu-list__item-panel-text']}>Назад</span>
+                                    <span className={styles['menu-list__item-panel-text']}>{t('backTitle')}</span>
                             </button>
 
                             <div className={styles['menu-list__item-panel-list']}>
@@ -82,7 +84,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                                                                 <svg><use href={`${sprite.src}#catalog-arrow`}/></svg>
                                                             </span>
 
-                                                            <span className={styles['menu-list__item-panel-text']}>Назад</span>
+                                                            <span className={styles['menu-list__item-panel-text']}>{t('backTitle')}</span>
                                                         </button>
 
                                                             <If condition={item.childItems.nodes.length}>
@@ -129,8 +131,16 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                     header_top_menu.map((item, i) => (
                         <If key={i} condition={item.childItems.nodes.length}>
                             <Then>
-                                <li className={classNames(styles['menu-list__item'], styles['menu-list__item--has-children'])}>
-                                    <Link className={styles['menu-list__link']} href={item.url}>{item.label}</Link>
+                                <li className={classNames(styles['menu-list__item'], styles['menu-list__item--has-children'])} data-test={item.url}>
+                                    <If condition={item.url}>
+                                        <Then>
+                                            <Link className={styles['menu-list__link']} href={item.url}>{item.label}</Link>
+                                        </Then>
+
+                                        <Else>
+                                            <span className={styles['menu-list__link']}>{item.label}</span>
+                                        </Else>
+                                    </If>
 
                                     <svg
                                         className={styles['menu-list__icon']}
@@ -148,7 +158,7 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                                                 <svg><use href={`${sprite.src}#catalog-arrow`} /></svg>
                                             </span>
 
-                                            <span className={styles['menu-list__item-panel-text']}>Назад</span>
+                                            <span className={styles['menu-list__item-panel-text']}>{t('backTitle')}</span>
                                         </button>
 
                                         <div className={styles['menu-list__item-panel-list']}>
@@ -163,7 +173,14 @@ const Menu: React.FC<MenuProps> = ({isTablet, openSubmenu, closeSubmenu, openSub
                             </Then>
                             <Else>
                                 <li className={styles['menu-list__item']}>
-                                    <Link className={styles['menu-list__link']} href={item.url}>{item.label}</Link>
+                                    <If condition={item.url}>
+                                        <Then>
+                                            <Link className={styles['menu-list__link']} href={item.url}>{item.label}</Link>
+                                        </Then>
+                                        <Else>
+                                            <span className={styles['menu-list__link']}>{item.label}</span>
+                                        </Else>
+                                    </If>
                                 </li>
                             </Else>
                         </If>

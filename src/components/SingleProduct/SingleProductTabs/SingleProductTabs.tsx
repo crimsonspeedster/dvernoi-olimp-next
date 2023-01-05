@@ -6,6 +6,8 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import {acfProductProps} from "@components/Header/HeaderSearch";
 import {If, Then} from "react-if";
 import VideoCard from "@components/Cards/VideoCard/VideoCard";
+import {removeMultipleSlashes} from "@utils/stringHelper";
+import {useTranslation} from "next-i18next";
 
 
 interface SingleProductTabsProps {
@@ -19,7 +21,9 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
         description,
     } = props;
 
-    if (description || acf.enable_characteristics || acf.video_group.enable_video)
+    const {t} = useTranslation('common');
+
+    if (description || acf.enable_characteristics || acf.video_group?.enable_video)
     {
         return (
             <section className={styles['single-product-tabs']}>
@@ -28,17 +32,17 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
                         <TabList className={styles['single-product-tabs__nav']}>
                             {
                                 description &&
-                                <Tab className={styles['single-product-tabs__nav-item']}>Описание</Tab>
+                                <Tab className={styles['single-product-tabs__nav-item']}>{t('description')}</Tab>
                             }
 
                             {
-                                acf.video_group.enable_video &&
-                                <Tab className={styles['single-product-tabs__nav-item']}>Видео</Tab>
+                                acf.video_group?.enable_video &&
+                                <Tab className={styles['single-product-tabs__nav-item']}>{t('video')}</Tab>
                             }
 
                             {
                                 acf.enable_characteristics &&
-                                <Tab className={styles['single-product-tabs__nav-item']}>Характеристики</Tab>
+                                <Tab className={styles['single-product-tabs__nav-item']}>{t('characteristics')}</Tab>
                             }
                         </TabList>
 
@@ -47,7 +51,7 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
                                 description &&
                                 <TabPanel className={styles['single-product-tabs__body-item']}>
                                     <div className={styles['single-product-tabs__desc']}>
-                                        <If condition={acf.akciya.enable}>
+                                        <If condition={acf.akciya?.enable}>
                                             <Then>
                                                 <div className={styles['single-product-tabs__sale']}>
                                                     <div className={styles['single-product-tabs__sale-bg']}>
@@ -60,11 +64,11 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
                                                         }
                                                     </div>
 
-                                                    <span className={styles['single-product-tabs__sale-label']}>Акция</span>
+                                                    <span className={styles['single-product-tabs__sale-label']}>{t('labelPromo')}</span>
 
-                                                    <h2 className={styles['single-product-tabs__sale-title']}>Акция</h2>
+                                                    <h2 className={styles['single-product-tabs__sale-title']}>{t('labelPromo')}</h2>
 
-                                                    <div className={styles['single-product-tabs__sale-desc']} dangerouslySetInnerHTML={{__html: acf.akciya.description}} />
+                                                    <div className={styles['single-product-tabs__sale-desc']} dangerouslySetInnerHTML={{__html: acf.akciya?.description}} />
                                                 </div>
                                             </Then>
                                         </If>
@@ -75,7 +79,7 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
                             }
 
                             {
-                                acf.video_group.enable_video &&
+                                acf.video_group?.enable_video &&
                                 <TabPanel className={styles['single-product-tabs__body-item']}>
                                     <div className={styles['single-product-tabs__video']}>
                                         <VideoCard

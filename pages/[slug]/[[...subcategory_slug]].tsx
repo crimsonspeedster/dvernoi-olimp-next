@@ -24,6 +24,8 @@ import {removeMultipleSpaces} from "@utils/stringHelper";
 import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface SubCategoryProps {
@@ -52,6 +54,7 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
     } = props;
 
     const [productItems, setProductItems] = useState<ProductCardProps[]>(products);
+    const {t} = useTranslation('common');
 
     const dispatch = useDispatch();
 
@@ -64,8 +67,8 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
     }, [products]);
 
     const [pageTitle, setPageTitle] = useState<string>(pageData.name);
-    const [seoTitle, setSeoTitle] = useState<string>(`${pageData.name} - купить ${pageData.name} в Украине, цена на ${pageData.name} в интернет магазине дверей ${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}`);
-    const [seoDescription, setSeoDescription] = useState<string>(`${pageData.name} ✅  - купить по самым лучшим ценам в Украине 🔝 , заказать ${pageData.name} прямо сейчас ✅ в интернет магазине ${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}`);
+    const [seoTitle, setSeoTitle] = useState<string>(t('seoTitle').replace('%s1', pageData.name).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK ?? ''));
+    const [seoDescription, setSeoDescription] = useState<string>(t('seoDescription').replace('%s1', pageData.name).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK ?? ''));
 
     useEffect(()=>{
         let seoTitle:string = pageData.name,
@@ -90,8 +93,8 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         seoDescription = seoTitle += ` ${choosedAttributes.join(', ')}`;
 
         setPageTitle(removeMultipleSpaces(`${pageData.name} ${choosedAttributes.join(', ')}`));
-        setSeoTitle(removeMultipleSpaces(`${seoTitle} - купить ${seoTitle} в Украине, цена на ${seoTitle} в интернет магазине дверей ${process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE}`));
-        setSeoDescription(removeMultipleSpaces(`${seoDescription} ✅  - купить по самым лучшим ценам в Украине 🔝 , заказать ${seoDescription} прямо сейчас ✅ в интернет магазине ${process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE}`));
+        setSeoTitle(removeMultipleSpaces(t('seoTitle').replace('%s1', seoTitle).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE ?? '')));
+        setSeoDescription(removeMultipleSpaces(t('seoDescription').replace('%s1', seoDescription).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE ?? '')));
     }, [pageData.name, pageData.category_filter]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
@@ -131,7 +134,7 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
                         <section className={styles['section-slider--reviewed']}>
                             <div className="container">
                                 <CardSlider
-                                    block_title={'Ранее просмотренные товары'}
+                                    block_title={t('productViewed')}
                                     sliderItems={reviewed_products}
                                     perViewAmount={4}
                                     cardType={'product'}
@@ -224,6 +227,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -341,7 +347,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             total_pages: resData.total_pages,
             reviewed_products,
             nonce: resData.nonce.nonce,
-            cartData: resData.cart
+            cartData: resData.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

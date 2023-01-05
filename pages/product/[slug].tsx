@@ -24,6 +24,8 @@ import SingleProductTogether, {
     SingleProductTogetherProps
 } from "@components/SingleProduct/SingleProductTogether/SingleProductTogether";
 import {setProductSelectedImage} from "@store/product";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface ProductPageProps {
@@ -54,7 +56,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
-
+    const {t} = useTranslation('common');
     const dispatch = useDispatch();
 
     useEffect(()=>{
@@ -108,7 +110,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     <section className={styles['section-bundle']}>
                         <div className="container">
                             <CardSlider
-                                block_title={'Вместе покупают'}
+                                block_title={t('togetherBuying')}
                                 sliderItems={pageData.acf.products_together}
                                 perViewAmount={1}
                                 cardType={'bundle'}
@@ -123,7 +125,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                         <section className={styles['section-slider--same']}>
                             <div className="container">
                                 <CardSlider
-                                    block_title={'Похожие товары'}
+                                    block_title={t('sameProducts')}
                                     sliderItems={products}
                                     perViewAmount={4}
                                     cardType={'product'}
@@ -139,7 +141,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                         <section className={styles['section-slider--reviewed']}>
                             <div className="container">
                                 <CardSlider
-                                    block_title={'Ранее просмотренные товары'}
+                                    block_title={t('productViewed')}
                                     sliderItems={reviewed_products}
                                     perViewAmount={4}
                                     cardType={'product'}
@@ -183,6 +185,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -308,7 +313,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             products,
             reviewed_products,
             nonce: resultDat.nonce.nonce,
-            cartData: resultDat.cart
+            cartData: resultDat.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     };
 }

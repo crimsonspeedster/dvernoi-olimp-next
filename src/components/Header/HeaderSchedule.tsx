@@ -4,6 +4,7 @@ import sprite from '@icons/sprite.svg';
 import classNames from "classnames";
 import {workTimeProps} from "@components/Footer/FooterContacts";
 import {SettingsContext} from "@pages/_app";
+import {useTranslation} from "next-i18next";
 
 
 interface HeaderScheduleProps {
@@ -13,10 +14,11 @@ interface HeaderScheduleProps {
 
 const HeaderSchedule:React.FC<HeaderScheduleProps> = ({isOpenSchedule, setIsOpenSchedule}) => {
     const settingsCtx = useContext(SettingsContext).settings;
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['header__schedule'], styles['header-schedule'])}>
-            <div className={styles['header-schedule__title']}>(бесплатно с любого номера)</div>
+            <div className={styles['header-schedule__title']}>({t('freeNumber')})</div>
 
             <a className={styles['header-schedule__phone']} href={settingsCtx.header_phone.url}>{settingsCtx.header_phone.title}</a>
 
@@ -31,7 +33,7 @@ const HeaderSchedule:React.FC<HeaderScheduleProps> = ({isOpenSchedule, setIsOpen
                         </svg>
                     </div>
 
-                    <div className={styles['header-schedule__list-text']}>График работы</div>
+                    <div className={styles['header-schedule__list-text']}>{t('scheduleTitle')}</div>
                 </div>
 
                 <div className={classNames(styles['header-schedule__panel'], isOpenSchedule ? styles['open'] : '')}>

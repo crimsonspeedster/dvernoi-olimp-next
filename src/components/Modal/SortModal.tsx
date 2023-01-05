@@ -9,36 +9,38 @@ import {getScrollbarWidth} from '@utils/getScrollbarWidth';
 import classNames from "classnames";
 import {useRouter} from "next/router";
 import {SortDropdownProps} from "@components/ProductCategoryContent/ProductCategoryDropdown";
+import {useTranslation} from "next-i18next";
 
 
 const SortModal = () => {
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     const [dropdownList, setDropdownList] = useState<SortDropdownProps[]>([
         {
             id: 1,
-            title: 'По новизне (от новых к старым)',
+            title: t('filterNewDESC'),
             order: 'desc',
             orderBy: 'date',
             isActive: router.query.order === 'desc' && router.query.orderBy === 'date'
         },
         {
             id: 2,
-            title: 'По новизне (от старых к новым)',
+            title: t('filterNewASC'),
             isActive: router.query.order === 'asc' && router.query.orderBy === 'date',
             order: 'asc',
             orderBy: 'date',
         },
         {
             id: 3,
-            title: 'По цене (от меньшего к большему)',
+            title: t('filterPriceDESC'),
             isActive: router.query.order === 'desc' && router.query.orderBy === 'price',
             order: 'desc',
             orderBy: 'price',
         },
         {
             id: 4,
-            title: 'По цене (от большего к меньшему)',
+            title: t('filterPriceASC'),
             isActive: router.query.order === 'asc' && router.query.orderBy === 'price',
             order: 'asc',
             orderBy: 'price',
@@ -113,7 +115,7 @@ const SortModal = () => {
 
     return (
         <div className={classNames(styles['modal'], styles['modal-sort'])} id="sort-modal" style={{display: 'none'}}>
-            <div className={styles['modal__title']}>Сортировка</div>
+            <div className={styles['modal__title']}>{t('sort')}</div>
 
             <div className={classNames(styles['modal__list'], styles['modal-list'])}>
                 {

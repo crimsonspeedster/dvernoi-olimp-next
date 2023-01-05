@@ -5,21 +5,23 @@ import classNames from "classnames";
 import {SettingsContext} from "@pages/_app";
 import {socialLinkProps, workTimeProps} from "@components/Footer/FooterContacts";
 import Image from "next/image";
+import {useTranslation} from "next-i18next";
 
 
 const ContactsIntroInfo = () => {
     const settingsCtx = useContext(SettingsContext).settings;
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['contacts-intro__info'], styles['contacts-intro-info'])}>
             <div className={styles['contacts-intro-info__item']}>
-                <div className={styles['contacts-intro-info__title']}>Бесплатно по всей Украине</div>
+                <div className={styles['contacts-intro-info__title']}>{t('freeUkraine')}</div>
 
                 <a className={styles['contacts-intro-info__phone']} href={settingsCtx.header_phone.url}>{settingsCtx.header_phone.title}</a>
             </div>
 
             <div className={styles['contacts-intro-info__item']}>
-                <div className={styles['contacts-intro-info__title']}>График работы Call Center</div>
+                <div className={styles['contacts-intro-info__title']}>{t('callCenterTitle')}</div>
 
                 <div className={styles['contacts-intro-info__schedule']}>
                     {
@@ -31,7 +33,7 @@ const ContactsIntroInfo = () => {
             </div>
 
             <div className={styles['contacts-intro-info__item']}>
-                <div className={styles['contacts-intro-info__title']}>Написать нам</div>
+                <div className={styles['contacts-intro-info__title']}>{t('writeToUs')}</div>
 
                 <a className={styles['contacts-intro-info__email']} href={`mailto:${settingsCtx.email}`}>{settingsCtx.email}</a>
 
@@ -49,7 +51,7 @@ const ContactsIntroInfo = () => {
             </div>
 
             <div className={styles['contacts-intro-info__item']}>
-                <div className={styles['contacts-intro-info__title']}>Юр. информация</div>
+                <div className={styles['contacts-intro-info__title']}>{t('lawyerTitle')}</div>
 
                 <div className={styles['contacts-intro-info__desc']} dangerouslySetInnerHTML={{__html: settingsCtx.yur_informacziya}} />
             </div>

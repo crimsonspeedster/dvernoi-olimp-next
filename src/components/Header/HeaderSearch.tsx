@@ -9,6 +9,7 @@ import {useRouter} from "next/router";
 import axios from "axios";
 import {PhotoProps} from "@components/About/Intro/Intro";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
+import {useTranslation} from "next-i18next";
 
 
 interface HeaderSearchProps {
@@ -69,6 +70,8 @@ const HeaderSearch:React.FC<HeaderSearchProps> = ({isOpenSearch, setIsOpenSearch
     const [searchData, setSearchData] = useState<ProductCardProps[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
 
+    const {t} = useTranslation('common');
+
     const router = useRouter();
 
     useEffect(()=>{
@@ -119,7 +122,7 @@ const HeaderSearch:React.FC<HeaderSearchProps> = ({isOpenSearch, setIsOpenSearch
                         type="search"
                         name="search"
                         autoComplete="off"
-                        placeholder="Поиск..."
+                        placeholder={`${t('searchTitle')}...`}
                         value={search}
                         onChange={e => setSearch(e.currentTarget.value)}
                     />
@@ -160,12 +163,12 @@ const HeaderSearch:React.FC<HeaderSearchProps> = ({isOpenSearch, setIsOpenSearch
                                         }
 
                                         <div className={styles['header-search__result-btn-wrapper']}>
-                                            <Link href={`/search?s=${search}`} className={styles['header-search__result-btn']}>Показать все результаты</Link>
+                                            <Link href={`/search?s=${search}`} className={styles['header-search__result-btn']}>{t('showAllResults')}</Link>
                                         </div>
                                     </Then>
 
                                     <Else>
-                                        <p>Ничего не найдено</p>
+                                        <p>{t('nothingFound')}</p>
                                     </Else>
                                 </If>
                             </div>

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PhotoPlaceholder from "@icons/clear_photo.png";
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 export interface BrandProp extends PostProp {
@@ -26,6 +27,7 @@ const BrandCard:React.FC<BrandProp> = (props) => {
     } = props;
 
     const router = useRouter();
+    const {t} = useTranslation('common');
 
     return (
         <div className={classNames(styles['brand-card'], `brand-${id}`)}>
@@ -48,7 +50,7 @@ const BrandCard:React.FC<BrandProp> = (props) => {
                     className={styles['brand-card__link']}
                     locale={router.locale}
                 >
-                    Узнать больше
+                    {t('watchMore')}
                 </Link>
             </div>
         </div>

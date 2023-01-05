@@ -3,6 +3,7 @@ import styles from './SeoBlock.module.scss';
 import {isBrowser} from '@utils/isBrowser';
 import classNames from "classnames";
 import {If, Then} from "react-if";
+import {useTranslation} from "next-i18next";
 
 interface SeoBlockProps {
     seoBlock: seoBlockProps
@@ -16,10 +17,11 @@ export interface seoBlockProps {
 
 const SeoBlock: React.FC<SeoBlockProps> = ({seoBlock}) => {
     const [isOpen, setOpen] = useState<boolean>(false);
-    const [btnText, setBtnText] = useState<string>('Узнать больше');
+    const {t} = useTranslation('common');
+    const [btnText, setBtnText] = useState<string>(t('seoBtnDown') ?? '');
 
     useEffect(() => {
-        isOpen ? setBtnText('Свернуть') : setBtnText('Узнать больше');
+        isOpen ? setBtnText(t('seoBtnUp') ?? '') : setBtnText(t('seoBtnDown') ?? '');
     }, [isOpen]);
 
     const toggleBlock = (): void => {

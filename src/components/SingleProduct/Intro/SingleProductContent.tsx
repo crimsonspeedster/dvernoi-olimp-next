@@ -24,6 +24,8 @@ import {getCookie, getCookies, setCookie} from "cookies-next";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {useDispatch} from "react-redux";
 import {setProductSelectedPrice} from "@store/product";
+import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 
 interface SingleProductContentProps {
@@ -93,6 +95,8 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
 
     const settingsCtx = useContext(SettingsContext);
     const dispatch = useDispatch();
+    const router = useRouter();
+    const {t} = useTranslation('common');
 
     const [counter, setCounter] = useState<string>('1');
     const [itemPrice, setItemPrice] = useState<string>(type === 'simple' ? price : currentVariation?.price ?? '0');
@@ -172,6 +176,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/cart/add-item`, {
             nonce: settingsCtx.nonce,
             id,
+            lang: router.locale,
             quantity: counter,
             ...(type === 'variable') && {'variation-id': currentVariation?.id},
             ...(extraData.length > 0) && {cart_item_data: {
@@ -203,7 +208,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         <div className={classNames(styles['single-product-intro__content'], styles['single-product-intro-content'])}>
             <div className={styles['single-product-intro-content__top']}>
                 <div className={styles['single-product-intro-content__number']}>
-                    Код товара: <span>{id}</span>
+                    {t('productCode')}: <span>{id}</span>
                 </div>
             </div>
 
@@ -279,14 +284,14 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                                 <svg><use href={`${sprite.src}#cart`}/></svg>
                             </span>
 
-                            <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text', dataStatus ? styles['updating'] : '')}>Купить</span>
+                            <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text', dataStatus ? styles['updating'] : '')}>{t('buyTitle')}</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <div className={styles['single-product-intro-content__price']}>
-                <p className={styles['single-product-intro-content__price-text']}>Общая стоимость:</p>
+                <p className={styles['single-product-intro-content__price-text']}>{t('selectedPrice')}:</p>
 
                 <div className={styles['single-product-intro-content__price-count']}>
                     <span>{parseInt(itemPrice) + parseInt(extraPrice)}</span> грн / шт.
@@ -300,7 +305,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                             <svg><use href={`${sprite.src}#ruler`}/></svg>
                         </span>
 
-                        <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text')}>Вызвать замерщика</span>
+                        <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text')}>{t('callMaster')}</span>
                     </button>
                 </div>
             </div>
@@ -327,7 +332,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                             <svg><use href={`${sprite.src}#cursor`}/></svg>
                         </span>
 
-                        <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text')}>Купить в 1 клик</span>
+                        <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text')}>{t('buy1Click')}</span>
                     </button>
                 </div>
             </div>

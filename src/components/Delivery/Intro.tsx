@@ -9,6 +9,7 @@ import {Else, If, Then} from "react-if";
 import {AcfDataProps} from "@root/templates/DeliveryTemplate";
 import Image from "next/image";
 import {menuItemProp} from "@components/Header/interfaces";
+import {useTranslation} from "next-i18next";
 
 interface DeliveryIntroProps {
     title: string,
@@ -23,6 +24,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
     } = props;
 
     const settingsCtx = useContext(SettingsContext).menus;
+    const {t} = useTranslation('common');
 
     return (
         <section className={classNames(styles['delivery'], 'intro')}>
@@ -161,7 +163,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
 
                                 <div className={styles['green-text']} dangerouslySetInnerHTML={{__html: acf.pickup.description_after_conditions}} />
 
-                                <strong>Адреса складов:</strong>
+                                <strong>{t('shopAddress')}:</strong>
 
                                 <ul>
                                     {
@@ -396,7 +398,7 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                                 <If condition={settingsCtx.shop_addresses}>
                                     <Then>
                                         <div className={styles['delivery-block__links']}>
-                                            <h4>Адреса магазинов (для просмотра ИНФО нажать НА АДРЕС):</h4>
+                                            <h4>{t('addressInfo')}:</h4>
 
                                             <div className={styles['delivery-block__links-inner']}>
                                                 {

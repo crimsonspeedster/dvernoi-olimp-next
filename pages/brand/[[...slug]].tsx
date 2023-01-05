@@ -21,6 +21,8 @@ import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface BrandProps {
@@ -53,6 +55,7 @@ const Brand:React.FC<BrandProps> = (props) => {
     } = props;
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
+    const {t} = useTranslation('common');
 
     const dispatch = useDispatch();
 
@@ -90,7 +93,7 @@ const Brand:React.FC<BrandProps> = (props) => {
                         title={pageData.title.rendered}
                         content={pageData.acf.kratkoe_opisanie}
                         posts={childPosts}
-                        collectionTitle={'Колекции'}
+                        collectionTitle={t('collections')}
                         category_filter={categoryData.category_filter}
                         productItems={productItems}
                         setProductItems={setProductItems}
@@ -104,7 +107,7 @@ const Brand:React.FC<BrandProps> = (props) => {
                             <section className={styles['section-slider--reviewed']}>
                                 <div className="container">
                                     <CardSlider
-                                        block_title={'Ранее просмотренные товары'}
+                                        block_title={t('productViewed')}
                                         sliderItems={reviewed_products}
                                         perViewAmount={4}
                                         cardType={'product'}
@@ -152,6 +155,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -172,8 +178,19 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         res.end();
     }
 
+    const brandCategoryRequest = await axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brands-category/`, {
+        params: {
+            slug: resultDat.page[0]?.category_main?.slug ?? '',
+            lang: locale,
+            acf_format: 'standard'
+        }
+    })
+        .then((result) => result.data?.[0] ?? {})
+        .catch((error) => {console.log(error)});
+
     const categoryRequestParams:any = {
-        slug: resultDat.page[0].category_main.slug,
+        // slug: resultDat.page[0]?.category_main?.slug ?? '',
+        id: brandCategoryRequest?.acf?.product_category_inner?.term_id ?? 0,
         lang: locale,
         consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
         consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
@@ -182,7 +199,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     const productsRequestParams:any = {
         lang: locale,
-        category: resultDat.page[0].category_main.slug,
+        category: brandCategoryRequest?.acf?.product_category_inner?.term_id ?? 0,
         consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
         consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
         per_page: process.env.NEXT_PUBLIC_ENV_PRODUCTS_PER_PAGE,
@@ -217,7 +234,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             lang: locale,
             _embed: true,
             acf_format: 'standard',
-            parent: resultDat.page[0].id
+            parent: resultDat.page[0]?.id ?? 0
         }
     });
 
@@ -320,7 +337,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             total_pages: subResultDat.total_pages,
             reviewed_products,
             nonce: resultDat.nonce.nonce,
-            cartData: resultDat.cart
+            cartData: resultDat.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     };
 }

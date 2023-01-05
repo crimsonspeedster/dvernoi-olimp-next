@@ -8,6 +8,8 @@ import Layout from "@components/Layout";
 import {SettingsContext} from "@pages/_app";
 import HeadHTML from "@components/Layout/Head";
 import {useRouter} from "next/router";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {useTranslation} from "next-i18next";
 
 interface FourOhFourProps {
     settingsData: any,
@@ -18,6 +20,7 @@ interface FourOhFourProps {
 
 const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) => {
     const router = useRouter();
+    const {t} = useTranslation('404');
 
     return (
         <SettingsContext.Provider value={{
@@ -28,10 +31,10 @@ const FourOhFour:React.FC<FourOhFourProps> = ({settingsData, pageData, menus}) =
             <Layout>
                 <HeadHTML
                     seoPage={{
-                        title: '404 - Дверной Олимп',
+                        title: t('title'),
                         og_locale: router.locale ?? 'ru',
-                        og_site_name: 'Дверной Олимп',
-                        og_title: '404 - Дверной Олимп',
+                        og_site_name: t('og_site_name'),
+                        og_title: t('og_title'),
                         og_type: 'article',
                         article_modified_time: new Date().toTimeString(),
                     }}
@@ -128,15 +131,18 @@ export const getStaticProps:GetStaticProps = async ({locale}) => {
                 translated_slugs: [
                     {
                         lang: 'ru',
-                        slug: '404'
+                        translated: true,
+                        link: '/404'
                     },
                     {
                         lang: 'uk',
-                        slug: '404'
+                        translated: true,
+                        link: '/404'
                     },
                 ]
             },
-            menus
+            menus,
+            ...(await serverSideTranslations(locale ?? '', ['404', 'common']))
         }
     }
 }

@@ -15,6 +15,8 @@ import {useDispatch} from "react-redux";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {CartServerDataProps} from "@pages/cart";
 import {getCookie} from "cookies-next";
+import {useTranslation} from "next-i18next";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 
 interface BlogPageProps {
@@ -43,6 +45,7 @@ const CategoryPage:React.FC<BlogPageProps> = (props) => {
     } = props;
 
     const [postItems, setPostItems] = useState<PostProp[]>(posts);
+    const {t} = useTranslation('common');
 
     const dispatch = useDispatch();
 
@@ -70,7 +73,7 @@ const CategoryPage:React.FC<BlogPageProps> = (props) => {
                 <Layout>
                     <BlogTemplate
                         breadcrumbs={breadcrumbs}
-                        pageTitle={'Блог'}
+                        pageTitle={t('blogTitle')}
                         categories={categories}
                         posts={postItems}
                         updatePosts={setPostItems}
@@ -127,6 +130,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         headers: {
             'X-Headless-WP': true,
             'X-WC-Session': getCookie('X-WC-Session', {req, res})
+        },
+        params: {
+            lang: locale
         }
     });
 
@@ -217,7 +223,8 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             categories: resultDat.categories,
             page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
             nonce: resultDat.nonce.nonce,
-            cartData: resultDat.cart
+            cartData: resultDat.cart,
+            ...(await serverSideTranslations(locale ?? '', ['common']))
         }
     }
 }

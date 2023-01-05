@@ -21,6 +21,7 @@
     "graphql": "^16.6.0",
     "gsap": "^3.11.3",
     "next": "13.0.0",
+    "next-i18next": "^13.0.3",
     "next-redux-wrapper": "^8.0.0",
     "nouislider-react": "^3.4.1",
     "novaposhta": "^1.1.1",

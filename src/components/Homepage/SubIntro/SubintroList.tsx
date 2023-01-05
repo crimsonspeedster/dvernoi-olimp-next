@@ -4,6 +4,7 @@ import sprite from '@icons/sprite.svg';
 import {categories_repeaterProps} from "@components/Homepage/SubIntro/SubIntro";
 import styles from './Subintro.module.scss';
 import classNames from "classnames";
+import {useTranslation} from "next-i18next";
 
 
 interface SubintroListProps {
@@ -11,6 +12,8 @@ interface SubintroListProps {
 }
 
 const SubintroList: React.FC<SubintroListProps> = ({repeater}) => {
+    const {t} = useTranslation('common');
+
     return (
         <div className={styles['main-subintro__inner']}>
             {
@@ -36,7 +39,7 @@ const SubintroList: React.FC<SubintroListProps> = ({repeater}) => {
 
                                 <div className={classNames(styles['main-subintro__item-btn-wrapper'], 'filter-item__btn-wrapper')}>
                                     <Link className={classNames(styles['main-subintro__item-btn btn'], 'filter-item__btn')} href="/">
-                                        <span className={classNames(styles['main-subintro__item-btn btn__text'], 'filter-item__btn-text')}>Узнать больше</span>
+                                        <span className={classNames(styles['main-subintro__item-btn btn__text'], 'filter-item__btn-text')}>{t('watchMore')}</span>
                                     </Link>
                                 </div>
                             </div>
