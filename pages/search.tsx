@@ -171,6 +171,12 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req, q
     const nonceRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_URL}/wp-json/twentytwentytwo-child/v1/nonce`);
 
     const resultData = await axios.all([pageRequest, settingsRequest, productsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, products, nonce, cart) {
+        if (!page.data?.[0])
+        {
+            res.writeHead(301, { Location: '/404' });
+            res.end();
+        }
+
         return {
             page: page.data[0],
             settings: settings.data,

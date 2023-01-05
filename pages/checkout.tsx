@@ -140,6 +140,12 @@ export const getServerSideProps:GetServerSideProps = async ({locale, res, req}) 
     const novaPoshtaRequest = new NovaPoshta({ apiKey: process.env.NEXT_PUBLIC_ENV_NP_API_KEY });
 
     const resData = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
+        if (!page.data?.[0])
+        {
+            res.writeHead(301, { Location: '/404' });
+            res.end();
+        }
+
         return {
             page: page.data[0],
             settings: settings.data,
