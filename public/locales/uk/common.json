@@ -2,6 +2,7 @@
   "seoBtnUp": "Свернуть",
   "seoBtnDown": "Узнать больше",
   "toastThankTitle": "Спасибо, мы скоро <br /> свяжемся с вами",
+  "toastThankMiniTitle": "Спасибо, мы скоро свяжемся с Вами",
   "formCallbackLabelPhone": "Ваш номер телефона",
   "fieldRequired": "Обязательное поле",
   "selected": "Выбрано",
@@ -128,5 +129,7 @@
   "brands": "Бренды",
   "blogTitle": "Блог",
   "region": "Область",
-  "thank": "спасибо"
+  "thank": "спасибо",
+  "masterTitle": "Замер дверей за 1 день!",
+  "masterBtnTitle": "Вызвать Замерщика!"
 }

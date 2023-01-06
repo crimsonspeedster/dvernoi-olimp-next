@@ -86,6 +86,7 @@ const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
                         in_stock={stock}
                         sku={sku}
                         id={id}
+                        title={title}
                         type={type}
                         attributes={attributes}
                         variation_array={variation_array}

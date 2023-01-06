@@ -48,13 +48,14 @@ const CartItem:React.FC<CartItemProps> = (props) => {
     }, [quantity]);
 
     const counterHandler = (val: string):void => {
-        setDataStatus(true);
         const filteredVal = parseInt(val);
 
         if (isNaN(filteredVal) || filteredVal < 1) {
             setCounter('1');
             return;
         }
+
+        setDataStatus(true);
 
         setCounter(filteredVal.toString());
 

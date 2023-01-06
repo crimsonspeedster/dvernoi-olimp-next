@@ -51,6 +51,9 @@ const SortModal = () => {
         Fancybox.bind("[data-fancybox='sort']", {
             showClass: 'fancybox-fadeIn',
             hideClass: 'fancybox-fadeOut',
+            infinite: false,
+            groupAll: false,
+            groupAttr: false,
             dragToClose: false,
             parentEl: isBrowser() && document.querySelector('#__next'),
             on: {

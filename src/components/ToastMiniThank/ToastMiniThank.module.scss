@@ -1,0 +1,17 @@
+.toast-thank {
+    background: #A4AC14;
+    padding: 7px 50px 7px 24px;
+    font-size: 14px;
+    line-height: 160%;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+    min-width: 387px;
+
+    &__img {
+        position: absolute;
+        top: 50%;
+        right: 24px;
+        z-index: 1;
+        transform: translateY(-50%);
+    }
+}

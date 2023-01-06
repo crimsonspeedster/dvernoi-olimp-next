@@ -11,6 +11,7 @@ import menuStyles from '@components/Menu/Menu.module.scss';
 import CallbackModal from '@components/Modal/CallbackModal';
 import classNames from "classnames";
 import {useRouter} from "next/router";
+import MasterModal from "@components/Modal/MasterModal";
 
 
 interface HeaderProps {
@@ -23,14 +24,10 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
     const [isMobile, setIsMobile] = useState<boolean>(false);
     const [openCatalog, setIsOpenCatalog] = useState<boolean>(false);
     const [isFirsVisible, setIsFirsVisible] = useState<boolean>(true);
-    const [isOpenSchedule, setIsOpenSchedule] = useState<boolean>(false);
     const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
     const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
 
     const router = useRouter();
-
-    //@ts-ignore
-    const closeSchedule = (e:Event) => !e?.target?.closest('.header-schedule') && setIsOpenSchedule(false)
 
     const openSubmenu = (e:Event) => {
         let target = e.currentTarget,
@@ -93,12 +90,6 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
         setIsMobile(window.innerWidth <= 480);
 
         window.innerWidth >= 1025 ? setIsOpenMenu(false) : null;
-
-        if (isBrowser()) window.addEventListener('click', closeSchedule);
-
-        return () => {
-            if (isBrowser()) window.removeEventListener('click', closeSchedule)
-        }
     }, [isMobile, isTablet])
 
     useEffect(() => {
@@ -126,8 +117,6 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
                 isMobile={isMobile}
                 openCatalog={openCatalog}
                 setIsOpenCatalog={setIsOpenCatalog}
-                isOpenSchedule={isOpenSchedule}
-                setIsOpenSchedule={setIsOpenSchedule}
                 isOpenSearch={isOpenSearch}
                 setIsOpenSearch={setIsOpenSearch}
                 isOpenMenu={isOpenMenu}
@@ -153,6 +142,8 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
             />
 
             <CallbackModal />
+            
+            <MasterModal />
         </header>
     )
 }

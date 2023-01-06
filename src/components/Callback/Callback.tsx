@@ -102,7 +102,11 @@ const Callback = () => {
                                             </div>
 
                                             <div className={styles['callback__btn-wrapper']}>
-                                                <button type="submit" className={classNames(styles['callback__btn'], 'btn')} disabled={isSubmitting}>
+                                                <button
+                                                    type="submit"
+                                                    className={classNames(styles['callback__btn'], 'btn', isSubmitting ? styles['updating'] : '')}
+                                                    disabled={isSubmitting}
+                                                >
                                                     <span className={classNames(styles['callback__btn-text'], 'btn__text')}>{settingsCtx.btn_title}</span>
                                                 </button>
                                             </div>

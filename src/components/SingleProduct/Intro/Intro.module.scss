@@ -380,6 +380,8 @@
 
             &-item {
                 width: 50%;
+                position: relative;
+                padding-bottom: 22px;
             }
         }
 
@@ -778,4 +780,10 @@
         background: url('./select-arrow.svg') center no-repeat;
         background-size: contain;
     }
+}
+.form-error__msg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    max-width: 100%;
 }

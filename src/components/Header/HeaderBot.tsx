@@ -13,8 +13,6 @@ interface HeaderBotProps {
     isMobile: boolean,
     openCatalog: boolean,
     setIsOpenCatalog: Dispatch<SetStateAction<boolean>>,
-    isOpenSchedule: boolean,
-    setIsOpenSchedule: Dispatch<SetStateAction<boolean>>,
     isOpenSearch: boolean
     setIsOpenSearch: Dispatch<SetStateAction<boolean>>
     isOpenMenu: boolean
@@ -26,8 +24,6 @@ const HeaderBot: React.FC<HeaderBotProps> = (props) => {
         isMobile,
         openCatalog,
         setIsOpenCatalog,
-        isOpenSchedule,
-        setIsOpenSchedule,
         isOpenSearch,
         setIsOpenSearch,
         isOpenMenu,
@@ -52,10 +48,7 @@ const HeaderBot: React.FC<HeaderBotProps> = (props) => {
                         setIsOpenSearch={setIsOpenSearch}
                     />}
 
-                    <HeaderSchedule
-                        isOpenSchedule={isOpenSchedule}
-                        setIsOpenSchedule={setIsOpenSchedule}
-                    />
+                    <HeaderSchedule />
 
                     <HeaderBotControls/>
                 </div>

@@ -16,24 +16,18 @@ import {If, Then} from "react-if";
 import ToastThank from "@components/ToastThank/ToastThank";
 import Toast from "@components/Toast/Toast";
 
-const CallbackModal = () => {
+const MasterModal = () => {
     const {t} = useTranslation('common');
 
     const [toastStatus, setToastStatus] = useState<boolean>(false);
 
     const validateFormSchema = Yup.object().shape({
-        user_name: Yup.string()
-            .min(2, t('errorShort') ?? '')
-            .max(50, t('errorLong') ?? '')
-            .matches(/^[\p{Script=Cyrl}\s]*$/u, t('errorNotCorrectFormat') ?? '')
-            .trim()
-            .required(t('fieldRequired') ?? ''),
         user_phone: Yup.string()
             .phone('380', false, t('fieldRequired') ?? '')
     });
 
     useEffect(() => {
-        Fancybox.bind("[data-fancybox='callback']", {
+        Fancybox.bind("[data-fancybox='masterfancy']", {
             showClass: 'fancybox-fadeIn',
             hideClass: 'fancybox-fadeOut',
             infinite: false,
@@ -60,21 +54,16 @@ const CallbackModal = () => {
 
     return (
         <>
-            <div className={classNames(styles['modal'], styles['modal-callback'])} id="callback-modal" style={{display: 'none'}}>
-                <div className={styles['modal__title']}>{t('callbackTitle')}</div>
-
-                <p className={styles['modal__desc']}>{t('callbackDesc')}</p>
+            <div className={classNames(styles['modal'], styles['modal-callback'])} id="master-modal" style={{display: 'none'}}>
+                <div className={styles['modal__title']}>{t('masterTitle')}</div>
 
                 <Formik
                     initialValues={{
                         user_phone: '',
-                        user_name: ''
                     }}
                     validationSchema={validateFormSchema}
                     onSubmit={(values, {setSubmitting}) => {
                         setSubmitting(true);
-
-                        console.log(values);
 
                         const formBodyData = new FormData();
 
@@ -82,7 +71,7 @@ const CallbackModal = () => {
                             formBodyData.append(key, value.trim());
                         }
 
-                        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_FORM}/420/feedback`, formBodyData)
+                        axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_FORM}/319/feedback`, formBodyData)
                             .then(function (response) {
                                 Fancybox.close();
 
@@ -109,32 +98,6 @@ const CallbackModal = () => {
                             isSubmitting
                          }) => (
                             <form className={styles['modal__form']} onSubmit={handleSubmit}>
-                                <div className={styles['modal__inp-wrapper']}>
-                                    <label className={styles['modal__label']} htmlFor="modal-callback-name">{t('modalCallbackLabelName')}</label>
-
-                                    <div className={styles['modal__inp-inner']}>
-                                        <input
-                                            className={styles['modal__inp']}
-                                            id="modal-callback-name"
-                                            type="text"
-                                            name="user_name"
-                                            autoComplete="off"
-                                            placeholder={t('modalCallbackPlaceholderName') ?? ''}
-                                            onChange={(e)=>{
-                                                setFieldTouched('user_name');
-                                                handleChange(e);
-                                            }}
-                                        />
-                                    </div>
-
-                                    <If condition={errors.user_name && touched.user_name}>
-                                        <Then>
-                                            <div className={styles['form-error__msg']}>
-                                                <ErrorMessage name="user_name" />
-                                            </div>
-                                        </Then>
-                                    </If>
-                                </div>
                                 <div className={styles['modal__inp-wrapper']}>
                                     <label className={styles['modal__label']} htmlFor="modal-callback-phone">{t('modalCallbackLabelPhone')}</label>
 
@@ -168,7 +131,7 @@ const CallbackModal = () => {
                                 <div className={styles['modal__btns']}>
                                     <div className={styles['modal__btn-wrapper']}>
                                         <button disabled={isSubmitting} type="submit" className={classNames(styles['modal__btn'], 'btn', isSubmitting ? styles['updating'] : '')}>
-                                            <span className={classNames(styles['modal__btn-text'], 'btn__text')}>{t('sendBtnTitle')}</span>
+                                            <span className={classNames(styles['modal__btn-text'], 'btn__text')}>{t('masterBtnTitle')}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -184,4 +147,4 @@ const CallbackModal = () => {
     )
 }
 
-export default CallbackModal
+export default MasterModal;

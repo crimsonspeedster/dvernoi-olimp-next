@@ -103,7 +103,7 @@ const CartIntro:React.FC<CartIntroProps> = (props) => {
                 </If>
             </div>
 
-            <QuickModal/>
+            <QuickModal />
         </section>
     );
 }

@@ -10,13 +10,18 @@ const HeaderTopControls = () => {
 
     return (
         <div className={styles['header-top__controls']}>
-            <Link className={styles['header-top__controls-item']} href="/">
+            <button
+                className={styles['header-top__controls-item']}
+                type="button"
+                data-fancybox="masterfancy"
+                data-src="#master-modal"
+            >
                 <span className={styles['header-top__controls-icon']}>
                     <svg><use href={`${sprite.src}#ruler`}/></svg>
                 </span>
 
                 <span className={styles['header-top__controls-text']}>{t('orderMeasurement')}</span>
-            </Link>
+            </button>
 
             <button
                 className={styles['header-top__controls-item']}

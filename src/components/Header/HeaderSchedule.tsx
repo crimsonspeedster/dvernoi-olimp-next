@@ -1,4 +1,4 @@
-import React, {Dispatch, SetStateAction, useContext} from 'react'
+import React, {Dispatch, SetStateAction, useContext, useState} from 'react'
 import styles from './Header.module.scss';
 import sprite from '@icons/sprite.svg';
 import classNames from "classnames";
@@ -6,18 +6,21 @@ import {workTimeProps} from "@components/Footer/FooterContacts";
 import {SettingsContext} from "@pages/_app";
 import {useTranslation} from "next-i18next";
 
-
-interface HeaderScheduleProps {
-    isOpenSchedule: boolean,
-    setIsOpenSchedule: Dispatch<SetStateAction<boolean>>
-}
-
-const HeaderSchedule:React.FC<HeaderScheduleProps> = ({isOpenSchedule, setIsOpenSchedule}) => {
+const HeaderSchedule = () => {
     const settingsCtx = useContext(SettingsContext).settings;
     const {t} = useTranslation('common');
 
+    const [isOpenSchedule, setIsOpenSchedule] = useState<boolean>(false);
+
     return (
         <div className={classNames(styles['header__schedule'], styles['header-schedule'])}>
+            <div
+                className={classNames(styles['header-schedule__backdrop'], isOpenSchedule ? styles['active'] : '')}
+                onClick={()=>{
+                    setIsOpenSchedule(false);
+                }}
+            />
+
             <div className={styles['header-schedule__title']}>({t('freeNumber')})</div>
 
             <a className={styles['header-schedule__phone']} href={settingsCtx.header_phone.url}>{settingsCtx.header_phone.title}</a>
@@ -25,7 +28,7 @@ const HeaderSchedule:React.FC<HeaderScheduleProps> = ({isOpenSchedule, setIsOpen
             <div className={styles['header-schedule__list']}>
                 <div
                     className={classNames(styles['header-schedule__list-title'], isOpenSchedule ? styles['open'] : '')}
-                    onClick={() => setIsOpenSchedule(prev => !prev)}
+                    onClick={() => {console.log('clicked'); setIsOpenSchedule(prev => !prev)}}
                 >
                     <div className={styles['header-schedule__list-icon']}>
                         <svg>

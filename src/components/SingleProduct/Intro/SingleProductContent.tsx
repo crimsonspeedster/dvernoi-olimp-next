@@ -1,11 +1,8 @@
 import React, {
-    ChangeEvent,
     Dispatch,
-    ReactElement,
     SetStateAction,
     useContext,
     useEffect,
-    useRef,
     useState
 } from 'react';
 import InputMask from 'react-input-mask';
@@ -13,24 +10,30 @@ import sprite from '@icons/sprite.svg';
 import styles from './Intro.module.scss';
 import classNames from "classnames";
 import {If, Then} from "react-if";
-import {ProductCardProps, variationsProps} from "@components/Cards/ProductCard/ProductCard";
+import {variationsProps} from "@components/Cards/ProductCard/ProductCard";
 import ProductVariation from "@components/SingleProduct/ProductVariation/ProductVariation";
 import ProductExtra, {
     ProductExtraOptionsProps
 } from "@components/SingleProduct/ProductExtra/ProductExtra";
 import axios from "axios";
 import {SettingsContext} from "@pages/_app";
-import {getCookie, getCookies, setCookie} from "cookies-next";
+import {getCookie, setCookie} from "cookies-next";
 import {setCartItemsAmount, setCartServerData} from "@store/cart";
 import {useDispatch} from "react-redux";
 import {setProductSelectedPrice} from "@store/product";
 import {useRouter} from "next/router";
 import {useTranslation} from "next-i18next";
+import {ErrorMessage, Formik} from "formik";
+import * as Yup from "yup";
+import "yup-phone";
+import Toast from "@components/Toast/Toast";
+import ToastMiniThank from "@components/ToastMiniThank/ToastMiniThank";
 
 
 interface SingleProductContentProps {
     id: number,
     in_stock: boolean,
+    title: string,
     sku: string,
     type: string,
     attributes: attributesProps[],
@@ -83,6 +86,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
         id,
         sku,
         type,
+        title,
         attributes,
         in_stock,
         variation_array,
@@ -103,6 +107,12 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
     const [extraPrice, setExtraPrice] = useState<string>('0');
     const [extraProducts, setExtraProducts] = useState<extraAttributesProps[]>(extra_attributes);
     const [dataStatus, setDataStatus] = useState<boolean>(false);
+    const [toastStatus, setToastStatus] = useState<boolean>(false);
+
+    const validateFormSchema = Yup.object().shape({
+        user_phone: Yup.string()
+            .phone('380', false, t('fieldRequired') ?? '')
+    });
 
     useEffect(()=>{
         setItemPrice(type === 'simple' ? price : currentVariation?.price ?? '0');
@@ -300,7 +310,11 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
 
             <div className={styles['single-product-intro-content__btns']}>
                 <div className={styles['single-product-intro-content__btns-item']}>
-                    <button className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--ruler'], 'btn')}>
+                    <button
+                        data-fancybox="masterfancy"
+                        data-src="#master-modal"
+                        className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--ruler'], 'btn')}
+                    >
                         <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon')}>
                             <svg><use href={`${sprite.src}#ruler`}/></svg>
                         </span>
@@ -310,34 +324,95 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 </div>
             </div>
 
-            <div className={styles['single-product-intro-content__bot']}>
-                <div className={styles['single-product-intro-content__bot-item']}>
-                    <InputMask
-                        className={styles['single-product-intro-content__phone']}
-                        mask="+38 (099) 999-99-99"
-                        maskPlaceholder={null}
-                        name="phone"
-                        autoComplete="off"
-                        type="tel"
-                        placeholder="+38 (___) ___-__-__"
-                    />
-                </div>
+            <Formik
+                initialValues={{
+                    user_phone: '',
+                    product_title: title,
+                    product_id: id.toString(),
+                    product_link: `${process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK}${router.asPath}`
+                }}
+                validationSchema={validateFormSchema}
+                onSubmit={(values, {setSubmitting}) => {
+                    setSubmitting(true);
 
-                <div className={styles['single-product-intro-content__bot-item']}>
-                    <button
-                        disabled={dataStatus}
-                        className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--cursor'], 'btn', !in_stock ? 'disabled' : '')}
-                    >
-                        <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon')}>
-                            <svg><use href={`${sprite.src}#cursor`}/></svg>
-                        </span>
+                    const formBodyData = new FormData();
 
-                        <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text')}>{t('buy1Click')}</span>
-                    </button>
-                </div>
-            </div>
+                    for (let [key, value] of Object.entries(values)) {
+                        formBodyData.append(key, value.trim());
+                    }
+
+                    axios.post(`${process.env.NEXT_PUBLIC_ENV_APP_FORM}/1448/feedback`, formBodyData)
+                        .then(function (response) {
+                            setToastStatus(true);
+                            setSubmitting(false);
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+
+                            setToastStatus(true);
+                            setSubmitting(false);
+                        });
+                }}
+            >
+                {
+                    ({
+                         values,
+                         errors,
+                         touched,
+                         handleChange,
+                         handleSubmit,
+                         isSubmitting,
+                         setFieldTouched
+                     }) => (
+                            <form className={styles['single-product-intro-content__bot']} onSubmit={handleSubmit}>
+                                <div className={styles['single-product-intro-content__bot-item']}>
+                                    <InputMask
+                                        className={styles['single-product-intro-content__phone']}
+                                        mask="+38 (099) 999-99-99"
+                                        maskPlaceholder={'+38 (___) ___-__-__'}
+                                        name="user_phone"
+                                        autoComplete="off"
+                                        type="tel"
+                                        placeholder="+38 (___) ___-__-__"
+                                        value={values.user_phone}
+                                        onChange={(e)=>{
+                                            setFieldTouched('user_phone');
+                                            handleChange(e);
+                                        }}
+                                    />
+
+                                    <If condition={errors.user_phone && touched.user_phone}>
+                                        <Then>
+                                            <div className={styles['form-error__msg']}>
+                                                <ErrorMessage name="user_phone" />
+                                            </div>
+                                        </Then>
+                                    </If>
+                                </div>
+
+                                <div className={styles['single-product-intro-content__bot-item']}>
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className={classNames(styles['single-product-intro-content__btn'], styles['single-product-intro-content__btn--cursor'], 'btn', !in_stock ? 'disabled' : '', isSubmitting ? styles['updating'] : '')}
+                                    >
+                                        <span className={classNames(styles['single-product-intro-content__btn-icon'], 'btn__icon', isSubmitting ? styles['updating'] : '')}>
+                                            <svg><use href={`${sprite.src}#cursor`}/></svg>
+                                        </span>
+
+                                        <span className={classNames(styles['single-product-intro-content__btn-text'], 'btn__text', isSubmitting ? styles['updating'] : '')}>{t('buy1Click')}</span>
+                                    </button>
+                                </div>
+                            </form>
+                    )
+                }
+            </Formik>
+
+            <Toast status={toastStatus} closeHandler={setToastStatus}>
+                <ToastMiniThank />
+            </Toast>
         </div>
     )
 }
 
-export default SingleProductContent
+export default SingleProductContent;

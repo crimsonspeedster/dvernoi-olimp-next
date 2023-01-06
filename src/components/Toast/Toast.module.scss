@@ -7,10 +7,12 @@
     z-index: -1;
     opacity: 0;
     transition: all ease .4s;
+    visibility: hidden;
 
     &.active {
         z-index: 100;
         opacity: 1;
+        visibility: visible;
     }
 
     &-overlay {
