@@ -54,8 +54,13 @@
 
     &__article {
 
+        h1 {
+            margin-bottom: 20px;
+        }
+
         p {
             margin-bottom: 20px;
+            font-size: 14px;
         }
 
         h2, h3, h4, h5, h6 {

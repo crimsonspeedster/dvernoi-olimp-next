@@ -8,6 +8,14 @@ const nextConfig = {
     images: {
         domains: ['test.dvernoyolimp.com.ua', 'img.youtube.com', 'olimp.loc'],
     },
+    redirects: async () => [
+        {
+            source: '/:path*',
+            has: [{ type: 'host', value: 'www.localhost:3000' }],
+            destination: 'http://www.localhost:3000/:path*',
+            permanent: true
+        }
+    ],
     i18n
 }
 

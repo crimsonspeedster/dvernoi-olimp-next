@@ -222,25 +222,22 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                 </div>
             </div>
 
-            <If condition={type === 'variable'}>
-                <Then>
-                    {
-                        attributes.sort((a, b) => a.id > b.id ? 1 : -1).map((item, i, arr) => (
-                            <If key={i} condition={item.visible && item.variation}>
-                                <Then>
-                                    <ProductVariation
-                                        defaultAttribute={default_attributes.sort((a, b) => a.id > b.id ? 1 : -1)[i]}
-                                        attribute={item}
-                                        setCurrVariation={setCurrentVariation}
-                                        currentVariation={currentVariation}
-                                        variation_array={variation_array}
-                                    />
-                                </Then>
-                            </If>
-                        ))
-                    }
-                </Then>
-            </If>
+            {
+                type === 'variable' &&
+                attributes.sort((a, b) => a.id > b.id ? 1 : -1).map((item, i, arr) => (
+                    <If key={i} condition={item.visible && item.variation}>
+                        <Then>
+                            <ProductVariation
+                                defaultAttribute={default_attributes.sort((a, b) => a.id > b.id ? 1 : -1)[i]}
+                                attribute={item}
+                                setCurrVariation={setCurrentVariation}
+                                currentVariation={currentVariation}
+                                variation_array={variation_array}
+                            />
+                        </Then>
+                    </If>
+                ))
+            }
 
             <If condition={extra_attributes.length > 0}>
                 <Then>
@@ -365,7 +362,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                          setFieldTouched
                      }) => (
                             <form className={styles['single-product-intro-content__bot']} onSubmit={handleSubmit}>
-                                <div className={styles['single-product-intro-content__bot-item']}>
+                                <div className={classNames(styles['single-product-intro-content__bot-item'], styles['input'])}>
                                     <InputMask
                                         className={styles['single-product-intro-content__phone']}
                                         mask="+38 (099) 999-99-99"
@@ -390,7 +387,7 @@ const SingleProductContent:React.FC<SingleProductContentProps> = (props) => {
                                     </If>
                                 </div>
 
-                                <div className={styles['single-product-intro-content__bot-item']}>
+                                <div className={classNames(styles['single-product-intro-content__bot-item'], styles['button'])}>
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}

@@ -15,13 +15,13 @@ const ContactsIntroInfo = () => {
     return (
         <div className={classNames(styles['contacts-intro__info'], styles['contacts-intro-info'])}>
             <div className={styles['contacts-intro-info__item']}>
-                <div className={styles['contacts-intro-info__title']}>{t('freeUkraine')}</div>
+                <div className={classNames(styles['contacts-intro-info__title'], styles['mini'])}>{t('freeUkraine')}</div>
 
                 <a className={styles['contacts-intro-info__phone']} href={settingsCtx.header_phone.url}>{settingsCtx.header_phone.title}</a>
             </div>
 
             <div className={styles['contacts-intro-info__item']}>
-                <div className={styles['contacts-intro-info__title']}>{t('callCenterTitle')}</div>
+                <div className={classNames(styles['contacts-intro-info__title'], styles['mini'])}>{t('callCenterTitle')}</div>
 
                 <div className={styles['contacts-intro-info__schedule']}>
                     {

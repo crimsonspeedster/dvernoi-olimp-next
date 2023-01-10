@@ -17,14 +17,14 @@ const MainStages:React.FC<MainStagesProps> = ({background_image, repeater, title
     return (
         <div className={styles['main-stages']} style={{backgroundImage: `url(${background_image})`}}>
             <div className="container">
-                <div className={classNames(styles['main-stages__title'], 'title', 'title--light')}>{title}</div>
+                <div className={classNames(styles['main-stages__title'], 'title', 'title--light')} dangerouslySetInnerHTML={{__html: title}} />
 
                 <div className={styles['main-stages__inner']}>
                     {
                         repeater.map((item, i) => (
                             <div className={styles['main-stages__item']} key={i}>
                                 <div className={styles['main-stages__item-inner']}>
-                                    <div className={styles['main-stages__item-title']}>{item.text}</div>
+                                    <div className={styles['main-stages__item-title']} dangerouslySetInnerHTML={{__html: item.text}} />
                                 </div>
                             </div>
                         ))

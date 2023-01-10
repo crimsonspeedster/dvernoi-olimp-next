@@ -80,6 +80,7 @@ const SingleProductIntro:React.FC<SingleProductIntroProps> = (props) => {
                     <SingleProductSlider
                         images={images}
                         in_stock={stock}
+                        title={title}
                     />
 
                     <SingleProductContent

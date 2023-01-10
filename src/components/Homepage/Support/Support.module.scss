@@ -50,6 +50,7 @@
     &-photo {
         position: relative;
         width: 43%;
+        line-height: 1;
 
         &__img {
             &--big {
@@ -63,12 +64,13 @@
             }
 
             &--small {
-                max-width: 295px;
+                max-width: 297px;
+                height: 244px;
                 width: 100%;
                 position: absolute;
                 left: 0;
                 bottom: 0;
-                transform: translate(-75%, 20%);
+                transform: translate(-69%, 29%);
             }
         }
     }

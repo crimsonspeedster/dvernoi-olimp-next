@@ -110,6 +110,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, req
         params: {
             hide_empty: true,
             lang: locale,
+            exclude: 30
         }
     })
 

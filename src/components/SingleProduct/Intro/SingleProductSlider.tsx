@@ -1,32 +1,55 @@
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import {Swiper, SwiperSlide} from 'swiper/react'
 import {Pagination, EffectFade} from 'swiper'
 import Image from "next/image";
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-fade'
-import singleProductImg from '@images/single-product.jpg';
-import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css';
-import InnerImageZoom from 'react-inner-image-zoom';
 import styles from './Intro.module.scss';
 import classNames from "classnames";
 import {ImageProductProps} from "@components/Cards/ProductCard/ProductCard";
 import {Else, If, Then} from "react-if";
 import {useTranslation} from "next-i18next";
+import ZoomIcon from "./zoom_icon.svg";
+// @ts-ignore
+import {Fancybox} from '@fancyapps/ui';
+import '@fancyapps/ui/dist/fancybox.css';
 
 
 interface SingleProductSliderProps {
     images: ImageProductProps,
-    in_stock: boolean
+    in_stock: boolean,
+    title: string
+}
+
+interface FancyArray {
+    src: string,
+    type: string,
+    preload?: boolean
 }
 
 const SingleProductSlider:React.FC<SingleProductSliderProps> = (props) => {
     const {
         images,
-        in_stock
+        in_stock,
+        title
     } = props;
 
     const {t} = useTranslation('common');
+
+    const handleFancy = ():void => {
+        const galleryImages:FancyArray[] = images.gallery.length > 0 ? images.gallery.map((item, i) => ({
+                src: item,
+                type: 'image',
+                preload: false,
+            })) : [{
+            src: images.default,
+            type: 'image',
+            preload: false,
+        }];
+
+        Fancybox.show(galleryImages);
+    }
 
     return (
         <div className={styles['single-product-intro__slider-wrapper']}>
@@ -66,7 +89,19 @@ const SingleProductSlider:React.FC<SingleProductSliderProps> = (props) => {
                                             className={styles['single-product-intro-slider__item']}
                                             key={i}
                                         >
-                                            <InnerImageZoom src={item} />
+                                            <div
+                                                className={styles['single-product-intro-slider__item-inner']}
+                                                onClick={handleFancy}
+                                            >
+                                                <Image src={item} alt={title} width={349} height={467} />
+                                            </div>
+
+                                            <div
+                                                className={styles['single-product-intro-slider__item-zoom']}
+                                                onClick={handleFancy}
+                                            >
+                                                <Image src={ZoomIcon.src} alt="zoom" width={32} height={32} />
+                                            </div>
                                         </SwiperSlide>
                                     )
                                 })
@@ -76,7 +111,19 @@ const SingleProductSlider:React.FC<SingleProductSliderProps> = (props) => {
 
                     <Else>
                         <div className={classNames(styles['single-product-intro-slider__item'], styles['opacity'])}>
-                            <InnerImageZoom src={images.default} />
+                            <div
+                                className={styles['single-product-intro-slider__item-inner']}
+                                onClick={handleFancy}
+                            >
+                                <Image src={images.default} alt={title} width={349} height={467} />
+                            </div>
+
+                            <div
+                                className={styles['single-product-intro-slider__item-zoom']}
+                                onClick={handleFancy}
+                            >
+                                <Image src={ZoomIcon.src} alt="zoom" width={32} height={32} />
+                            </div>
                         </div>
                     </Else>
                 </If>

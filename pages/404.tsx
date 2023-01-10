@@ -132,12 +132,14 @@ export const getStaticProps:GetStaticProps = async ({locale}) => {
                     {
                         lang: 'ru',
                         translated: true,
-                        link: '/404'
+                        link: '/404',
+                        tag: 'ru'
                     },
                     {
                         lang: 'uk',
                         translated: true,
-                        link: '/404'
+                        link: '/404',
+                        tag: 'ua'
                     },
                 ]
             },

@@ -32,7 +32,7 @@ const Partners:React.FC<PartnersProps> = ({title, repeater}) => (
             allowTouchMove={false}
             modules={[Autoplay, FreeMode]}
             freeMode={true}
-            slidesPerView={5}
+            slidesPerView={6.3}
             loop={true}
             speed={5000}
             autoplay={{
@@ -53,7 +53,7 @@ const Partners:React.FC<PartnersProps> = ({title, repeater}) => (
             allowTouchMove={false}
             modules={[Autoplay, FreeMode]}
             freeMode={true}
-            slidesPerView={5}
+            slidesPerView={6.3}
             loop={true}
             speed={5000}
             autoplay={{

@@ -7,7 +7,7 @@ const Copyright = () => {
 
     return (
         <div className={styles['copyright']}>
-            <div className={styles['copyright__text']} dangerouslySetInnerHTML={{__html: settingsCtx?.description ?? ''}} />
+            <div className={styles['copyright__text']} dangerouslySetInnerHTML={{__html: settingsCtx?.description?.replace('%s', new Date().getFullYear()) ?? ''}} />
         </div>
     );
 }

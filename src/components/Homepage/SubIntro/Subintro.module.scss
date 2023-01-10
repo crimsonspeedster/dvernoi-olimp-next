@@ -1,6 +1,6 @@
 .main-subintro {
     position: relative;
-    padding: 125px 0 135px;
+    padding: 0 0 135px;
 
     &__top {
         display: flex;
@@ -18,13 +18,14 @@
     }
 
     &__inner {
-        display: flex;
-        gap: 30px 60px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 387px));
+        grid-gap: 60px 30px;
+        justify-content: space-between;
     }
 
     &__item {
-        width: calc(100% / 3);
-        padding: 0 30px;
+
     }
 }
 
@@ -33,10 +34,6 @@
         &__inner {
             margin: 0 -10px;
             gap: 30px;
-        }
-
-        &__item {
-            padding: 0 10px;
         }
     }
 }
@@ -137,33 +134,43 @@
     }
 }
 .filter-item {
-    &__inner {
-        position: relative;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 24px 32px;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
 
-        &::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(0deg, rgba(66, 66, 85, 0.8), rgba(66, 66, 85, 0.8));
-        }
-    }
+    //&__inner {
+    //    position: relative;
+    //    height: 100%;
+    //    background-size: cover;
+    //    background-position: center;
+    //    background-repeat: no-repeat;
+    //
+    //    &::before {
+    //        content: "";
+    //        position: absolute;
+    //        left: 0;
+    //        top: 0;
+    //        right: 0;
+    //        bottom: 0;
+    //        background: linear-gradient(0deg, rgba(66, 66, 85, 0.8), rgba(66, 66, 85, 0.8));
+    //    }
+    //}
 
-    &__info {
-        padding: 40px 25px 30px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: space-between;
-        position: relative;
-        z-index: 1;
-    }
+    //&__info {
+    //    padding: 40px 24px 32px;
+    //    display: flex;
+    //    flex-direction: column;
+    //    align-items: flex-start;
+    //    justify-content: space-between;
+    //    position: relative;
+    //    z-index: 1;
+    //    flex-grow: 1;
+    //}
 
     &__title {
         font-weight: 700;

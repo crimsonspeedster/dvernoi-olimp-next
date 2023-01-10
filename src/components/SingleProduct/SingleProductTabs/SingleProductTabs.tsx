@@ -8,10 +8,12 @@ import {If, Then} from "react-if";
 import VideoCard from "@components/Cards/VideoCard/VideoCard";
 import {removeMultipleSlashes} from "@utils/stringHelper";
 import {useTranslation} from "next-i18next";
+import {attributesProps} from "@components/SingleProduct/Intro/SingleProductContent";
 
 
 interface SingleProductTabsProps {
     acf: acfProductProps,
+    characteristics: attributesProps[]
     description: string
 }
 
@@ -19,6 +21,7 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
     const {
         acf,
         description,
+        characteristics
     } = props;
 
     const {t} = useTranslation('common');
@@ -41,7 +44,7 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
                             }
 
                             {
-                                acf.enable_characteristics &&
+                                characteristics.length > 0 &&
                                 <Tab className={styles['single-product-tabs__nav-item']}>{t('characteristics')}</Tab>
                             }
                         </TabList>
@@ -93,16 +96,22 @@ const SingleProductTabs: React.FC<SingleProductTabsProps> = (props) => {
                             }
 
                             {
-                                acf.enable_characteristics &&
+                                characteristics.length > 0 &&
                                 <TabPanel className={styles['single-product-tabs__body-item']}>
                                     <div className={styles['single-product-tabs__chars']}>
                                         <div className={styles['single-product-tabs__chars-inner']}>
                                             {
-                                                acf.haratekristiki.map((item, i) => (
+                                                characteristics.map((item, i) => (
                                                     <div key={i} className={styles['single-product-tabs__chars-item-inner']}>
-                                                        <p className={styles['single-product-tabs__chars-title']}>{item.nazvanie}</p>
+                                                        <p className={styles['single-product-tabs__chars-title']}>{item.name}</p>
 
-                                                        <p className={styles['single-product-tabs__chars-value']}>{item.opisanie}</p>
+                                                        <p className={styles['single-product-tabs__chars-value']}>
+                                                            {item.options.map((subitem, k) => (
+                                                                <span key={k}>
+                                                                    {k < item.options.length -1 ? `${subitem}, ` : subitem}
+                                                                </span>
+                                                            ))}
+                                                        </p>
                                                     </div>
                                                 ))
                                             }

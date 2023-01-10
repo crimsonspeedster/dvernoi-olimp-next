@@ -12,7 +12,7 @@
         position: absolute;
         display: flex;
         flex-direction: column;
-        gap: 9px;
+        gap: 4px;
         top: 44px;
         z-index: 1;
 
@@ -25,64 +25,54 @@
         position: relative;
         font-weight: 600;
         font-size: 10px;
-        line-height: 160%;
-        text-align: center;
+        line-height: 100%;
         letter-spacing: -0.02em;
         text-transform: uppercase;
-        border: 1px solid;
-        padding: 6px 18px;
-        width: fit-content;
+        text-align: center;
+        padding-top: 6px;
+        height: 29px;
         
-        @media screen and (max-width: 991px) {
-            background: #fff;
-        }
-
         &::before {
-            content: "";
             position: absolute;
-            left: -1px;
-            z-index: -2;
-            top: 100%;
-            width: 0;
-            height: 0;
-            border-top: 3px solid;
-            border-right: 3px solid;
-            border-bottom: 3px solid transparent;
-            border-left: 3px solid transparent;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            content: '';
+            background-size: contain;
+            background-position: top left;
+            background-repeat: no-repeat;
         }
-
+        
         &--new {
-            border-color: #76B439;
+            width: 85px;
             color: #76B439;
 
             &::before {
-                border-top: 3px solid #63982F;
-                border-right: 3px solid #63982F;
-            }
-        }
-
-        &--sale {
-            border-color: #F03B3B;
-            color: #F03B3B;
-
-            &::before {
-                border-top: 3px solid #C82020;
-                border-right: 3px solid #C82020;
+                background-image: url('label_new.svg');
             }
         }
 
         &--hit {
-            border-color: #BFAED7;
+            width: 47px;
             color: #BFAED7;
 
             &::before {
-                border-top: 3px solid #AB9CC1;
-                border-right: 3px solid #AB9CC1;
+                background-image: url('label_top.svg');
+            }
+        }
+
+        &--sale {
+            width: 66px;
+            color: #F03B3B;
+            
+            &::before {
+                background-image: url('label_sale.svg');
             }
         }
 
         &--video {
-            margin-top: 14px;
+            margin-top: 16px;
         }
     }
 

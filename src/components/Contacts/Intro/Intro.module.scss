@@ -25,6 +25,10 @@
             letter-spacing: -0.02em;
             color: #BEBEC8;
             margin-bottom: 15px;
+
+            &.mini {
+                margin-bottom: 5px;
+            }
         }
 
         &__phone {
@@ -144,8 +148,10 @@
         }
 
         &__desc {
+            color: #414042;
+
             p:not(:last-child) {
-                margin-bottom: 15px;
+                margin-bottom: 5px;
             }
         }
     }

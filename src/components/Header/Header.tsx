@@ -26,6 +26,7 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
     const [isFirsVisible, setIsFirsVisible] = useState<boolean>(true);
     const [isOpenSearch, setIsOpenSearch] = useState<boolean>(false);
     const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
+    const [btnToTopStatus, setBtnToTopStatus] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -94,11 +95,31 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
 
     useEffect(() => {
         isOpenMenu ? disableScrollbar() : enableScrollbar()
-    }, [isOpenMenu])
+    }, [isOpenMenu]);
+
+    useEffect(()=>{
+        window.addEventListener('scroll', handleScroll, {
+            passive: true
+        });
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(()=>{
         setIsOpenSearch(false);
     }, [router.query]);
+
+    const handleTop = ():void => {
+        window.scrollTo({
+            top: 100,
+            left: 100,
+            behavior: 'smooth'
+        });
+    }
+
+    const handleScroll = ():void => {
+         setBtnToTopStatus(window.pageYOffset >= 150);
+    }
 
     return (
         <header className={classNames(styles['header'], 'header')}>
@@ -144,6 +165,13 @@ const Header:React.FC<HeaderProps> = ({isOpenFilter, setIsOpenFilter}) => {
             <CallbackModal />
             
             <MasterModal />
+
+            <div className={classNames(styles['header-button'], btnToTopStatus ? styles['active'] : '')} onClick={handleTop}>
+                <svg width="17" height="28" viewBox="0 0 17 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 8.75L8.75 1L16.5 8.75" stroke="#A4AC14"/>
+                    <path d="M8.75 1.42969L8.75 27.263" stroke="#A4AC14"/>
+                </svg>
+            </div>
         </header>
     )
 }

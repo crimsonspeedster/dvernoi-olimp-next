@@ -4,6 +4,8 @@
         position: relative;
         z-index: 2;
         padding: 15px;
+        min-height: 250px;
+        display: flex;
 
         img {
             position: absolute;
@@ -29,10 +31,11 @@
 
     &__inner {
         border: 1px solid #A4AC14;
-        padding: 65px 70px;
+        padding: 0 70px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        flex-grow: 1;
     }
 
     &-content {

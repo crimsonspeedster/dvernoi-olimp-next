@@ -55,6 +55,8 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
         cartData
     } = props;
 
+    console.log(pageData);
+
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
     const {t} = useTranslation('common');
     const dispatch = useDispatch();
@@ -89,7 +91,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     id={pageData.id}
                     title={pageData.name}
                     slug={pageData.slug}
-                    attributes={pageData.attributes.filter((item:any) => item?.variation && item?.visible)}
+                    attributes={pageData.attributes}
                     sku={pageData.sku}
                     variation_array={pageData.variation_array}
                     type={pageData.type}
@@ -103,6 +105,7 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                 <SingleProductTabs
                     acf={pageData.acf}
                     description={pageData.description}
+                    characteristics={pageData.attributes.filter((item:any) => item.visible)}
                 />
 
                 {
@@ -120,37 +123,42 @@ const ProductPage:React.FC<ProductPageProps> = (props) => {
                     </section>
                 }
 
-                <If condition={products.length > 0}>
-                    <Then>
-                        <section className={styles['section-slider--same']}>
-                            <div className="container">
-                                <CardSlider
-                                    block_title={t('sameProducts')}
-                                    sliderItems={products}
-                                    perViewAmount={4}
-                                    cardType={'product'}
-                                    perCard={0}
-                                />
-                            </div>
-                        </section>
-                    </Then>
-                </If>
+                {
+                    products.length > 0 || reviewed_products.length > 0 &&
+                    <section className={styles['section--border']}>
+                        <If condition={products.length > 0}>
+                            <Then>
+                                <section className={styles['section-slider--same']}>
+                                    <div className="container">
+                                        <CardSlider
+                                            block_title={t('sameProducts')}
+                                            sliderItems={products}
+                                            perViewAmount={4}
+                                            cardType={'product'}
+                                            perCard={0}
+                                        />
+                                    </div>
+                                </section>
+                            </Then>
+                        </If>
 
-                <If condition={reviewed_products.length > 0}>
-                    <Then>
-                        <section className={styles['section-slider--reviewed']}>
-                            <div className="container">
-                                <CardSlider
-                                    block_title={t('productViewed')}
-                                    sliderItems={reviewed_products}
-                                    perViewAmount={4}
-                                    cardType={'product'}
-                                    perCard={0}
-                                />
-                            </div>
-                        </section>
-                    </Then>
-                </If>
+                        <If condition={reviewed_products.length > 0}>
+                            <Then>
+                                <section className={styles['section-slider--reviewed']}>
+                                    <div className="container">
+                                        <CardSlider
+                                            block_title={t('productViewed')}
+                                            sliderItems={reviewed_products}
+                                            perViewAmount={4}
+                                            cardType={'product'}
+                                            perCard={0}
+                                        />
+                                    </div>
+                                </section>
+                            </Then>
+                        </If>
+                    </section>
+                }
 
                 <BottomTabs />
             </Layout>

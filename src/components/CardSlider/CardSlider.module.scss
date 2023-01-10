@@ -97,13 +97,13 @@
 
     &-tab {
         font-size: 15px;
-        line-height: 160%;
+        line-height: 207%;
         letter-spacing: -0.02em;
         white-space: nowrap;
         color: #424255;
         cursor: pointer;
         transition: all ease .4s;
-        text-underline-offset: 6px;
+        text-underline-offset: 8px;
         text-decoration: underline;
         text-decoration-color: transparent;
 
@@ -120,6 +120,10 @@
 
     &-slider {
         margin-top: 45px;
+
+        &--tabs {
+            margin-top: 32px;
+        }
 
         &--destroyed {
 

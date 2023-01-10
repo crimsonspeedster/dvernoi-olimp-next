@@ -195,7 +195,7 @@ const CardSlider:React.FC<cardSliderProps> = (props) => {
             </If>
 
             <Swiper
-                className={classNames(styles['cardSlider-slider'], sliderItems.length <= perViewAmount ? styles['cardSlider-slider--destroyed'] : '', cardType)}
+                className={classNames(styles['cardSlider-slider'], sliderItems.length <= perViewAmount ? styles['cardSlider-slider--destroyed'] : '', tabs && tabs.length > 0 ? styles['cardSlider-slider--tabs'] : '', cardType)}
                 modules={[Navigation]}
                 spaceBetween={perCard}
                 slidesPerView={perViewAmount}

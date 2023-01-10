@@ -49,12 +49,14 @@ const ContactsInfo:React.FC<ContactsInfoProps> = ({zagolovok, povtoritel, showPh
     const [mapiframe, setMapiframe] = useState<string>('');
     const {t} = useTranslation('common');
 
+    console.log(povtoritel);
+
     useEffect(()=>{
         setMapiframe(povtoritel[0].magaziny[0].adres_iframe);
     }, [povtoritel]);
 
     const GeneratePhone = (data:NomerProps):ReactElement => (
-        <a className={styles['contacts-info-slider__item-content-link']} href={data.nomer_telefona.url}>{data.nomer_telefona.title}</a>
+        data.nomer_telefona.url && data.nomer_telefona.title ? <a className={styles['contacts-info-slider__item-content-link']} href={data.nomer_telefona.url}>{data.nomer_telefona.title}</a> : <></>
     );
 
     const GenerateShopCard = (data:ShopProps):ReactElement => (
@@ -70,53 +72,62 @@ const ContactsInfo:React.FC<ContactsInfoProps> = ({zagolovok, povtoritel, showPh
     const GenerateShop = (data:ShopProps):ReactElement => (
         <div className={styles['contacts-info-slider__item-content-elem']}>
             <div
-                className={styles['contacts-info-slider__item-content-title']}
+                className={classNames(styles['contacts-info-slider__item-content-title'], mapiframe === data.adres_iframe ? styles['active'] : '')}
                 onClick={()=>setMapiframe(data.adres_iframe)}
             >
                 {data.adres}
             </div>
 
             <div className={styles['contacts-info-slider__item-content-inner']}>
-                <div className={styles['contacts-info-slider__item-content-phones']}>
-                    <div className={styles['contacts-info-slider__item-content-icon']}>
-                        <svg>
-                            <use href={`${sprite.src}#phone`}/>
-                        </svg>
-                    </div>
+                {
+                    data.nomera.length > 0 &&
+                    <div className={styles['contacts-info-slider__item-content-phones']}>
+                        <div className={styles['contacts-info-slider__item-content-icon']}>
+                            <svg>
+                                <use href={`${sprite.src}#phone`}/>
+                            </svg>
+                        </div>
 
-                    <div className={styles['contacts-info-slider__item-content-wrapper']}>
-                        {
-                            data.nomera.map((item, index) => (
-                                <GeneratePhone
-                                    nomer_telefona={item.nomer_telefona}
-                                    key={index}
-                                />
-                            ))
-                        }
+                        <div className={styles['contacts-info-slider__item-content-wrapper']}>
+                            {
+                                data.nomera.map((item, index) => (
+                                    item.nomer_telefona.url && item.nomer_telefona.title ? <GeneratePhone
+                                        nomer_telefona={item.nomer_telefona}
+                                        key={index}
+                                    /> : <></>
+                                ))
+                            }
+                        </div>
                     </div>
-                </div>
+                }
 
-                <div className={styles['contacts-info-slider__item-content-email']}>
-                    <div className={styles['contacts-info-slider__item-content-icon']}>
-                        <svg>
-                            <use href={`${sprite.src}#mail`}/>
-                        </svg>
+                {
+                    data.emejl &&
+                    <div className={styles['contacts-info-slider__item-content-email']}>
+                        <div className={styles['contacts-info-slider__item-content-icon']}>
+                            <svg>
+                                <use href={`${sprite.src}#mail`}/>
+                            </svg>
+                        </div>
+
+                        <div className={styles['contacts-info-slider__item-content-wrapper']}>
+                            <a className={styles['contacts-info-slider__item-content-link']} href={`mailto:${data.emejl}`}>{data.emejl}</a>
+                        </div>
                     </div>
+                }
 
-                    <div className={styles['contacts-info-slider__item-content-wrapper']}>
-                        <a className={styles['contacts-info-slider__item-content-link']} href={`mailto:${data.emejl}`}>{data.emejl}</a>
+                {
+                    data.dni_raboty &&
+                    <div className={styles['contacts-info-slider__item-content-schedule']}>
+                        <div className={styles['contacts-info-slider__item-content-icon']}>
+                            <svg>
+                                <use href={`${sprite.src}#clock`}/>
+                            </svg>
+                        </div>
+
+                        <div className={styles['contacts-info-slider__item-content-wrapper']} dangerouslySetInnerHTML={{__html: data.dni_raboty}} />
                     </div>
-                </div>
-
-                <div className={styles['contacts-info-slider__item-content-schedule']}>
-                    <div className={styles['contacts-info-slider__item-content-icon']}>
-                        <svg>
-                            <use href={`${sprite.src}#clock`}/>
-                        </svg>
-                    </div>
-
-                    <div className={styles['contacts-info-slider__item-content-wrapper']} dangerouslySetInnerHTML={{__html: data.dni_raboty}} />
-                </div>
+                }
             </div>
         </div>
     );

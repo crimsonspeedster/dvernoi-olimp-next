@@ -10,6 +10,40 @@
         transform: translateY(-47.38px);
     }
 
+    &-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+        line-height: 1;
+        cursor: pointer;
+        border: 1px solid #A4AC14;
+        overflow: hidden;
+        z-index: -1;
+        visibility: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all ease .4s;
+        background-color: transparent;
+        opacity: 0;
+
+        &.active {
+            z-index: 150;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        &:hover {
+            background-color: #A4AC14;
+
+            path {
+                stroke: #fff;
+            }
+        }
+    }
+
     &-top {
         background: #333342;
         padding: 12px 0 13px;
@@ -23,7 +57,7 @@
         &__controls {
             display: flex;
             align-items: center;
-            margin: 0 55px 0 auto;
+            margin: 0 70px 0 auto;
 
             &-item {
                 display: flex;
@@ -133,10 +167,6 @@
 
                 &.active svg {
                     fill: #A4AC14;
-                }
-
-                &.disabled {
-                    opacity: .6;
                 }
 
                 @media (min-width: 1024px) {

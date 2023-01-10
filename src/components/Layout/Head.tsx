@@ -36,17 +36,13 @@ const HeadHTML: React.FC<HeadHTMLProps> = ({seoPage}) => {
         <Head>
             <title>{seoPage.title}</title>
 
-            <link rel="canonical" href={current_url}/>
-
-            {/*/!*{*!/*/}
-            {/*/!*    process.env.NEXT_PUBLIC_ENV_MODE === 'production' &&*!/*/}
-            {/*/!*    <script async type="text/javascript" src="//static.chartbeat.com/js/chartbeat.js"/>*!/*/}
-            {/*/!*}*!/*/}
-
             <meta property="og:locale" content={seoPage.og_locale}/>
             <meta property="og:type" content={seoPage.og_type}/>
             <meta property="og:title" content={seoPage.og_title} key="title"/>
+
+            <link rel="canonical" href={current_url}/>
             <meta name="robots" content="noindex, nofollow" />
+
             {
                 seoPage.description || seoPage.og_description &&
                 <meta property="og:description" content={seoPage.og_description ? seoPage.og_description : seoPage.description}/>
@@ -54,10 +50,6 @@ const HeadHTML: React.FC<HeadHTMLProps> = ({seoPage}) => {
 
             <meta property="og:url" content={current_url}/>
             <meta property="og:site_name" content={seoPage.og_site_name}/>
-
-            {/*{meta?.og?.published_time && <meta property="article:published_time" content={meta?.og?.published_time}/>}*/}
-
-            {/*{meta?.og?.modified_time && <meta property="article:modified_time" content={meta?.og?.modified_time}/>}*/}
 
             {
                 seoPage.og_image &&
@@ -72,7 +64,7 @@ const HeadHTML: React.FC<HeadHTMLProps> = ({seoPage}) => {
 
             {seoPage.description && <meta name="description" content={seoPage.description}/>}
 
-            {/*<link rel="shortcut icon" href="/favicon.ico"/>*/}
+            <link rel="shortcut icon" href="/favicon.ico" />
         </Head>
     );
 }

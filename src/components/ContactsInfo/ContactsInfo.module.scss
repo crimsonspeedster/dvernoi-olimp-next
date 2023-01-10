@@ -77,18 +77,20 @@
                     max-height: 100%;
                     padding-right: 25px;
 
-                    .simplebar-vertical {
+                    :global(.simplebar-vertical) {
                         width: 2px;
                         background: #BEBEC8;
+                    }
 
-                        .simplebar-scrollbar {
-                            width: 100%;
-                            background: #A4AC14;
-                        }
+                    :global(.simplebar-scrollbar) {
+                        width: 100%;
+                        background: #A4AC14;
                     }
                 }
 
                 &-elem {
+                    font-size: 15px;
+
                     & + & {
                         margin-top: 15px;
                         padding-top: 15px;
@@ -100,6 +102,16 @@
                     font-weight: 600;
                     font-size: 15px;
                     margin-bottom: 15px;
+                    transition: all ease .4s;
+
+                    &.active {
+                        color: #A4AC14;
+                    }
+
+                    &:hover:not(.active) {
+                        cursor: pointer;
+                        color: #A4AC14;
+                    }
                 }
 
                 &-wrapper {
@@ -135,7 +147,8 @@
                 }
 
                 &-icon {
-                    width: 20px;
+                    min-width: 20px;
+                    max-width: 20px;
                     height: 20px;
                     margin-right: 20px;
 
