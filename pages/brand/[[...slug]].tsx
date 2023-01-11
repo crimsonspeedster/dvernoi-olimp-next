@@ -125,18 +125,19 @@ const Brand:React.FC<BrandProps> = (props) => {
 
 export default Brand;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req, query}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, resolvedUrl, res, req, query}) => {
     const apolloClient = getApolloClient();
 
-    let filter_items:string[]|undefined = [];
+    const current_url_arr:string[] = resolvedUrl.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/');
+    const last_category_slug:string = current_url_arr.findIndex((item:string) => item === 'filter' || item === 'page') > 0 ? current_url_arr[current_url_arr.findIndex((item:string) => item === 'filter' || item === 'page')-1] : current_url_arr.slice(-1).toString();
 
-    const filterStartIndex:number = params?.slug?.indexOf('filter') ?? -1;
-    const filterEndIndex:number = params?.slug?.indexOf('apply') ?? -1;
-    const pageNum:number = params?.slug?.indexOf('page') ?? -1;
+    const filterStartIndex:number = current_url_arr.findIndex(item => item === 'filter');
+    const filterEndIndex:number = current_url_arr.findIndex(item => item === 'apply');
+    const pageNum:number =  current_url_arr.findIndex((item:string) => item === 'page');
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brend/`, {
         params: {
-            slug: params?.slug ?? '404',
+            slug: last_category_slug,
             lang: locale,
             _embed: true,
             acf_format: 'standard'
@@ -172,9 +173,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         };
     }));
 
-    if (!params?.slug?.[0] || resultDat.page.length !== 1)
+    if (!resultDat.page?.id)
     {
-        res.writeHead(301, { Location: '/404' });
+        res.writeHead(404, { Location: '/404' });
         res.end();
     }
 
@@ -203,17 +204,17 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
         consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
         per_page: process.env.NEXT_PUBLIC_ENV_PRODUCTS_PER_PAGE,
-        page: pageNum >= 0 && params?.slug && params?.slug?.length >= pageNum + 2 ? parseInt(params?.slug?.[pageNum+1]) : 1,
+        page: pageNum >= 0 ? parseInt(current_url_arr[pageNum+1] ?? '1') : 1,
         acf_format: 'standard',
         ...(query.order) && {order: query.order},
         ...(query.orderBy) && {orderby: query.orderBy}
     };
 
-    if (filterStartIndex >= 0 && filterEndIndex > 0)
+    if (filterStartIndex > 0 && filterEndIndex > 0)
     {
-        filter_items = params?.slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(',');
+        const filter_items:string[] = current_url_arr.slice(filterStartIndex+1, filterEndIndex);
 
-        filter_items?.map(item => item.split('-').filter(item => item !== 'is' && item !== 'or'))?.map(item => {
+        filter_items.map(item => item.split(/-is-|-or-/)).map(item => {
             categoryRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
             productsRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
 

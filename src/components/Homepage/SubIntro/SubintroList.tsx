@@ -26,7 +26,7 @@ const SubintroList: React.FC<SubintroListProps> = ({repeater}) => {
                         <div className={classNames(styles['main-subintro__item-links'], styles['filter-item__links'])}>
                             {
                                 item.subcategories && item.subcategories.map((category, index) => (
-                                    <Link key={index} className={classNames(styles['main-subintro__item-link'], styles['filter-item__link'])} href="/">
+                                    <Link key={index} className={classNames(styles['main-subintro__item-link'], styles['filter-item__link'])} href={`/${category.link ?? ''}`}>
                                         <span className={classNames(styles['main-subintro__item-text'], styles['filter-item__text'])}>{category.name}</span>
 
                                         <span className={classNames(styles['main-subintro__item-icon'], styles['filter-item__icon'])}>

@@ -395,40 +395,40 @@ const DeliveryIntro:React.FC<DeliveryIntroProps> = (props) => {
                             <article className={styles["delivery-block__article"]}>
                                 <div dangerouslySetInnerHTML={{__html: acf.company.description}} />
 
-                                <If condition={settingsCtx.shop_addresses}>
-                                    <Then>
-                                        <div className={styles['delivery-block__links']}>
-                                            <h4>{t('addressInfo')}:</h4>
+                                {/*<If condition={settingsCtx.shop_addresses}>*/}
+                                {/*    <Then>*/}
+                                {/*        <div className={styles['delivery-block__links']}>*/}
+                                {/*            <h4>{t('addressInfo')}:</h4>*/}
 
-                                            <div className={styles['delivery-block__links-inner']}>
-                                                {
-                                                    settingsCtx.shop_addresses.map((item:menuItemProp, i:number) => (
-                                                        <div key={i} className={styles['delivery-block__links-item']}>
-                                                            <div className={styles['delivery-block__links-title']}>{item.label}</div>
+                                {/*            <div className={styles['delivery-block__links-inner']}>*/}
+                                {/*                {*/}
+                                {/*                    settingsCtx.shop_addresses.map((item:menuItemProp, i:number) => (*/}
+                                {/*                        <div key={i} className={styles['delivery-block__links-item']}>*/}
+                                {/*                            <div className={styles['delivery-block__links-title']}>{item.label}</div>*/}
 
-                                                            {
-                                                                item.childItems.nodes.length &&
-                                                                <div className={styles['delivery-block__links-list']}>
-                                                                    {
-                                                                        item.childItems.nodes.map((subitem, k) => (
-                                                                            <Link key={k} className={styles['delivery-block__links-link']} href={subitem.url}>
-                                                                                <span className={styles['delivery-block__links-text']}>{subitem.label}</span>
+                                {/*                            {*/}
+                                {/*                                item.childItems.nodes.length &&*/}
+                                {/*                                <div className={styles['delivery-block__links-list']}>*/}
+                                {/*                                    {*/}
+                                {/*                                        item.childItems.nodes.map((subitem, k) => (*/}
+                                {/*                                            <Link key={k} className={styles['delivery-block__links-link']} href={subitem.url}>*/}
+                                {/*                                                <span className={styles['delivery-block__links-text']}>{subitem.label}</span>*/}
 
-                                                                                <span className={styles['delivery-block__links-icon']}>
-                                                                                    <svg><use href={`${sprite.src}#big-item-arrow`}/></svg>
-                                                                                </span>
-                                                                            </Link>
-                                                                        ))
-                                                                    }
-                                                                </div>
-                                                            }
-                                                        </div>
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                    </Then>
-                                </If>
+                                {/*                                                <span className={styles['delivery-block__links-icon']}>*/}
+                                {/*                                                    <svg><use href={`${sprite.src}#big-item-arrow`}/></svg>*/}
+                                {/*                                                </span>*/}
+                                {/*                                            </Link>*/}
+                                {/*                                        ))*/}
+                                {/*                                    }*/}
+                                {/*                                </div>*/}
+                                {/*                            }*/}
+                                {/*                        </div>*/}
+                                {/*                    ))*/}
+                                {/*                }*/}
+                                {/*            </div>*/}
+                                {/*        </div>*/}
+                                {/*    </Then>*/}
+                                {/*</If>*/}
                             </article>
                         </div>
                     </div>

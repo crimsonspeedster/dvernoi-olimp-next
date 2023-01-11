@@ -27,6 +27,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            max-height: 145px;
+            overflow: hidden;
+
+            img {
+                object-fit: contain;
+                object-position: center;
+            }
 
             & + & {
                 border-left: 1px solid #5A5A74;

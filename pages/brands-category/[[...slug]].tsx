@@ -89,12 +89,17 @@ const BrandsCategory:React.FC<BrandsCategoryProps> = (props) => {
 
 export default BrandsCategory;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, res, req, resolvedUrl}) => {
     const apolloClient = getApolloClient();
+
+    const current_url_arr:string[] = resolvedUrl.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/');
+    const last_category_slug:string = current_url_arr.findIndex((item:string) => item === 'filter' || item === 'page') > 0 ? current_url_arr[current_url_arr.findIndex((item:string) => item === 'filter' || item === 'page')-1] : current_url_arr.slice(-1).toString();
+
+    const pageNum:number =  current_url_arr.findIndex((item:string) => item === 'page');
 
     const pageRequest = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brands-category/`, {
         params: {
-            slug: params?.slug?.[0] ?? '',
+            slug: last_category_slug,
             lang: locale,
             acf_format: 'standard'
         }
@@ -103,13 +108,13 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
     const brands = axios.get(`${process.env.NEXT_PUBLIC_ENV_APP_API}/brend/`, {
         params: {
             per_page: process.env.NEXT_PUBLIC_ENV_BRAND_PER_PAGE,
-            page: !isNaN(parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1')) ? parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1') : 1,
+            page: pageNum >= 0 ? parseInt(current_url_arr[pageNum+1] ?? '1') : 1,
             parent: 0,
             lang: locale,
             _embed: true,
             order: 'asc',
             tax_name: 'brands-category',
-            category_slug: params?.slug?.[0] ?? '',
+            category_slug: last_category_slug,
         }
     })
 
@@ -143,7 +148,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
     const resultDat = await axios.all([pageRequest, settingsRequest, brands, brands_cats, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, brands, brands_cats, nonce, cart) {
         if (!page.data?.[0])
         {
-            res.writeHead(301, { Location: '/404' });
+            res.writeHead(404, { Location: '/404' });
             res.end();
         }
 
@@ -158,9 +163,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         };
     }));
 
-    if (!params?.slug?.[0] || resultDat.categories.filter((item: categoriesProps) => item.slug === params?.slug?.[0]).length === 0)
+    if (!resultDat.page?.id)
     {
-        res.writeHead(301, { Location: '/404' });
+        res.writeHead(404, { Location: '/404' });
         res.end();
     }
 
@@ -229,7 +234,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             total_pages: resultDat.total_pages,
             categories: resultDat.categories,
             posts: resultDat.posts,
-            page: parseInt(params?.slug?.[params?.slug?.length-1].toString() ?? '1'),
+            page: pageNum >= 0 ? parseInt(current_url_arr[pageNum+1] ?? '1') : 1,
             nonce: resultDat.nonce.nonce,
             cartData: resultDat.cart,
             ...(await serverSideTranslations(locale ?? '', ['common']))

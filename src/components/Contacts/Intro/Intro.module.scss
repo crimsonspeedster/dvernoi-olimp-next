@@ -220,3 +220,10 @@
         }
     }
 }
+.contacts-callback--top {
+    padding-top: 120px;
+
+    @media (max-width: 991px) {
+        padding-top: 80px;
+    }
+}

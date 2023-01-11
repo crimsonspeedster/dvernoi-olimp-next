@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import styles from './ProductCategoryContent.module.scss';
 import {useRouter} from "next/router";
-import {convertToDefaultAttrs, removeMultipleSlashes} from "@utils/stringHelper";
+import {convertToDefaultAttrs, joinFilterItems, removeMultipleSlashes} from "@utils/stringHelper";
 import Link from "next/link";
 import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {If, Then} from "react-if";
@@ -14,84 +14,80 @@ interface ProductCategoryFiltersProps {
 
 const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_filter}) => {
     const router = useRouter();
+
     const {t} = useTranslation('common');
 
-    let current_link:string = '';
 
-    if (router.route === "/brand/[[...slug]]")
-        current_link = `/brand/${router.query?.slug?.[0]}`;
-    else
-        current_link = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
-
-    const filterStartIndex:number = router.route === "/brand/[[...slug]]" ? router.query.slug?.indexOf('filter') ?? -1 : router.query.subcategory_slug?.indexOf('filter') ?? -1;
-    const filterEndIndex:number = router.route === "/brand/[[...slug]]" ?  router.query.slug?.indexOf('apply') ?? -1 : router.query.subcategory_slug?.indexOf('apply') ?? -1;
-
-    const [filterItems, setFilterItems] = useState<string[]|undefined>([]);
     const [itemsFilterIsOpen, setItemsFilterIsOpen] = useState<FilterAttrsProps[]>(category_filter);
+    const [currUrlArr, setCurrUrlArr] = useState<string[]>(router.asPath.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/'));
+    const [filterStartIndex, setFilterStartIndex] = useState<number>(currUrlArr.findIndex(item => item === 'filter'));
+    const [filterEndIndex, setFilterEndIndex] = useState<number>(currUrlArr.findIndex(item => item === 'apply'));
+    const [pageStartIndex, setPageStartIndex] = useState<number>(currUrlArr.findIndex(item => item === 'page'));
+    const [filterItems, setFilterItems] = useState<string[][]>(filterStartIndex > 0 && filterEndIndex > 0 ? currUrlArr.slice(filterStartIndex+1, filterEndIndex).map(item => item.split(/-is-|-or-/)) : []);
+    const [currUrl, setCurrUrl] = useState<string>(router.asPath);
+
+    useEffect(()=>{
+        const currArrUrl:string[] = router.asPath.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/');
+        const filterIndex:number = currArrUrl.findIndex(item => item === 'filter');
+        const applyIndex:number = currArrUrl.findIndex(item => item === 'apply');
+        const pageIndex:number = currArrUrl.findIndex(item => item === 'page');
+
+        setCurrUrlArr(currArrUrl);
+        setFilterStartIndex(filterIndex);
+        setFilterEndIndex(applyIndex);
+        setPageStartIndex(pageIndex);
+        setFilterItems(filterIndex > 0 && applyIndex > 0 ? currArrUrl.slice(filterIndex+1, applyIndex).map(item => item.split(/-is-|-or-/)) : []);
+
+        if (filterIndex > 0)
+        {
+            setCurrUrl(currArrUrl.slice(0, filterIndex).join('/'));
+        }
+        else if (pageIndex > 0)
+        {
+            setCurrUrl(currArrUrl.slice(0, pageIndex).join('/'));
+        }
+        else {
+            setCurrUrl(currArrUrl.join('/'))
+        }
+    }, [router.asPath]);
 
     useEffect(()=>{
         setItemsFilterIsOpen(category_filter);
     }, [category_filter]);
 
-    useEffect(()=>{
+    const removeAttrHandler = (category: string, cat_param: string):void => {
+        let elements:string[][] = filterItems;
+        let currentFilter:string[] = filterItems.filter((item) => item.includes(category))?.[0]?.filter((item) => item !== cat_param) ?? [];
 
-        if (filterStartIndex >= 0 && filterEndIndex > 0)
+        if (currentFilter.length > 1)
         {
-            setFilterItems(router.route === "/brand/[[...slug]]" ? router.query?.slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') : router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
+            currentFilter = currentFilter.filter(item => item !== cat_param);
+            elements = elements.filter((item, i) => item[0] !== category);
+            elements.push(currentFilter);
+        }
+        else
+        {
+            elements = elements.filter((item, i) => item[0] !== category);
+        }
+
+        if (!elements.map(item => joinFilterItems(item).join('')).join('/'))
+        {
+            router.push({
+                pathname: currUrl,
+                query: {
+                    ...(router.query?.order) && {'order': router.query.order},
+                    ...(router.query?.orderBy) && {'orderBy': router.query.orderBy},
+                }
+            });
         }
         else {
-            setFilterItems([]);
-        }
-
-    }, [filterEndIndex, filterStartIndex, router.query.slug, router.query.subcategory_slug]);
-
-    const removeAttrHandler = (category: string, cat_param: string):void => {
-        const linkItemsFilter:string|undefined = filterItems?.filter(item => item.includes(category))[0];
-        const indexInFilterItems:number = filterItems?.findIndex(item => item.includes(category)) ?? 0;
-        const linkItemsArray:string[] = linkItemsFilter ? linkItemsFilter.split('-') : [];
-
-        if (linkItemsFilter && !linkItemsArray.includes(cat_param))
-        {
-            filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter((item) => item !== linkItemsFilter), `${linkItemsFilter}-or-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${linkItemsFilter}-or-${cat_param}/apply`));
-        }
-        else if (!linkItemsFilter && !linkItemsArray.includes(cat_param)) {
-            filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems, `${category}-is-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${category}-is-${cat_param}/apply`));
-        }
-        else if (linkItemsArray.includes(cat_param)) {
-            const stringWithoutParam:string = linkItemsArray.filter(item => item !== cat_param).join('-');
-            let filtered_param:string|boolean = false;
-
-            if (stringWithoutParam === `${category}-is` || stringWithoutParam === `${category}-or`)
-            {
-                filtered_param = false;
-            }
-            else if (stringWithoutParam.endsWith('or'))
-            {
-                filtered_param = stringWithoutParam.slice(0, -3);
-            }
-            else if (stringWithoutParam.includes('is-or'))
-            {
-                filtered_param = stringWithoutParam.replace('is-or', 'is');
-            }
-            else if(stringWithoutParam.includes('or-or'))
-            {
-                filtered_param = stringWithoutParam.replace('or-or', 'or');
-            }
-
-            const filterString:string[]|undefined = filterItems?.filter((item, i) => i !== indexInFilterItems);
-
-            if (filtered_param)
-            {
-                filterString?.push(filtered_param);
-            }
-
-            if (filterString && filterString.length > 0)
-            {
-                router.push(removeMultipleSlashes(`${current_link}/filter/${filterString.join('/')}/apply`));
-            }
-            else {
-                router.push(`${current_link}`);
-            }
+            router.push({
+                pathname: `/${currUrl}/filter/${elements.map(item => joinFilterItems(item).join('')).join('/')}/apply`,
+                query: {
+                    ...(router.query?.order) && {'order': router.query.order},
+                    ...(router.query?.orderBy) && {'orderBy': router.query.orderBy},
+                }
+            });
         }
     }
 
@@ -130,9 +126,7 @@ const ProductCategoryFilters:React.FC<ProductCategoryFiltersProps> = ({category_
                 </div>
 
                 <button
-                    onClick={()=>{
-                        router.push(current_link);
-                    }}
+                    onClick={()=>router.push(`/${currUrl}`)}
                     className={styles['product-category-filters__btn']}
                 >{t('resetFilters')}</button>
             </div>

@@ -48,7 +48,9 @@ const ContactsTemplate:React.FC<ContactsTemplateProps> = (props) => {
                 seoBlockContent?.title && <SeoBlock seoBlock={seoBlockContent} />
             }
 
-            <ContactsCallback />
+            <ContactsCallback
+                classList={!seoBlockContent?.title ? styles['contacts-callback--top'] : ''}
+            />
         </>
     )
 }

@@ -67,8 +67,8 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
     }, [products]);
 
     const [pageTitle, setPageTitle] = useState<string>(pageData.name);
-    const [seoTitle, setSeoTitle] = useState<string>(t('seoTitle').replace('%s1', pageData.name).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK ?? ''));
-    const [seoDescription, setSeoDescription] = useState<string>(t('seoDescription').replace('%s1', pageData.name).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK ?? ''));
+    const [seoTitle, setSeoTitle] = useState<string>(t('seoTitle').replaceAll('%s1', pageData.name).replaceAll('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK ?? ''));
+    const [seoDescription, setSeoDescription] = useState<string>(t('seoDescription').replaceAll('%s1', pageData.name).replaceAll('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_LINK ?? ''));
 
     useEffect(()=>{
         let seoTitle:string = pageData.name,
@@ -93,8 +93,8 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
         seoDescription = seoTitle += ` ${choosedAttributes.join(', ')}`;
 
         setPageTitle(removeMultipleSpaces(`${pageData.name} ${choosedAttributes.join(', ')}`));
-        setSeoTitle(removeMultipleSpaces(t('seoTitle').replace('%s1', seoTitle).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE ?? '')));
-        setSeoDescription(removeMultipleSpaces(t('seoDescription').replace('%s1', seoDescription).replace('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE ?? '')));
+        setSeoTitle(removeMultipleSpaces(t('seoTitle').replaceAll('%s1', seoTitle).replaceAll('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE ?? '')));
+        setSeoDescription(removeMultipleSpaces(t('seoDescription').replaceAll('%s1', seoDescription).replaceAll('%s2', process.env.NEXT_PUBLIC_ENV_FRONTEND_TITLE ?? '')));
     }, [pageData.name, pageData.category_filter]);
 
     const breadcrumbs = pageData?.yoast_head_json?.schema['@graph']?.filter((item:any) => item['@type'] === 'BreadcrumbList')?.[0]?.itemListElement;
@@ -164,17 +164,18 @@ const SubCategory:React.FC<SubCategoryProps> = (props) => {
 
 export default SubCategory;
 
-export const getServerSideProps:GetServerSideProps = async ({locale, params, res, req, query}) => {
+export const getServerSideProps:GetServerSideProps = async ({locale, res, req, query, resolvedUrl}) => {
     const apolloClient = getApolloClient();
 
-    let filter_items:string[]|undefined = [];
+    const current_url_arr:string[] = resolvedUrl.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/');
+    const last_category_slug:string = current_url_arr.findIndex((item:string) => item === 'filter' || item === 'page') > 0 ? current_url_arr[current_url_arr.findIndex((item:string) => item === 'filter' || item === 'page')-1] : current_url_arr.slice(-1).toString();
 
-    const filterStartIndex:number = params?.subcategory_slug?.indexOf('filter') ?? -1;
-    const filterEndIndex:number = params?.subcategory_slug?.indexOf('apply') ?? -1;
-    const pageNum:number = params?.subcategory_slug?.indexOf('page') ?? -1;
+    const filterStartIndex:number = current_url_arr.findIndex(item => item === 'filter');
+    const filterEndIndex:number = current_url_arr.findIndex(item => item === 'apply');
+    const pageNum:number =  current_url_arr.findIndex((item:string) => item === 'page');
 
     const categoryRequestParams:any = {
-        slug: params?.subcategory_slug?.[0] === 'filter' || params?.subcategory_slug?.[0] === 'page' ? params?.slug : params?.subcategory_slug?.[0] ?? params?.slug,
+        slug: last_category_slug,
         lang: locale,
         consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
         consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
@@ -183,21 +184,21 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     const productsRequestParams:any = {
         lang: locale,
-        category: params?.subcategory_slug?.[0] === 'filter' || params?.subcategory_slug?.[0] === 'page' ? params?.slug : params?.subcategory_slug?.[0] ?? params?.slug,
+        category: last_category_slug,
         consumer_key: process.env.NEXT_PUBLIC_ENV_CONSUMER_KEY,
         consumer_secret: process.env.NEXT_PUBLIC_ENV_CONSUMER_SECRET,
         per_page: process.env.NEXT_PUBLIC_ENV_PRODUCTS_PER_PAGE,
-        page: pageNum >= 0 && params?.subcategory_slug && params?.subcategory_slug?.length >= pageNum + 2 ? parseInt(params?.subcategory_slug?.[pageNum+1]) : 1,
+        page: pageNum >= 0 ? parseInt(current_url_arr[pageNum+1] ?? '1') : 1,
         acf_format: 'standard',
         ...(query.order) && {order: query.order},
         ...(query.orderBy) && {orderby: query.orderBy}
     };
 
-    if (filterStartIndex >= 0 && filterEndIndex > 0)
+    if (filterStartIndex > 0 && filterEndIndex > 0)
     {
-        filter_items = params?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex).toString().split(',');
+        const filter_items:string[] = current_url_arr.slice(filterStartIndex+1, filterEndIndex);
 
-        filter_items?.map(item => item.split('-').filter(item => item !== 'is' && item !== 'or'))?.map(item => {
+        filter_items.map(item => item.split(/-is-|-or-/)).map(item => {
             categoryRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
             productsRequestParams[`filter[${item[0]}]`] = item.filter(subitem => subitem !== item[0]).join(', ');
 
@@ -237,9 +238,9 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
         return {
             settings: settings.data,
             pageData: category.data?.[0] ?? {},
-            products: products.data.products,
-            current_page: products.data.current_page,
-            total_pages: products.data.total_pages,
+            products: products.data?.products ?? [],
+            current_page: products.data?.current_page ?? 1,
+            total_pages: products.data?.total_pages ?? 1,
             nonce: nonce.data,
             cart: cart.data
         };
@@ -247,7 +248,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     if (!resData.pageData.id)
     {
-        res.writeHead(301, { Location: '/404' });
+        res.writeHead(404, { Location: '/404' });
         res.end();
     }
 
@@ -342,7 +343,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
             settingsData: resData.settings,
             menus,
             pageData: resData.pageData,
-            products: resData.products ?? [],
+            products: resData.products,
             current_page: resData.current_page,
             total_pages: resData.total_pages,
             reviewed_products,

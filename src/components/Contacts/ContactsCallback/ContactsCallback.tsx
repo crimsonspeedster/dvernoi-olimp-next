@@ -13,7 +13,12 @@ import loadSpinner from '@icons/load-spinner.gif';
 import Image from "next/image";
 import {useTranslation} from "next-i18next";
 
-const ContactsCallback = () => {
+
+interface ContactsCallbackProps {
+    classList?: string
+}
+
+const ContactsCallback:React.FC<ContactsCallbackProps> = ({classList}) => {
     const {t} = useTranslation('common');
 
     const validateFormSchema = Yup.object().shape({
@@ -36,7 +41,7 @@ const ContactsCallback = () => {
 
     return (
         <>
-            <div className={styles['contacts-callback']}>
+            <div className={classNames(styles['contacts-callback'], classList)}>
                 <div className="container">
                     <div className={styles['contacts-callback__title']}>{t('orderCallBack')}</div>
 

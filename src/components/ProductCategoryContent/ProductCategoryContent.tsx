@@ -34,8 +34,6 @@ const ProductCategoryContent: React.FC<ProductCategoryContentProps> = (props) =>
     const [isModalExist, setIsModalExist] = useState<boolean>(false);
 
     useEffect(() => {
-        // gsap.registerPlugin(ScrollTrigger)
-
         setIsModalExist(window.innerWidth<= 649);
     }, [])
 

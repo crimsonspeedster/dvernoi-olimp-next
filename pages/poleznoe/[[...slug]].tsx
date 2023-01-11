@@ -137,7 +137,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, req
     const resData = await axios.all([pageRequest, settingsRequest, posts, categories, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, posts, categories, nonce, cart) {
         if (!page.data?.[0]?.id)
         {
-            res.writeHead(301, { Location: '/404' });
+            res.writeHead(404, { Location: '/404' });
             res.end();
         }
 

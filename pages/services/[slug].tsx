@@ -144,7 +144,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     if (!resultData.page.id)
     {
-        res.writeHead(301, { Location: '/404' });
+        res.writeHead(404, { Location: '/404' });
         res.end();
     }
 

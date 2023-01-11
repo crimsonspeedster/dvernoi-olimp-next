@@ -14,7 +14,8 @@ export interface categoriesProps {
     name: string,
     slug: string,
     taxonomy: string,
-    featured_image?: string
+    featured_image?: string,
+    link: string
 }
 
 const BlogIntroCategories:React.FC<BlogIntroCategoriesProps> = ({categories}) => {

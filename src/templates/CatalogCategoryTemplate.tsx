@@ -5,6 +5,9 @@ import {categoriesProps} from "@components/Blog/Intro/BlogIntroCategories";
 import ProductCategoryContent from "@components/ProductCategoryContent/ProductCategoryContent";
 import {FilterAttrsProps} from "@components/ProductCategoryContent/ProductCategorySidebar";
 import {ProductCardProps} from "@components/Cards/ProductCard/ProductCard";
+import SingleBrandIntro from "@components/SingleBrand/Intro/Intro";
+import {If, Then} from "react-if";
+import SingleBrandCollection from "@components/SingleBrand/SingleBrandCollection/SingleBrandCollaction";
 
 
 interface CatalogCategoryTemplateProps {
@@ -40,6 +43,17 @@ const CatalogCategoryTemplate:React.FC<CatalogCategoryTemplateProps> = (props) =
             <Breadcrumbs
                 list={breadcrumbs}
             />
+
+            {/*<SingleBrandIntro*/}
+            {/*    title={title}*/}
+            {/*    content={content}*/}
+            {/*    image={image}*/}
+            {/*/>*/}
+
+            {/*<SingleBrandCollection*/}
+            {/*    title={collectionTitle}*/}
+            {/*    posts={posts}*/}
+            {/*/>*/}
 
             <ProductCategoryIntro
                 title={pageTitle}

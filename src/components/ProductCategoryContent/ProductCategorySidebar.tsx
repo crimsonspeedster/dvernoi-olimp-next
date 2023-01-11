@@ -8,12 +8,13 @@ import styles from './ProductCategoryContent.module.scss';
 import classNames from "classnames";
 import {If, Then} from "react-if";
 import {useRouter} from "next/router";
-import {convertToDefaultAttrs, removeMultipleSlashes} from "@utils/stringHelper";
+import {convertToDefaultAttrs, joinFilterItems, removeMultipleSlashes} from "@utils/stringHelper";
 import Nouislider from "nouislider-react";
 import 'nouislider/distribute/nouislider.css'
 import {PriceRangeProps} from "@root/templates/CatalogCategoryTemplate";
 import {DebounceInput} from "react-debounce-input";
 import {useTranslation} from "next-i18next";
+import ParamFilter from "@components/ProductCategoryContent/ProductCategoryParam";
 
 
 interface ProductCategorySidebarProps {
@@ -53,288 +54,47 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
     const router = useRouter();
     const {t} = useTranslation('common');
 
-    let current_link:string = '';
-
-    if (router.route === "/brand/[[...slug]]")
-        current_link = `/brand/${router.query?.slug?.[0]}`;
-    else
-        current_link = router.query.subcategory_slug?.[0] && router.query.subcategory_slug?.[0] !== 'filter' ? `/${router.query.slug}/${router.query.subcategory_slug[0]}` : `/${router.query.slug}`;
-
-    const filterStartIndex:number = router.route === "/brand/[[...slug]]" ? router.query.slug?.indexOf('filter') ?? -1 : router.query.subcategory_slug?.indexOf('filter') ?? -1;
-    const filterEndIndex:number = router.route === "/brand/[[...slug]]" ?  router.query.slug?.indexOf('apply') ?? -1 : router.query.subcategory_slug?.indexOf('apply') ?? -1;
-
-    const [filterItems, setFilterItems] = useState<string[]|undefined>(router.route === "/brand/[[...slug]]" ? router.query?.slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') ?? [] : router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') ?? []);
-
-    const [minPriceVal, setMinPriceVal] = useState<number>(parseInt(priceRange?.min_price ?? '0'));
-    const [maxPriceVal, setMaxPriceVal] = useState<number>(parseInt(priceRange?.max_price ?? '0'));
-
-    const [currentMinVal, setCurrentMinVal] = useState<number>(parseInt(priceRange?.min_price ?? '0'));
-    const [currentMaxVal, setCurrentMaxVal] = useState<number>(parseInt(priceRange?.max_price ?? '0'));
-
     const [globalFilterIsOpen, setGlobalFilterIsOpen] = useState<boolean>(false);
     const [itemsFilterIsOpen, setItemsFilterIsOpen] = useState<FilterAttrsProps[]>(category_filter);
+    const [currUrlArr, setCurrUrlArr] = useState<string[]>(router.asPath.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/'));
+    const [filterStartIndex, setFilterStartIndex] = useState<number>(currUrlArr.findIndex(item => item === 'filter'));
+    const [filterEndIndex, setFilterEndIndex] = useState<number>(currUrlArr.findIndex(item => item === 'apply'));
+    const [pageStartIndex, setPageStartIndex] = useState<number>(currUrlArr.findIndex(item => item === 'page'));
+    const [filterItems, setFilterItems] = useState<string[][]>(filterStartIndex > 0 && filterEndIndex > 0 ? currUrlArr.slice(filterStartIndex+1, filterEndIndex).map(item => item.split(/-is-|-or-/)) : []);
+    const [currUrl, setCurrUrl] = useState<string>(router.asPath);
 
     useEffect(()=>{
-        setMinPriceVal(parseInt(priceRange?.min_price ?? '0'));
-        setMaxPriceVal(parseInt(priceRange?.max_price ?? '0'));
+        const currArrUrl:string[] = router.asPath.split(/[?#]/)[0].split('/').filter(item => item !== '' && item !== '/');
+        const filterIndex:number = currArrUrl.findIndex(item => item === 'filter');
+        const applyIndex:number = currArrUrl.findIndex(item => item === 'apply');
+        const pageIndex:number = currArrUrl.findIndex(item => item === 'page');
 
-        setCurrentMinVal(parseInt(priceRange?.min_price ?? '0'));
-        setCurrentMaxVal(parseInt(priceRange?.max_price ?? '0'));
-    }, [priceRange]);
+        setCurrUrlArr(currArrUrl);
+        setFilterStartIndex(filterIndex);
+        setFilterEndIndex(applyIndex);
+        setPageStartIndex(pageIndex);
+        setFilterItems(filterIndex > 0 && applyIndex > 0 ? currArrUrl.slice(filterIndex+1, applyIndex).map(item => item.split(/-is-|-or-/)) : []);
+
+        if (filterIndex > 0)
+        {
+            setCurrUrl(currArrUrl.slice(0, filterIndex).join('/'));
+        }
+        else if (pageIndex > 0)
+        {
+            setCurrUrl(currArrUrl.slice(0, pageIndex).join('/'));
+        }
+        else {
+            setCurrUrl(currArrUrl.join('/'))
+        }
+    }, [router.asPath]);
 
     useEffect(()=>{
         setItemsFilterIsOpen(category_filter);
     }, [category_filter]);
 
     useEffect(()=>{
-
-        if (filterStartIndex >= 0 && filterEndIndex > 0)
-        {
-            setFilterItems(router.route === "/brand/[[...slug]]" ? router.query?.slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(',') : router.query?.subcategory_slug?.slice(filterStartIndex+1, filterEndIndex)?.toString()?.split(','));
-
-            let min_price:string = '';
-            let max_price:string = '';
-
-            if (router.route === "/brand/[[...slug]]")
-            {
-                min_price = [router?.query?.slug]?.flat()?.filter(item => item?.includes('min_price'))?.[0] ?? '';
-                max_price = [router?.query?.slug]?.flat()?.filter(item => item?.includes('max_price'))?.[0] ?? '';
-            }
-            else
-            {
-                min_price = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('min_price'))?.[0] ?? '';
-                max_price = [router?.query?.subcategory_slug]?.flat()?.filter(item => item?.includes('max_price'))?.[0] ?? '';
-            }
-
-            if (min_price)
-            {
-                setCurrentMinVal(parseInt(min_price.replace('min_price-is-', '')));
-            }
-
-            if (max_price)
-            {
-                setCurrentMaxVal(parseInt(max_price.replace('max_price-is-', '')));
-            }
-        }
-        else {
-            setFilterItems([]);
-        }
-
-    }, [filterEndIndex, filterStartIndex, router.query.slug, router.query.subcategory_slug]);
-
-    useEffect(()=>{
         if (globalFilterIsOpen) setItemsFilterIsOpen(prev => prev.map(item => {item.isOpen = true; return item}));
     }, [globalFilterIsOpen]);
-
-    const handleClick = (category: string, cat_param: string):void => {
-        const linkItemsFilter:string|undefined = filterItems?.filter(item => item.includes(category))[0];
-        const indexInFilterItems:number = filterItems?.findIndex(item => item.includes(category)) ?? 0;
-        const linkItemsArray:string[] = linkItemsFilter ? linkItemsFilter.split('-') : [];
-
-        if (linkItemsFilter && !linkItemsArray.includes(cat_param))
-        {
-            if (category === 'min_price' || category === 'max_price')
-            {
-                filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter(item => !item.includes(category)), `${category}-is-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${category}-is-${cat_param}/apply`));
-            }
-            else {
-                filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems.filter((item) => item !== linkItemsFilter), `${linkItemsFilter}-or-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${linkItemsFilter}-or-${cat_param}/apply`));
-            }
-        }
-        else if (!linkItemsFilter && !linkItemsArray.includes(cat_param)) {
-            filterItems && filterItems.length > 0 ? router.push(removeMultipleSlashes(`${current_link}/filter/${[...filterItems, `${category}-is-${cat_param}`]?.join('/')}/apply`)) : router.push(removeMultipleSlashes(`${current_link}/filter/${category}-is-${cat_param}/apply`));
-        }
-        else if (linkItemsArray.includes(cat_param)) {
-            const stringWithoutParam:string = linkItemsArray.filter(item => item !== cat_param).join('-');
-            let filtered_param:string|boolean = false;
-
-            if (stringWithoutParam === `${category}-is` || stringWithoutParam === `${category}-or`)
-            {
-                filtered_param = false;
-            }
-            else if (stringWithoutParam.endsWith('or'))
-            {
-                filtered_param = stringWithoutParam.slice(0, -3);
-            }
-            else if (stringWithoutParam.includes('is-or'))
-            {
-                filtered_param = stringWithoutParam.replace('is-or', 'is');
-            }
-            else if(stringWithoutParam.includes('or-or'))
-            {
-                filtered_param = stringWithoutParam.replace('or-or', 'or');
-            }
-
-            const filterString:string[]|undefined = filterItems?.filter((item, i) => i !== indexInFilterItems);
-
-            if (filtered_param)
-            {
-                filterString?.push(filtered_param);
-            }
-
-            if (filterString && filterString.length > 0)
-            {
-                router.push(removeMultipleSlashes(`${current_link}/filter/${filterString.join('/')}/apply`));
-            }
-            else {
-                router.push(`${current_link}`);
-            }
-        }
-    }
-
-    const handleStatus = (slug: string):void => {
-        setItemsFilterIsOpen(itemsFilterIsOpen.map(item => {item.slug === slug ? item.isOpen = !item.isOpen : null; return item}));
-        setGlobalFilterIsOpen(false);
-    }
-
-    const ParamFilter = (attribute: FilterAttrsProps):ReactElement => {
-        switch (attribute.slug)
-        {
-            case 'pa_price':
-                return (
-                    <>
-                        <div className={styles['product-category-sidebar__item']}>
-                            <div
-                                className={classNames(styles['product-category-sidebar__head'], attribute?.isOpen ? styles['open'] : '')}
-                                onClick={() => handleStatus(attribute.slug)}
-                            >
-                                <div className={styles['product-category-sidebar__head-text']}>{attribute.name}</div>
-
-                                <div className={styles['product-category-sidebar__head-icon']}>
-                                    <svg>
-                                        <use href={`${sprite.src}#big-item-arrow`}/>
-                                    </svg>
-                                </div>
-                            </div>
-
-                            <div className={styles['product-category-sidebar__body']}>
-                                <Collapse isOpened={attribute?.isOpen ?? true}>
-                                    <div className={styles['product-category-sidebar__body-inner']}>
-                                        {
-                                            attribute.values.map((item, i) => (
-                                                <div
-                                                    key={i}
-                                                    className={styles['product-category-sidebar__body-item']}
-                                                    onClick={()=>handleClick(attribute.slug, item.slug)}
-                                                >
-                                                    <input className={styles['product-category-sidebar__body-check']} type="checkbox" defaultChecked={item.isChoosed} id={item.slug} />
-
-                                                    <label className={styles['product-category-sidebar__body-label']} htmlFor={item.slug}>
-                                                    <span className={styles['product-category-sidebar__body-icon']}>
-                                                        <svg><use href={`${sprite.src}#check`}/></svg>
-                                                    </span>
-
-                                                        <span className={styles['product-category-sidebar__body-text']}>{item.value}</span>
-                                                    </label>
-                                                </div>
-                                            ))
-                                        }
-
-                                        <div className={classNames(styles['product-category-sidebar__body-item'], styles['product-category-sidebar__body-item--price'])}>
-                                            <div className={styles['product-category-sidebar__body-inp-wrapper']}>
-                                                <DebounceInput
-                                                    className={styles['product-category-sidebar__body-inp']}
-                                                    minLength={0}
-                                                    autoComplete={'off'}
-                                                    debounceTimeout={500}
-                                                    min={minPriceVal}
-                                                    max={maxPriceVal-1}
-                                                    value={currentMinVal}
-                                                    onChange={e => {
-                                                        setCurrentMinVal(parseInt(e.target.value ?? '1'));
-                                                        handleClick('min_price', e.target.value ?? '1');
-                                                    }}
-                                                />
-                                            </div>
-
-                                            <div className={styles['product-category-sidebar__body-inp-wrapper']}>
-                                                <DebounceInput
-                                                    className={styles['product-category-sidebar__body-inp']}
-                                                    autoComplete="off"
-                                                    debounceTimeout={500}
-                                                    value={currentMaxVal}
-                                                    max={maxPriceVal}
-                                                    min={minPriceVal+1}
-                                                    onChange={e => {
-                                                        setCurrentMaxVal(parseInt(e.target.value ?? '1'));
-                                                        handleClick('max_price', e.target.value ?? '1');
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className={classNames(styles['product-category-sidebar__body-item'], styles['product-category-sidebar__body-item--slider'])}>
-                                            <Nouislider
-                                                range={{min: minPriceVal, max: maxPriceVal}}
-                                                start={[currentMinVal, currentMaxVal]}
-                                                connect
-                                                step={1}
-                                                onChange={(value)=>{
-                                                    setCurrentMinVal(parseInt(value[0]));
-                                                    setCurrentMaxVal(parseInt(value[1]));
-
-                                                    if (parseInt(value[0]) !== currentMinVal)
-                                                    {
-                                                        handleClick('min_price', parseInt(value[0]).toString());
-                                                    }
-                                                    else if (parseInt(value[1]) !== currentMaxVal)
-                                                    {
-                                                        handleClick('max_price', parseInt(value[1]).toString());
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </Collapse>
-                            </div>
-                        </div>
-                    </>
-                );
-            default:
-                return (
-                    <div className={styles['product-category-sidebar__item']}>
-                        <div
-                            className={classNames(styles['product-category-sidebar__head'], attribute?.isOpen ? styles['open'] : '')}
-                            onClick={() => handleStatus(attribute.slug)}
-                        >
-                            <div className={styles['product-category-sidebar__head-text']}>{attribute.name}</div>
-
-                            <div className={styles['product-category-sidebar__head-icon']}>
-                                <svg>
-                                    <use href={`${sprite.src}#big-item-arrow`}/>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <div className={styles['product-category-sidebar__body']}>
-                            <Collapse isOpened={attribute?.isOpen ?? true}>
-                                <div className={styles['product-category-sidebar__body-inner']}>
-                                    {
-                                        attribute.values.map((item, i) => (
-                                            <div
-                                                key={i}
-                                                className={styles['product-category-sidebar__body-item']}
-                                                onClick={()=>handleClick(attribute.slug, item.slug)}
-                                            >
-                                                <input className={styles['product-category-sidebar__body-check']} type="checkbox" defaultChecked={item.isChoosed} id={item.slug} />
-
-                                                <label className={styles['product-category-sidebar__body-label']} htmlFor={item.slug}>
-                                                    <span className={styles['product-category-sidebar__body-icon']}>
-                                                        <svg><use href={`${sprite.src}#check`}/></svg>
-                                                    </span>
-
-                                                    <span className={styles['product-category-sidebar__body-text']}>{item.value}</span>
-                                                </label>
-                                            </div>
-                                        ))
-                                    }
-                                </div>
-                            </Collapse>
-                        </div>
-                    </div>
-                );
-        }
-    };
 
     return (
         <aside className={classNames(styles['product-category-sidebar'], isOpenFilter ? styles['open'] : '')}>
@@ -356,9 +116,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                             </div>
 
                             <button
-                                onClick={()=>{
-                                    router.push(current_link);
-                                }}
+                                onClick={()=>router.push(`/${currUrl}`)}
                                 className={styles['product-category-sidebar__header-btn']}
                             >
                                 {t('resetFilters')}
@@ -378,17 +136,20 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                                 </Then>
                             </If>
 
-                            <If condition={itemsFilterIsOpen.length > 0}>
+                            <If condition={category_filter.length > 0}>
                                 <Then>
                                     {
-                                        itemsFilterIsOpen.map((item, i) => (
+                                        category_filter.map((item, i) => (
                                             <ParamFilter
                                                 key={i}
-                                                name={item.name}
-                                                slug={item.slug}
-                                                values={item.values}
-                                                isOpen={item.isOpen}
-                                                isChoosed={item.isChoosed}
+                                                attribute={item}
+                                                filterItems={filterItems}
+                                                priceRange={priceRange}
+                                                itemsFilterIsOpen={itemsFilterIsOpen}
+                                                setItemsFilterIsOpen={setItemsFilterIsOpen}
+                                                setGlobalFilterIsOpen={setGlobalFilterIsOpen}
+                                                currUrlArr={currUrlArr}
+                                                currUrl={currUrl}
                                             />
                                         ))
                                     }
@@ -398,7 +159,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
                     </Then>
                 </If>
 
-                <If condition={!isSearchPage && itemsFilterIsOpen.length > 0}>
+                <If condition={!isSearchPage && category_filter.length > 0}>
                     <Then>
                         <div className={styles['product-category-sidebar__btns']}>
                             <div className={styles['product-category-sidebar__btn-wrapper']}>
@@ -412,7 +173,7 @@ const ProductCategorySidebar:React.FC<ProductCategorySidebarProps> = (props) => 
 
                             <div className={styles['product-category-sidebar__btn-wrapper']}>
                                 <button
-                                    onClick={()=>{router.push(current_link)}}
+                                    onClick={()=>router.push(`/${currUrl}`)}
                                     className={classNames(styles['product-category-sidebar__btn'], styles['product-category-sidebar__btn--cancel'])}
                                 >{t('resetFilters')}</button>
                             </div>

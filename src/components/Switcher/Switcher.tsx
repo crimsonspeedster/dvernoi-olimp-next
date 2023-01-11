@@ -20,8 +20,6 @@ const Switcher = () => {
     const langsCtx = context.translates;
     const router = useRouter();
 
-    console.log(langsCtx);
-
     return (
         <div className={styles['switcher']}>
             {

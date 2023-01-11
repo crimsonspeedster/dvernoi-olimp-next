@@ -142,7 +142,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
     const resultDat = await axios.all([pageRequest, settingsRequest, posts, categories, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, posts, categories, nonce, cart) {
         if (!page.data?.[0])
         {
-            res.writeHead(301, { Location: '/404' });
+            res.writeHead(404, { Location: '/404' });
             res.end();
         }
 
@@ -159,7 +159,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     if (!params?.slug?.[0] || resultDat.categories.filter((item: categoriesProps) => item.slug === params?.slug?.[0]).length === 0)
     {
-        res.writeHead(301, { Location: '/404' });
+        res.writeHead(404, { Location: '/404' });
         res.end();
     }
 

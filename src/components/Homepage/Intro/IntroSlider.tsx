@@ -19,7 +19,7 @@ export interface IntroSliderProps {
 }
 
 export interface sliderProps {
-    description: string,
+    description?: string,
     image: string,
     link?: LinkProps,
     title: string
@@ -58,7 +58,10 @@ const IntroSlider:React.FC<IntroSliderProps> = ({slider}) => {
                             <div className={styles['main-intro__slider-info']}>
                                 <h2 className={styles['main-intro__slider-title']}>{item.title}</h2>
 
-                                <div className={styles['main-intro__slider-desc']} dangerouslySetInnerHTML={{__html: item.description}} />
+                                {
+                                    item.description &&
+                                    <div className={styles['main-intro__slider-desc']} dangerouslySetInnerHTML={{__html: item.description}} />
+                                }
 
                                 {
                                     item.link && item.link.title &&

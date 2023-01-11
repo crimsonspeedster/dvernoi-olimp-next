@@ -15,8 +15,7 @@ export interface PartnersProps {
 }
 
 interface repeaterProps {
-    image: PhotoProps,
-    link: string
+    image: PhotoProps
 }
 
 const Partners:React.FC<PartnersProps> = ({title, repeater}) => (

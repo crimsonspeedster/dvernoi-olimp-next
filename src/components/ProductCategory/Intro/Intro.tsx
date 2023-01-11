@@ -62,7 +62,7 @@ const ProductCategoryIntro:React.FC<ProductCategoryIntroProps> = ({title, childr
                                 {
                                     childrenCategories.map((item, i) => (
                                         <SwiperSlide key={i} className={classNames(styles['product-category-intro-slider__item'], childrenCategories.length > 7 ? '' : styles['default'])}>
-                                            <Link className={styles['product-category-intro-slider__link']} href={`/${router.query.slug}/${item.slug}`} />
+                                            <Link className={styles['product-category-intro-slider__link']} href={item.link ?? '/'} />
 
                                             {
                                                 item.featured_image &&

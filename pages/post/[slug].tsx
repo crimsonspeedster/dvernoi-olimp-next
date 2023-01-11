@@ -164,7 +164,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
     const resultDat = await axios.all([pageRequest, settingsRequest, nonceRequest, cartRequest]).then(axios.spread(function(page, settings, nonce, cart) {
         if (!page.data?.[0])
         {
-            res.writeHead(301, { Location: '/404' });
+            res.writeHead(404, { Location: '/404' });
             res.end();
         }
 
@@ -178,7 +178,7 @@ export const getServerSideProps:GetServerSideProps = async ({locale, params, res
 
     if (!params?.slug?.[0] || resultDat.page.length !== 1)
     {
-        res.writeHead(301, { Location: '/404' });
+        res.writeHead(404, { Location: '/404' });
         res.end();
     }
 
